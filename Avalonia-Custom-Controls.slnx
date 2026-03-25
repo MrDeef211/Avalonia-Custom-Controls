@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Common.Controls/Common.Controls.csproj" />
+  <Project Path="Demonstrations.Desktop/Demonstrations.Desktop.csproj" />
+</Solution>

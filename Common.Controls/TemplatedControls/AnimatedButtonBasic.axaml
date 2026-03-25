@@ -1,0 +1,57 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Common.Controls.TemplatedControls">
+  
+  <Design.PreviewWith>
+    <StackPanel Width="400" Spacing="10">      
+        <StackPanel Background="{DynamicResource SystemRegionBrush}">
+          <controls:AnimatedButtonBasic />
+        </StackPanel>
+    </StackPanel>
+  </Design.PreviewWith>
+ 
+  <ControlTheme x:Key="{x:Type controls:AnimatedButtonBasic}" TargetType="controls:AnimatedButtonBasic">
+    <Setter Property="Background" Value="#3498db" />
+    <Setter Property="Padding" Value="20,7" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+
+    <Setter Property="Transitions">
+        <Transitions>
+        <BrushTransition Property="Background" Duration="0:0:0.03" /> 
+        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.01" />
+      </Transitions>
+  </Setter>
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                RenderTransform="{TemplateBinding RenderTransform}"
+                Padding="{TemplateBinding Padding}"
+                VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                CornerRadius="10"
+                Cursor="Hand">
+            
+            <TextBlock Text="{TemplateBinding Content}" 
+                       Foreground="White"
+                       HorizontalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:not(:pressed):canPressed:pointerover">
+        <Setter Property="Background" Value="#2980b9" />
+        <Setter Property="RenderTransform" Value="scale(1.05)" />
+    </Style>
+
+    <Style Selector="^:canPressed:pressed">
+        <Setter Property="Background" Value="#1f6391" />
+        <Setter Property="RenderTransform" Value="scale(0.975)" />
+    </Style>
+
+    <Style Selector="^:not(:canPressed)">
+        <Setter Property="Background" Value="#555555" />
+    </Style>
+
+  </ControlTheme>
+</ResourceDictionary>
