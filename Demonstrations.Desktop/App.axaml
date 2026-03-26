@@ -12,12 +12,13 @@
     <Application.Resources>
     <ResourceDictionary>
         <ResourceDictionary.MergedDictionaries>
-            <ResourceInclude Source="avares://Common.Controls/TemplatedControls/AnimatedButtonBasic.axaml" />
+            <ResourceInclude Source="avares://Common.Controls/TemplatedControls/AnimatedButtonBasic.axaml" /> 
         </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
 </Application.Resources>
   
     <Application.Styles>
         <FluentTheme />
+         <StyleInclude Source="avares://Common.Controls/TemplatedControls/Toolbar.axaml" />
     </Application.Styles>
 </Application>

@@ -15,6 +15,7 @@
     <Setter Property="Padding" Value="20,7" />
     <Setter Property="VerticalAlignment" Value="Center" />
 
+
     <Setter Property="Transitions">
         <Transitions>
         <BrushTransition Property="Background" Duration="0:0:0.03" /> 
@@ -34,12 +35,13 @@
             
             <TextBlock Text="{TemplateBinding Content}" 
                        Foreground="White"
-                       HorizontalAlignment="Center" />
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="{TemplateBinding VerticalAlignment}"/>
         </Border>
       </ControlTemplate>
     </Setter>
 
-    <Style Selector="^:not(:pressed):canPressed:pointerover">
+    <Style Selector="^:canPressed:not(:pressed):pointerover">
         <Setter Property="Background" Value="#2980b9" />
         <Setter Property="RenderTransform" Value="scale(1.05)" />
     </Style>
@@ -50,7 +52,7 @@
     </Style>
 
     <Style Selector="^:not(:canPressed)">
-        <Setter Property="Background" Value="#555555" />
+        <Setter Property="Background" Value="#858585" />
     </Style>
 
   </ControlTheme>
