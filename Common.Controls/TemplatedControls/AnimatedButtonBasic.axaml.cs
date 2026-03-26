@@ -12,7 +12,7 @@ namespace Common.Controls.TemplatedControls;
 public class AnimatedButtonBasic : TemplatedControl
 {
     public static readonly StyledProperty<string> ContentProperty =
-    AvaloniaProperty.Register<AnimatedButtonBasic, string>(nameof(Content), "Button");
+        AvaloniaProperty.Register<AnimatedButtonBasic, string>(nameof(Content), "Button");
 
 
     public static readonly StyledProperty<ICommand?> CommandProperty =

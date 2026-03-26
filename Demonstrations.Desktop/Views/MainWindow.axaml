@@ -14,26 +14,53 @@
        
         <vm:MainWindowViewModel/>
     </Design.DataContext>
+    
+    <DockPanel>
+        <controls:Toolbar
+            Background="#FFFFFF"
+            BorderBrush="#FFFFFF"
+            DockPanel.Dock="Top">
+            <Button Command="{Binding TestCommand}">
+                <PathIcon Data="M300, 300L100, 300L200, 100Z"
+                    Foreground="Black" 
+                    Width="16" Height="16" />
+            </Button>
 
-    <controls:Toolbar
-        Background="#FFFFFF"
-        BorderBrush="#000000">
-        <Button Command="{Binding TestCommand}">
-            <PathIcon Data="M300, 300L100, 300L200, 100Z"
-                Foreground="Black" 
-                Width="16" Height="16" />
-        </Button>
+            <Button Command="{Binding DrawCommand}">
+                <PathIcon Data="M100, 100L300, 100L200, 300Z"
+                    Foreground="Blue" 
+                    Width="16" Height="16" />
+            </Button>
 
-        <Button Command="{Binding ClickCommand}">
-            <PathIcon Data="M100, 100L300, 100L200, 300Z"
-                Foreground="Blue" 
-                Width="16" Height="16" />
-        </Button>
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
-        <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+            <CheckBox Content="Active" IsChecked="{Binding TestCommandIsActive}" />
 
-        <CheckBox Content="CheckBox" IsChecked="{Binding ClickCommand}" />
-    </controls:Toolbar>
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Fill" IsChecked="{Binding IsFill}" />
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <ComboBox SelectedIndex="0" 
+                VerticalAlignment="Center"
+                ItemsSource="{Binding AllChartStyles}"
+                SelectedItem="{Binding SelectedChartStyle}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:Toolbar>
+
+        <controls:ChartControl DockPanel.Dock="Bottom"
+                       Content="{Binding ChartData}"
+                       ChartStyle="{Binding SelectedChartStyle}"
+                       ChartColor="Red"
+                       IsFill="{Binding IsFill}"
+                       Background="#FAFAFA"/>
+    </DockPanel>
     
 
 </Window>

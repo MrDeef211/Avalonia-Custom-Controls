@@ -13,6 +13,7 @@
     <ResourceDictionary>
         <ResourceDictionary.MergedDictionaries>
             <ResourceInclude Source="avares://Common.Controls/TemplatedControls/AnimatedButtonBasic.axaml" /> 
+            <ResourceInclude Source="avares://Common.Controls/TemplatedControls/ChartControl.axaml" /> 
         </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
 </Application.Resources>
