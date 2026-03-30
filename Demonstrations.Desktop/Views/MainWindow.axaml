@@ -52,14 +52,51 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Grid" IsChecked="{Binding Grid}" />
+
+            <Separator Width="0" Height="20" Background="Gray" Margin="2,0"/>
+
+            <TextBox Text="{Binding GridSizeXText}" Watermark="X: Auto, *, 100" IsEnabled="{Binding Grid}" />
+            <TextBox Text="{Binding GridSizeYText}" Watermark="Y: Auto, *, 100" IsEnabled="{Binding Grid}" />
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Pts" IsChecked="{Binding HighlightPoints}" ToolTip.Tip="Показать точки" />
+            <CheckBox Content="Lbl" IsChecked="{Binding ShowLabels}" IsEnabled="{Binding HighlightPoints}" ToolTip.Tip="Значения над точками" />
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <TextBlock Text="Labels X:" VerticalAlignment="Center" Margin="5,0,2,0" FontSize="12"/>
+            <ComboBox ItemsSource="{Binding AllLabelModes}" 
+                SelectedItem="{Binding LabelModeX}" 
+                Width="90" VerticalAlignment="Center"/>
+
+            <TextBlock Text="Y:" VerticalAlignment="Center" Margin="5,0,2,0" FontSize="12"/>
+            <ComboBox ItemsSource="{Binding AllLabelModes}" 
+                SelectedItem="{Binding LabelModeY}" 
+                Width="90" VerticalAlignment="Center"/>
+
         </controls:Toolbar>
+
+
 
         <controls:ChartControl DockPanel.Dock="Bottom"
                        Content="{Binding ChartData}"
                        ChartStyle="{Binding SelectedChartStyle}"
                        ChartColor="Red"
-                       IsFill="{Binding IsFill}"
-                       Background="#FAFAFA"/>
+                       Fill="{Binding IsFill}"
+                       Background="#FAFAFA"
+                       Grid="{Binding Grid}"
+                       GridSizeX="{Binding GridSizeX}"
+                       GridSizeY="{Binding GridSizeY}"
+                       Axis="{Binding Grid}"
+                       HighlightPoints="{Binding HighlightPoints}"
+                       ShowPointsLabels="{Binding ShowLabels}"
+                       LabelModeX="{Binding LabelModeX}"
+                       LabelModeY="{Binding LabelModeY}"/>
     </DockPanel>
     
 
