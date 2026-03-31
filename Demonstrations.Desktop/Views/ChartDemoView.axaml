@@ -1,0 +1,87 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Common.Controls"
+             xmlns:vm="using:Demonstrations.Desktop.ViewModels"
+             x:Class="Demonstrations.Desktop.Views.ChartDemoView"
+             x:DataType="vm:ChartDemoViewModel">
+    <DockPanel>
+        <controls:Toolbar
+            Background="#FFFFFF"
+            BorderBrush="#FFFFFF"
+            DockPanel.Dock="Top">
+            <Button Command="{Binding TestCommand}">
+                <PathIcon Data="M300, 300L100, 300L200, 100Z"
+                          Foreground="Black" 
+                          Width="16" Height="16" />
+            </Button>
+
+            <Button Command="{Binding DrawCommand}">
+                <PathIcon Data="M100, 100L300, 100L200, 300Z"
+                          Foreground="Blue" 
+                          Width="16" Height="16" />
+            </Button>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Active" IsChecked="{Binding TestCommandIsActive}" />
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Fill" IsChecked="{Binding IsFill}" />
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <ComboBox SelectedIndex="0" 
+                      VerticalAlignment="Center"
+                      ItemsSource="{Binding AllChartStyles}"
+                      SelectedItem="{Binding SelectedChartStyle}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Grid" IsChecked="{Binding Grid}" />
+
+            <Separator Width="0" Height="20" Background="Gray" Margin="2,0"/>
+
+            <TextBox Text="{Binding GridSizeXText}" Watermark="X: Auto, *, 100" IsEnabled="{Binding Grid}" />
+            <TextBox Text="{Binding GridSizeYText}" Watermark="Y: Auto, *, 100" IsEnabled="{Binding Grid}" />
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Pts" IsChecked="{Binding HighlightPoints}" ToolTip.Tip="Показать точки" />
+            <CheckBox Content="Lbl" IsChecked="{Binding ShowLabels}" IsEnabled="{Binding HighlightPoints}" ToolTip.Tip="Значения над точками" />
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <TextBlock Text="Labels X:" VerticalAlignment="Center" Margin="5,0,2,0" FontSize="12"/>
+            <ComboBox ItemsSource="{Binding AllLabelModes}" 
+                      SelectedItem="{Binding LabelModeX}" 
+                      Width="90" VerticalAlignment="Center"/>
+
+            <TextBlock Text="Y:" VerticalAlignment="Center" Margin="5,0,2,0" FontSize="12"/>
+            <ComboBox ItemsSource="{Binding AllLabelModes}" 
+                      SelectedItem="{Binding LabelModeY}" 
+                      Width="90" VerticalAlignment="Center"/>
+        </controls:Toolbar>
+
+        <controls:ChartControl DockPanel.Dock="Bottom"
+                               Content="{Binding ChartData}"
+                               ChartStyle="{Binding SelectedChartStyle}"
+                               ChartColor="Red"
+                               Fill="{Binding IsFill}"
+                               Background="#FAFAFA"
+                               Grid="{Binding Grid}"
+                               GridSizeX="{Binding GridSizeX}"
+                               GridSizeY="{Binding GridSizeY}"
+                               Axis="{Binding Grid}"
+                               HighlightPoints="{Binding HighlightPoints}"
+                               ShowPointsLabels="{Binding ShowLabels}"
+                               LabelModeX="{Binding LabelModeX}"
+                               LabelModeY="{Binding LabelModeY}"/>
+    </DockPanel>
+</UserControl>

@@ -16,12 +16,12 @@ namespace Common.Controls.Models
             set => _chart = new ConcurrentDictionary<double, double>(value);
         }
 
-        public ChartDataBase(Dictionary<double, double> Chart) => 
-            Chart = Chart ?? throw new ArgumentNullException(nameof(Chart));
+        public ChartDataBase(Dictionary<double, double> Chart) =>
+            this.Chart = Chart ?? throw new ArgumentNullException(nameof(Chart));
 
         public ChartDataBase() => Chart = new();
 
-            
+
 
         /// <summary>
         /// Добавить точку на график по координатам
@@ -40,6 +40,5 @@ namespace Common.Controls.Models
 
         public void Remove(double key) =>
             _chart.TryRemove(key, out _);
-
     }
 }

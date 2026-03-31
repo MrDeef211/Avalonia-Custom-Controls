@@ -267,6 +267,8 @@ public class ChartControl : TemplatedControl
         List<double> xLabels = null;
         List<double> yLabels = null;
 
+        
+
         if (Grid || Axis)
         {
             var origin = Normalize(0, 0);

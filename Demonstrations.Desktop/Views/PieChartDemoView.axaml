@@ -1,0 +1,87 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Common.Controls"
+             xmlns:vm="clr-namespace:Demonstrations.Desktop.ViewModels"
+             x:Class="Demonstrations.Desktop.Views.PieChartDemoView"
+             x:DataType="vm:PieChartDemoViewModel">
+    <DockPanel>
+        <controls:Toolbar
+            Background="#FFFFFF"
+            BorderBrush="#FFFFFF"
+            DockPanel.Dock="Top">
+            <Button Command="{Binding GenerateRandomDataCommand}">
+                <PathIcon Data="M100,100 L300,100 L200,300Z"
+                          Foreground="Blue" 
+                          Width="16" Height="16" />
+                <ToolTip.Tip>Сгенерировать случайные данные</ToolTip.Tip>
+            </Button>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Подсветка сектора" 
+                      IsChecked="{Binding HighlightSector}" 
+                      ToolTip.Tip="Подсвечивать сектор при наведении"/>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Подписи" 
+                      IsChecked="{Binding ShowLabels}" 
+                      ToolTip.Tip="Показывать подписи секторов"/>
+
+            <CheckBox Content="Проценты" 
+                      IsChecked="{Binding ShowPercentages}" 
+                      ToolTip.Tip="Показывать проценты в подписях"/>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <TextBlock Text="Подписи:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <ComboBox SelectedValue="{Binding LabelPlacement}"
+                      Width="100" VerticalAlignment="Center"
+                      ToolTip.Tip="Расположение подписей">
+                <ComboBoxItem Content="Внутри" Tag="Inside"/>
+                <ComboBoxItem Content="Снаружи" Tag="Outside"/>
+                <ComboBoxItem Content="Выноска" Tag="Callout"/>
+            </ComboBox>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <TextBlock Text="Внутр. радиус:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <Slider Minimum="0" Maximum="100" Value="{Binding InnerRadius}" Width="120" 
+                    ToolTip.Tip="Внутренний радиус в процентах (0 = круговая, >0 = кольцевая)"/>
+            <TextBlock Text="{Binding InnerRadius, StringFormat='{}{0:F0}%'}" Width="40"/>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <TextBlock Text="Цвет отверстия:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <Button Content="Выбрать цвет" 
+                    Command="{Binding PickHoleColorCommand}" 
+                    Background="{Binding HoleColor}"
+                    ToolTip.Tip="Выбрать цвет центрального отверстия"/>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <TextBlock Text="Начальный угол:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <Slider Minimum="0" Maximum="360" Value="{Binding StartAngle}" Width="120" 
+                    ToolTip.Tip="Начальный угол отрисовки (градусы)"/>
+            <TextBlock Text="{Binding StartAngle, StringFormat='{}{0:F0}°'}" Width="40"/>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <Button Command="{Binding ResetDataCommand}" ToolTip.Tip="Сбросить данные">
+                <PathIcon Data="M256,256 L256,256" />
+            </Button>
+        </controls:Toolbar>
+
+        <controls:PieChart Content="{Binding Content}"
+                           SectorColors="{Binding SectorColors}"
+                           HighlightSector="{Binding HighlightSector}"
+                           ShowLabels="{Binding ShowLabels}"
+                           LabelPlacement="{Binding LabelPlacement}"
+                           ShowPercentages="{Binding ShowPercentages}"
+                           InnerRadius="{Binding InnerRadius}"
+                           StartAngle="{Binding StartAngle}"
+                           HoleColor="{Binding HoleColor}"
+                           CenterImage="{Binding CenterImage}"
+                           Background="WhiteSmoke"/>
+    </DockPanel>
+</UserControl>
