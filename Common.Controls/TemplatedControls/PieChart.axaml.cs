@@ -18,7 +18,9 @@ public class PieChart : TemplatedControl
     // индекс сектора под курсором
     private int? _hoverSectorIndex = null;
     // кэшированные данные секторов
-    private List<SectorData> _sectors = new(); 
+    private List<SectorData> _sectors = new();
+
+    #region Styled Property
 
     public static readonly StyledProperty<PieChartDataBase> ContentProperty =
     AvaloniaProperty.Register<PieChart, PieChartDataBase>(nameof(Content), new PieChartDataBase());
@@ -59,6 +61,8 @@ public class PieChart : TemplatedControl
     public static readonly StyledProperty<ImageScaling> ImageScalingProperty =
         AvaloniaProperty.Register<PieChart, ImageScaling>(nameof(ImageScaling), ImageScaling.Fill);
 
+    #endregion
+
     static PieChart()
     {
         AffectsRender<PieChart>(
@@ -75,6 +79,8 @@ public class PieChart : TemplatedControl
             ImageZoomProperty,
             ImageScalingProperty);
     }
+
+    #region Свойства
 
     /// <summary>
     /// Объект базы данных для диаграммы
@@ -213,6 +219,8 @@ public class PieChart : TemplatedControl
         set => SetValue(ImageScalingProperty, value);
     }
 
+    #endregion
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
@@ -323,6 +331,8 @@ public class PieChart : TemplatedControl
             }
         }
     }
+
+    #region Вспомогательные методы отрисовки
 
     /// <summary>
     /// Отрисовка одного сектора
@@ -490,6 +500,8 @@ public class PieChart : TemplatedControl
             dc.DrawText(formatted, new Point(textX, textY));
         }
     }
+
+    #endregion
 
     /// <summary>
     /// Пересчёт углов и кистей для секторов

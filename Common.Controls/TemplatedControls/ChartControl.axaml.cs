@@ -31,6 +31,8 @@ public class ChartControl : TemplatedControl
     private double _axisX;
     private double _axisY;
 
+    #region Styled Property
+
     public static readonly StyledProperty<ChartDataBase> ContentProperty =
         AvaloniaProperty.Register<ChartControl, ChartDataBase>(nameof(Content), new());
 
@@ -73,6 +75,8 @@ public class ChartControl : TemplatedControl
     public static readonly StyledProperty<bool> ShowPointsLabelsProperty =
         AvaloniaProperty.Register<ChartControl, bool>(nameof(ShowPointsLabels), false);
 
+    #endregion
+
     private Point? _mousePosition;
 
     static ChartControl()
@@ -93,6 +97,8 @@ public class ChartControl : TemplatedControl
             LabelModeYProperty,
             ShowPointsLabelsProperty);
     }
+
+    #region Свойства
 
     /// <summary>
     /// Массив точек для построения
@@ -219,6 +225,8 @@ public class ChartControl : TemplatedControl
         get => GetValue(ShowPointsLabelsProperty);
         set => SetValue(ShowPointsLabelsProperty, value);
     }
+
+    #endregion
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {

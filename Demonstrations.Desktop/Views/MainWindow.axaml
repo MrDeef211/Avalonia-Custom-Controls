@@ -39,5 +39,6 @@
                 </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>
+        
     </DockPanel>  
 </Window>
