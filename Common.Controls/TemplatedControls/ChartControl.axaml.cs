@@ -17,7 +17,7 @@ namespace Common.Controls;
 public class ChartControl : TemplatedControl
 {
 
-    // Константы отступов от краёв
+    // Константы отступов от внутренних краёв
     private const double PaddingLeft = 50;
     private const double PaddingRight = 30;
     private const double PaddingTop = 30;

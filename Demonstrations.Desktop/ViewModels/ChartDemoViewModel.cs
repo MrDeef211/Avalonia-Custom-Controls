@@ -13,10 +13,13 @@ namespace Demonstrations.Desktop.ViewModels
 {
     internal class ChartDemoViewModel : PageViewModelBase
     {
+        private ChartGenerator _chartGenerator;
+
         public ChartDemoViewModel()
         {
             Title = "График";
             ChartData = new ChartDataBase();
+            _chartGenerator = new();
 
             // Команды
             ClickCommand = ReactiveCommand.Create(() =>
@@ -28,15 +31,7 @@ namespace Demonstrations.Desktop.ViewModels
 
             DrawCommand = ReactiveCommand.Create(() =>
             {
-                var dB = new ChartDataBase();
-                var rand = new Random();
-                dB.Add(-200, 0);
-                for (int i = -199; i < 200; i++)
-                {
-                    var dy = rand.Next(0, 100);
-                    dB.Add(i, dB.Chart[i - 1] + Math.Cos(dy) * 100 + (-dB.Chart[i - 1]) / 10 * Math.Abs(Math.Cos(dy)));
-                }
-                ChartData = dB;
+                ChartData = _chartGenerator.Generate();
             }, this.WhenAnyValue(x => x.TestCommandIsActive));
 
             // Валидация

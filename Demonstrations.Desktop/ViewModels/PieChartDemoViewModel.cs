@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Common.Controls;
 using Common.Controls.Models;
 using ReactiveUI;
@@ -8,20 +9,24 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Demonstrations.Desktop.ViewModels
 {
     public class PieChartDemoViewModel : PageViewModelBase
     {
+        PieChartGenerator _generator;
         public PieChartDemoViewModel()
         {
             Title = "Круговая диаграмма";
 
             Content = new PieChartDataBase();
-            GenerateDefaultData();
+            _generator = new();
+            Content = _generator.GenerateDefaultData();
 
-            SectorColors = new ObservableCollection<IBrush>
+            SectorColors = new List<IBrush>
             {
                 Brushes.DodgerBlue,
                 Brushes.OrangeRed,
@@ -33,11 +38,14 @@ namespace Demonstrations.Desktop.ViewModels
                 Brushes.Coral
             };
 
-            HoleColor = Brushes.White;
+            HoleColor = Brushes.WhiteSmoke;
 
-            GenerateRandomDataCommand = ReactiveCommand.Create(GenerateRandomData);
-            ResetDataCommand = ReactiveCommand.Create(ResetData);
-            PickHoleColorCommand = ReactiveCommand.Create(PickHoleColor);
+            // Команды
+            GenerateRandomDataCommand = ReactiveCommand.Create(() => { Content = _generator.GenerateRandomData(); });
+            PickCenterImageCommand = ReactiveCommand.CreateFromTask(PickCenterImageAsync);
+
+            // Взаимодействия
+            ShowOpenFileDialog = new Interaction<Unit, string?>();
         }
 
         private PieChartDataBase _content;
@@ -75,6 +83,8 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _showPercentages, value);
         }
 
+        public IEnumerable<LabelPlacement> AllLabelPlacements =>
+            Enum.GetValues(typeof(LabelPlacement)).Cast<LabelPlacement>();
         private LabelPlacement _labelPlacement = LabelPlacement.Outside;
         public LabelPlacement LabelPlacement
         {
@@ -110,42 +120,47 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _centerImage, value);
         }
 
+
+        private double _imageZoom = 1;
+        public double ImageZoom
+        {
+            get => _imageZoom;
+            set => this.RaiseAndSetIfChanged(ref _imageZoom, value);
+        }
+
+        public IEnumerable<ImageScaling> AllImageScaling =>
+            Enum.GetValues(typeof(ImageScaling)).Cast<ImageScaling>();
+        private ImageScaling _imageScaling;
+        public ImageScaling ImageScaling
+        {
+            get => _imageScaling;
+            set => this.RaiseAndSetIfChanged(ref _imageScaling, value);
+        }
+
         // Команды
         public ReactiveCommand<Unit, Unit> GenerateRandomDataCommand { get; }
-        public ReactiveCommand<Unit, Unit> ResetDataCommand { get; }
         public ReactiveCommand<Unit, Unit> PickHoleColorCommand { get; }
+        public ReactiveCommand<Unit, Unit> PickCenterImageCommand { get; }
 
-        private void GenerateDefaultData()
-        {
-            Content = new PieChartDataBase();
-            Content.Add("Категория A", 35);
-            Content.Add("Категория B", 25);
-            Content.Add("Категория C", 20);
-            Content.Add("Категория D", 15);
-            Content.Add("Категория E", 5);
-        }
+        // Взаимодействия для диалогов
+        public Interaction<Unit, IBrush?> ShowColorPicker { get; }
+        public Interaction<Unit, string?> ShowOpenFileDialog { get; }
 
-        private void GenerateRandomData()
+        private async Task PickCenterImageAsync()
         {
-            var rand = new Random();
-            var newData = new PieChartDataBase();
-            int sectorsCount = rand.Next(3, 8);
-            for (int i = 0; i < sectorsCount; i++)
+            var path = await ShowOpenFileDialog.Handle(Unit.Default);
+            if (!string.IsNullOrEmpty(path))
             {
-                newData.Add($"Сектор {i + 1}", rand.Next(1, 50));
+                try
+                {
+                    var bitmap = await Task.Run(() => new Bitmap(path));
+                    CenterImage = bitmap;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Ошибка загрузки: {ex.Message}");
+                }
             }
-            Content = newData;
-        }
-
-        private void ResetData()
-        {
-            GenerateDefaultData();
-        }
-
-        private async void PickHoleColor()
-        {
-            var colorDialog = new ColorPicker();
-            HoleColor = Brushes.LightGray;
         }
     }
 }

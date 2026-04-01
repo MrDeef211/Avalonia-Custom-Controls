@@ -9,32 +9,26 @@
             Background="#FFFFFF"
             BorderBrush="#FFFFFF"
             DockPanel.Dock="Top">
-            <Button Command="{Binding TestCommand}">
-                <PathIcon Data="M300, 300L100, 300L200, 100Z"
-                          Foreground="Black" 
-                          Width="16" Height="16" />
-            </Button>
 
             <Button Command="{Binding DrawCommand}">
                 <PathIcon Data="M100, 100L300, 100L200, 300Z"
                           Foreground="Blue" 
                           Width="16" Height="16" />
+                <ToolTip.Tip>Случайная диаграмма</ToolTip.Tip>
             </Button>
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
-            <CheckBox Content="Active" IsChecked="{Binding TestCommandIsActive}" />
-
-            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
-
-            <CheckBox Content="Fill" IsChecked="{Binding IsFill}" />
+            <CheckBox Content="Fill" IsChecked="{Binding IsFill}" 
+                      ToolTip.Tip="Заполнять область под диаграммой"/>
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
             <ComboBox SelectedIndex="0" 
                       VerticalAlignment="Center"
                       ItemsSource="{Binding AllChartStyles}"
-                      SelectedItem="{Binding SelectedChartStyle}">
+                      SelectedItem="{Binding SelectedChartStyle}"
+                      ToolTip.Tip="Стиль диаграммы">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
@@ -44,12 +38,15 @@
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
-            <CheckBox Content="Grid" IsChecked="{Binding Grid}" />
+            <CheckBox Content="Grid" IsChecked="{Binding Grid}"
+                      ToolTip.Tip="Показывать сетку и оси" />
 
             <Separator Width="0" Height="20" Background="Gray" Margin="2,0"/>
 
-            <TextBox Text="{Binding GridSizeXText}" Watermark="X: Auto, *, 100" IsEnabled="{Binding Grid}" />
-            <TextBox Text="{Binding GridSizeYText}" Watermark="Y: Auto, *, 100" IsEnabled="{Binding Grid}" />
+            <TextBox Text="{Binding GridSizeXText}" Watermark="X: Auto, *, 100" 
+                     IsEnabled="{Binding Grid}" ToolTip.Tip="Размер оси по X" />
+            <TextBox Text="{Binding GridSizeYText}" Watermark="Y: Auto, *, 100" 
+                     IsEnabled="{Binding Grid}" ToolTip.Tip="Размер оси по Y" />
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
@@ -61,12 +58,14 @@
             <TextBlock Text="Labels X:" VerticalAlignment="Center" Margin="5,0,2,0" FontSize="12"/>
             <ComboBox ItemsSource="{Binding AllLabelModes}" 
                       SelectedItem="{Binding LabelModeX}" 
-                      Width="90" VerticalAlignment="Center"/>
+                      Width="90" VerticalAlignment="Center"
+                      ToolTip.Tip="Подписи по X"/>
 
             <TextBlock Text="Y:" VerticalAlignment="Center" Margin="5,0,2,0" FontSize="12"/>
             <ComboBox ItemsSource="{Binding AllLabelModes}" 
                       SelectedItem="{Binding LabelModeY}" 
-                      Width="90" VerticalAlignment="Center"/>
+                      Width="90" VerticalAlignment="Center"
+                      ToolTip.Tip="Подписи по Y"/>
         </controls:Toolbar>
 
         <controls:ChartControl DockPanel.Dock="Bottom"

@@ -17,13 +17,14 @@
     
     <DockPanel>
         <Menu DockPanel.Dock="Top"
-                      Background="WhiteSmoke"
-                      >
-            <MenuItem Header="Диаграммы"
+                      Background="WhiteSmoke">
+            <MenuItem Header="Отдельные компоненты"
                       BorderBrush="DarkGray"
                       BorderThickness="1">
-                <MenuItem Header="График" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[0]}"/>
-                <MenuItem Header="Круговая диаграмма" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[1]}"/>
+                <MenuItem Header="Диаграммы">
+                    <MenuItem Header="График" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[0]}"/>
+                    <MenuItem Header="Круговая диаграмма" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[1]}"/>
+                </MenuItem>                
             </MenuItem>
         </Menu>
 

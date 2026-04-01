@@ -2,77 +2,86 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:Common.Controls"
              xmlns:vm="clr-namespace:Demonstrations.Desktop.ViewModels"
+             xmlns:c="using:Demonstrations.Desktop.Converters"
              x:Class="Demonstrations.Desktop.Views.PieChartDemoView"
              x:DataType="vm:PieChartDemoViewModel">
+
+    <UserControl.Resources>
+        <c:BrushToColorConverter x:Key="StaticBrushToColorConverter" />
+    </UserControl.Resources>
+
     <DockPanel>
         <controls:Toolbar
             Background="#FFFFFF"
-            BorderBrush="#FFFFFF"
+            BorderBrush="#000000"
             DockPanel.Dock="Top">
             <Button Command="{Binding GenerateRandomDataCommand}">
                 <PathIcon Data="M100,100 L300,100 L200,300Z"
                           Foreground="Blue" 
                           Width="16" Height="16" />
-                <ToolTip.Tip>Сгенерировать случайные данные</ToolTip.Tip>
+                <ToolTip.Tip>"Случайная диаграмма"</ToolTip.Tip>
             </Button>
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
-            <CheckBox Content="Подсветка сектора" 
+            <CheckBox Content="Highlight" 
                       IsChecked="{Binding HighlightSector}" 
-                      ToolTip.Tip="Подсвечивать сектор при наведении"/>
+                      ToolTip.Tip="Выделять сектора при наведении"/>
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
-            <CheckBox Content="Подписи" 
+            <CheckBox Content="Labels" 
                       IsChecked="{Binding ShowLabels}" 
                       ToolTip.Tip="Показывать подписи секторов"/>
 
-            <CheckBox Content="Проценты" 
+            <CheckBox Content="Percent" 
                       IsChecked="{Binding ShowPercentages}" 
                       ToolTip.Tip="Показывать проценты в подписях"/>
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
-            <TextBlock Text="Подписи:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <ComboBox SelectedValue="{Binding LabelPlacement}"
-                      Width="100" VerticalAlignment="Center"
-                      ToolTip.Tip="Расположение подписей">
-                <ComboBoxItem Content="Внутри" Tag="Inside"/>
-                <ComboBoxItem Content="Снаружи" Tag="Outside"/>
-                <ComboBoxItem Content="Выноска" Tag="Callout"/>
-            </ComboBox>
+            <TextBlock Text="Labels:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <ComboBox ItemsSource="{Binding AllLabelPlacements}" 
+                SelectedItem="{Binding LabelPlacement}"
+                Width="100" VerticalAlignment="Center"/>
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
-            <TextBlock Text="Внутр. радиус:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <Slider Minimum="0" Maximum="100" Value="{Binding InnerRadius}" Width="120" 
-                    ToolTip.Tip="Внутренний радиус в процентах (0 = круговая, >0 = кольцевая)"/>
-            <TextBlock Text="{Binding InnerRadius, StringFormat='{}{0:F0}%'}" Width="40"/>
+            <TextBlock Text="Inner Radius:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <NumericUpDown Value="{Binding InnerRadius}" Minimum="0" Maximum="1" Increment="0.05" 
+                               Width="120" VerticalAlignment="Center"
+                               ToolTip.Tip="Внутренний радиус кольца"/>
+
+            <TextBlock Text="Starting angle:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <NumericUpDown Value="{Binding StartAngle}" Minimum="0" Maximum="360" Increment="15" 
+                               Width="120" VerticalAlignment="Center" 
+                               ToolTip.Tip="Начальный угол"/>
+            
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <ColorPicker Color="{Binding HoleColor, Converter={StaticResource StaticBrushToColorConverter}}" 
+                 Width="100" 
+                 Margin="0,0,5,0"
+                 ToolTip.Tip="Выбрать цвет центрального отверстия" />
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
-            <TextBlock Text="Цвет отверстия:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <Button Content="Выбрать цвет" 
-                    Command="{Binding PickHoleColorCommand}" 
-                    Background="{Binding HoleColor}"
-                    ToolTip.Tip="Выбрать цвет центрального отверстия"/>
+            <Button Content="Image" Command="{Binding PickCenterImageCommand}" 
+                    ToolTip.Tip="Выбрать изображение для центра"/>
 
-            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+            <TextBlock Text="Scaling:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <ComboBox ItemsSource="{Binding AllImageScaling}"
+                      SelectedItem="{Binding ImageScaling}"
+                      Width="100" VerticalAlignment="Center"/>
 
-            <TextBlock Text="Начальный угол:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <Slider Minimum="0" Maximum="360" Value="{Binding StartAngle}" Width="120" 
-                    ToolTip.Tip="Начальный угол отрисовки (градусы)"/>
-            <TextBlock Text="{Binding StartAngle, StringFormat='{}{0:F0}°'}" Width="40"/>
-
-            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
-
-            <Button Command="{Binding ResetDataCommand}" ToolTip.Tip="Сбросить данные">
-                <PathIcon Data="M256,256 L256,256" />
-            </Button>
+            <TextBlock Text="Zoom:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <NumericUpDown Value="{Binding ImageZoom}" Minimum="0" Maximum="5" Increment="0.1" 
+                               Width="120" VerticalAlignment="Center" 
+                               ToolTip.Tip="Множитель масштабирования изображения"/>
         </controls:Toolbar>
 
         <controls:PieChart Content="{Binding Content}"
+                           Padding="20"
                            SectorColors="{Binding SectorColors}"
                            HighlightSector="{Binding HighlightSector}"
                            ShowLabels="{Binding ShowLabels}"
@@ -82,6 +91,9 @@
                            StartAngle="{Binding StartAngle}"
                            HoleColor="{Binding HoleColor}"
                            CenterImage="{Binding CenterImage}"
+                           ImageZoom="{Binding ImageZoom}"
+                           ImageScaling="{Binding ImageScaling}"
+                           PaintHole="True"
                            Background="WhiteSmoke"/>
     </DockPanel>
 </UserControl>
