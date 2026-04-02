@@ -166,6 +166,9 @@ public class ChartControl : TemplatedControl
     /// <summary>
     /// Размер сетки по X в еденицах измерения графика
     /// </summary>
+    /// <remarks>
+    /// Auto - автоматические целые значения, примерно 80 px между линиями; * - автоматически примерно 10 ячеек сетки
+    /// </remarks>
     public GridLength GridSizeX
     {
         get => GetValue(GridSizeXProperty);
@@ -173,8 +176,11 @@ public class ChartControl : TemplatedControl
     }
 
     /// <summary>
-    /// Размер сетки по Y в еденицах измерения графика
+    /// Размер сетки по Y в еденицах измерения графика 
     /// </summary>
+    /// <remarks>
+    /// Auto - автоматические целые значения, примерно 80 px между линиями; * - автоматически примерно 10 ячеек сетки
+    /// </remarks>
     public GridLength GridSizeY
     {
         get => GetValue(GridSizeYProperty);

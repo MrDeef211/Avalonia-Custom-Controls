@@ -22,9 +22,12 @@
                       BorderBrush="DarkGray"
                       BorderThickness="1">
                 <MenuItem Header="Диаграммы">
-                    <MenuItem Header="График" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[0]}"/>
-                    <MenuItem Header="Круговая диаграмма" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[1]}"/>
-                </MenuItem>                
+                    <MenuItem Header="График" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[1]}"/>
+                    <MenuItem Header="Круговая диаграмма" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[2]}"/>
+                </MenuItem>   
+                <MenuItem Header="Компоненты управления">
+					<MenuItem Header="Слайдер диапазона" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[3]}" />
+                </MenuItem>
             </MenuItem>
         </Menu>
 

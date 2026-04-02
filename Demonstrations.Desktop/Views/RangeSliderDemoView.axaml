@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Common.Controls"
+             xmlns:vm="using:Demonstrations.Desktop.ViewModels"
+             x:Class="Demonstrations.Desktop.Views.RangeSliderDemoView"
+             x:DataType="vm:RangeSliderDemoViewModel">
+    <DockPanel>
+        <controls:Toolbar DockPanel.Dock="Top" Background="White">
+
+            <Button Command="{Binding RandomizeCommand}">
+                <PathIcon Data="M100,100L300,100L200,300Z" Foreground="Blue" Width="16" Height="16" />
+                <ToolTip.Tip>Случайные значения</ToolTip.Tip>
+            </Button>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <TextBlock Text="Min:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <NumericUpDown Value="{Binding Minimum}" Minimum="-1000" Maximum="1000" Increment="1" Width="120"/>
+            <TextBlock Text="Max:" VerticalAlignment="Center" Margin="10,0,2,0"/>
+            <NumericUpDown Value="{Binding Maximum}" Minimum="-1000" Maximum="1000" Increment="1" Width="120"/>
+            
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <TextBlock Text="Step:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <NumericUpDown Value="{Binding Step}" Minimum="0.1" Maximum="100" Increment="0.5" Width="120"/>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Show TextBoxes" IsChecked="{Binding ShowTextBoxes}" ToolTip.Tip="Показывать поля ввода"/>
+            <TextBlock Text="Width:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <NumericUpDown Value="{Binding TextBoxWidth}" Minimum="30" Maximum="150" Increment="5" Width="120"/>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="Lock Lower" IsChecked="{Binding !IsLowerThumbEnabled}" ToolTip.Tip="Заблокировать нижний ползунок"/>
+            <CheckBox Content="Lock Upper" IsChecked="{Binding !IsUpperThumbEnabled}" ToolTip.Tip="Заблокировать верхний ползунок"/>
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <TextBlock Text="Fill:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <ComboBox ItemsSource="{Binding AllFillModes}" SelectedItem="{Binding FillMode}" Width="100"/>
+            
+
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+
+            <CheckBox Content="End Stops" IsChecked="{Binding ShowEndStops}" ToolTip.Tip="Ограничители по краям"/>
+            <TextBlock Text="TickStep:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <TextBox Text="{Binding TickStepText}" Width="60" ToolTip.Tip="Auto / *число / число"/>
+            <TextBlock Text="Length:" VerticalAlignment="Center" Margin="5,0,2,0"/>
+            <NumericUpDown Value="{Binding TickLength}" Minimum="0" Maximum="20" Increment="1" Width="120"/>
+        </controls:Toolbar>
+
+        <StackPanel Margin="20" Spacing="20" Height="250">
+            <controls:RangeSlider
+                Minimum="{Binding Minimum}"
+                Maximum="{Binding Maximum}"
+                LowerValue="{Binding LowerValue}"
+                UpperValue="{Binding UpperValue}"
+                Step="{Binding Step}"
+                ShowTextBoxes="{Binding ShowTextBoxes}"
+                TextBoxWidth="{Binding TextBoxWidth}"
+                IsLowerThumbEnabled="{Binding IsLowerThumbEnabled}"
+                IsUpperThumbEnabled="{Binding IsUpperThumbEnabled}"
+                LowerThumbBrush="{Binding LowerThumbBrush}"
+                UpperThumbBrush="{Binding UpperThumbBrush}"
+                TrackBrush="{Binding TrackBrush}"
+                FillMode="{Binding FillMode}"
+                FillBrush="{Binding FillBrush}"
+                ShowEndStops="{Binding ShowEndStops}"
+                TickStep="{Binding TickStep}"
+                TickBrush="{Binding TickBrush}"
+                TickLength="{Binding TickLength}"
+
+                VerticalAlignment="Center"
+                HorizontalAlignment="Stretch"
+                Margin="0,20,0,0" />
+
+        </StackPanel>
+    </DockPanel>
+</UserControl>

@@ -22,7 +22,9 @@ namespace Demonstrations.Desktop.ViewModels
             Pages = new ObservableCollection<PageViewModelBase>
             {
                 new ChartDemoViewModel(),
-                new PieChartDemoViewModel()
+                new ChartDemoViewModel(),
+                new PieChartDemoViewModel(),
+                new RangeSliderDemoViewModel()
             };
 
             CurrentPage = Pages[0];
