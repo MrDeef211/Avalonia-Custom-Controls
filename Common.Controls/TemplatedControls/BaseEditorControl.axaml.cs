@@ -1,8 +1,10 @@
 using Avalonia;
-using ReactiveUI.Avalonia;
 using Avalonia.Controls.Primitives;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
+using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
 namespace Common.Controls;
 
@@ -12,8 +14,11 @@ namespace Common.Controls;
 public abstract class BaseEditorControl : TemplatedControl
 {
     private CompositeDisposable? _subscriptions;
+    protected CompositeDisposable? Subscriptions => _subscriptions;
+
     private bool _hasChanges;
     private string _error = string.Empty;
+
 
     #region Styled Properties
 
@@ -112,12 +117,12 @@ public abstract class BaseEditorControl : TemplatedControl
         _subscriptions = new CompositeDisposable();
 
         this.GetObservable(SelectedObjectProperty)
-            .Subscribe(obj =>
+            .Subscribe(Observer.Create<object?>(obj =>
             {
                 GenerateEditors(obj);
                 HasChanges = false;
                 Error = string.Empty;
-            })
+            }))
             .DisposeWith(_subscriptions);
 
         OnActivated(_subscriptions);

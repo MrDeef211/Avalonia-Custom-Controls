@@ -27,6 +27,7 @@
                 </MenuItem>   
                 <MenuItem Header="Компоненты управления">
 					<MenuItem Header="Слайдер диапазона" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[3]}" />
+                    <MenuItem Header="Редактор свойств" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[4]}" />
                 </MenuItem>
             </MenuItem>
         </Menu>

@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Common.Controls"
+             xmlns:vm="using:Demonstrations.Desktop.ViewModels"
+             x:Class="Demonstrations.Desktop.Views.PropertyGridDemoView"
+             x:DataType="vm:PropertyGridDemoViewModel">
+    <DockPanel>
+        <controls:Toolbar DockPanel.Dock="Top" Background="#F0F0F0">
+            <Button Command="{Binding NewObjectCommand}" ToolTip.Tip="Новый объект">
+                <PathIcon Data="M100,100 L300,100 L200,300Z" Width="16" Height="16" />
+            </Button>
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+            <Button Command="{Binding MakeReadOnlyCommand}" ToolTip.Tip="Режим только чтение">
+                <TextBlock Text="🔒" />
+            </Button>
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+            <Button Command="{Binding ClearChangesCommand}" ToolTip.Tip="Сбросить флаг изменений">
+                <TextBlock Text="✓" />
+            </Button>
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
+            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="10,0,0,0" FontStyle="Italic"/>
+            <TextBlock Text="{Binding Error, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
+                       Foreground="Red" Margin="10,0,0,0" VerticalAlignment="Center"/>
+        </controls:Toolbar>
+
+        <Border Padding="10" Background="White">
+            <controls:PropertyGridControl x:Name="PropertyGrid"
+                                          SelectedObject="{Binding SelectedObject}"
+                                          IsReadOnly="{Binding IsReadOnly}" />
+        </Border>
+    </DockPanel>
+</UserControl>
