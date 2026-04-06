@@ -15,6 +15,8 @@ using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net.NetworkInformation;
+using System.Reactive.Linq;
 
 
 namespace Common.Controls;
@@ -29,9 +31,9 @@ public class RangeSlider : TemplatedControl
     private double _dragOffsetX;
     private TextBox _lowerTextBox;
     private TextBox _upperTextBox;
+    private string _lastValidLowerText = "0";
+    private string _lastValidUpperText = "100";
 
-    private bool _isLowerTextValid = true;
-    private bool _isUpperTextValid = true;
 
     #region Styled Property
 
@@ -93,15 +95,22 @@ public class RangeSlider : TemplatedControl
 
     #region Direct Property
 
+    public static readonly DirectProperty<RangeSlider, string> UpperTextProperty =
+    AvaloniaProperty.RegisterDirect<RangeSlider, string>(
+        nameof(UpperText),
+        o => o.UpperText,
+        (o, v) => o.UpperText = v);
 
+    public static readonly DirectProperty<RangeSlider, string> LowerTextProperty =
+    AvaloniaProperty.RegisterDirect<RangeSlider, string>(
+        nameof(LowerText),
+        o => o.LowerText,
+        (o, v) => o.LowerText = v);
 
     #endregion
 
     static RangeSlider()
     {
-        LowerValueProperty.Changed.AddClassHandler<RangeSlider>((x, e) => x.OnLowerValueChanged(e));
-        UpperValueProperty.Changed.AddClassHandler<RangeSlider>((x, e) => x.OnUpperValueChanged(e));
-
         AffectsRender<RangeSlider>(
                 MinimumProperty,
                 MaximumProperty,
@@ -266,8 +275,8 @@ public class RangeSlider : TemplatedControl
     /// Шаг засечек на направляющей
     /// </summary>
     /// <remarks>
-    /// - Auto: автоматический шаг (примерно 5-25 пикселей)
-    /// - *: фиксированное количество засечек
+    /// - "Auto": автоматический шаг
+    /// - "Число*": фиксированное количество засечек
     /// - Фиксированное значение: шаг в единицах значения
     /// </remarks>
     public GridLength TickStep
@@ -292,6 +301,26 @@ public class RangeSlider : TemplatedControl
     {
         get => GetValue(TickLengthProperty);
         set => SetValue(TickLengthProperty, value);
+    }
+
+    private string _upperText;
+    /// <summary>
+    /// Текст textbox значения сверху
+    /// </summary>
+    public string UpperText
+    {
+        get => _upperText;
+        set => SetAndRaise(UpperTextProperty, ref _upperText, value);
+    }
+
+    private string _lowerText;
+    /// <summary>
+    /// Текст textbox значения снизу
+    /// </summary>
+    public string LowerText
+    {
+        get => _lowerText;
+        set => SetAndRaise(LowerTextProperty, ref _lowerText, value);
     }
 
     #endregion
@@ -322,18 +351,39 @@ public class RangeSlider : TemplatedControl
         if (_lowerTextBox != null)
         {
             _lowerTextBox.TextChanged += OnLowerTextBoxTextChanged;
-            _lowerTextBox.Text = LowerValue.ToString(CultureInfo.CurrentCulture);
+            _lowerTextBox.KeyDown += OnTextBoxKeyDown;
         }
         if (_upperTextBox != null)
         {
             _upperTextBox.TextChanged += OnUpperTextBoxTextChanged;
-            _upperTextBox.Text = UpperValue.ToString(CultureInfo.CurrentCulture);
+            _upperTextBox.KeyDown += OnTextBoxKeyDown;
         }
 
         this.GetObservable(LowerValueProperty).Subscribe(_ => UpdateThumbPositions());
         this.GetObservable(UpperValueProperty).Subscribe(_ => UpdateThumbPositions());
+
         this.GetObservable(MinimumProperty).Subscribe(_ => { UpdateThumbPositions(); InvalidateVisual(); });
         this.GetObservable(MaximumProperty).Subscribe(_ => { UpdateThumbPositions(); InvalidateVisual(); });
+
+        this.GetObservable(LowerValueProperty).Subscribe(v =>
+        {
+            string newText = v.ToString(CultureInfo.CurrentCulture);
+            if (newText != _lastValidLowerText)
+            {
+                _lastValidLowerText = newText;
+                LowerText = newText;
+            }
+        });
+
+        this.GetObservable(UpperValueProperty).Subscribe(v =>
+        {
+            string newText = v.ToString(CultureInfo.CurrentCulture);
+            if (newText != _lastValidUpperText)
+            {
+                _lastValidUpperText = newText;
+                UpperText = newText;
+            }
+        });
 
         if (_trackCanvas != null)
         {
@@ -354,21 +404,19 @@ public class RangeSlider : TemplatedControl
         }, DispatcherPriority.Loaded);
     }
 
-    private void OnLowerValueChanged(AvaloniaPropertyChangedEventArgs e)
-    {
-        double newValue = (double)e.NewValue;
-        double coerced = Math.Max(Minimum, Math.Min(UpperValue - Step, newValue));
-        if (Math.Abs(coerced - newValue) > double.Epsilon)
-            SetCurrentValue(LowerValueProperty, coerced);
-    }
+    //private void LowerValueChanged(double e)
+    //{
+    //    double newValue = Math.Max(Minimum, Math.Min(UpperValue - Step, e));
+    //    if (Math.Abs(LowerValue - newValue) > double.Epsilon)
+    //        SetCurrentValue(LowerValueProperty, newValue);
+    //}
 
-    private void OnUpperValueChanged(AvaloniaPropertyChangedEventArgs e)
-    {
-        double newValue = (double)e.NewValue;
-        double coerced = Math.Min(Maximum, Math.Max(LowerValue + Step, newValue));
-        if (Math.Abs(coerced - newValue) > double.Epsilon)
-            SetCurrentValue(UpperValueProperty, coerced);
-    }
+    //private void UpperValueChanged(double e)
+    //{
+    //    double newValue = Math.Min(Maximum, Math.Max(LowerValue + Step, e));
+    //    if (Math.Abs(UpperValue - newValue) > double.Epsilon)
+    //        SetCurrentValue(UpperValueProperty, newValue);  
+    //}
 
     private void OnLowerThumbPointerPressed(object sender, PointerPressedEventArgs e)
     {
@@ -424,80 +472,90 @@ public class RangeSlider : TemplatedControl
         e.Pointer.Capture(null);
     }
 
+    private void OnTextBoxKeyDown(object sender, KeyEventArgs e)
+    {
+        var textBox = (TextBox)sender;
+        if (e.Key == Key.Back || e.Key == Key.Delete || e.Key == Key.Enter || e.Key == Key.Tab ||
+            e.Key == Key.Escape || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Home ||
+            e.Key == Key.End || (e.KeyModifiers == KeyModifiers.Control && (e.Key == Key.V || e.Key == Key.X || e.Key == Key.C)))
+            return;
+
+        string keyText = e.Key.ToString();
+        if (keyText.Length == 1)
+        {
+            char c = keyText[0];
+            if (!char.IsDigit(c) && c != '-' && c != '.' && c != ',')
+                e.Handled = true;
+        }
+    }
+
     private void OnLowerTextBoxTextChanged(object sender, RoutedEventArgs e)
     {
         if (_lowerTextBox == null) return;
-        string text = _lowerTextBox.Text;
-        bool isValid = double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out double newValue);
-        if (string.Equals(text, LowerValue.ToString(CultureInfo.CurrentCulture))) return;
-        if (isValid)
+        string newText = _lowerTextBox.Text;
+
+        if (newText == _lastValidLowerText) return;
+
+        if (double.TryParse(newText, NumberStyles.Any, CultureInfo.CurrentCulture, out double newValue))
         {
             newValue = Math.Max(Minimum, Math.Min(UpperValue - Step, newValue));
             newValue = RoundToStep(newValue);
             if (Math.Abs(newValue - LowerValue) > double.Epsilon)
-            {
                 SetCurrentValue(LowerValueProperty, newValue);
-            }
-            _lowerTextBox.Text = LowerValue.ToString(CultureInfo.CurrentCulture);
-        }
-        else if (text == "")
-        {
-            if (LowerValue != 0) SetCurrentValue(LowerValueProperty, 0);
-            else
+            _lastValidLowerText = newText;
+
+            string finalText = LowerValue.ToString(CultureInfo.CurrentCulture);
+            if (_lowerTextBox.Text != finalText)
             {
-                // Если ноль присваиваем временнное значение
-                // Нужно чтобы SetCurrentValue вызвалось, и вместо пустой строки дальше прошли нормальные значения
-                SetCurrentValue(LowerValueProperty, 1);
-                SetCurrentValue(LowerValueProperty, 0);
+                _lowerTextBox.Text = finalText;
             }
-            _lowerTextBox.Text = LowerValue.ToString(CultureInfo.CurrentCulture);
+        }
+        else if (newText == "")
+        {
+            // SetCurrentValue сообщает только если значение изменилось, а мне нужно гарантированно обновить текст на экране
+            SetCurrentValue(LowerValueProperty, Minimum);
+            _lowerTextBox.Text = Minimum.ToString(CultureInfo.CurrentCulture);
+            _lastValidLowerText = Minimum.ToString(CultureInfo.CurrentCulture);
         }
         else
         {
-            // Сбрасываем значение через смену туда сюда
-            var temp = LowerValue;
-            SetCurrentValue(LowerValueProperty, temp - 1);
-            SetCurrentValue(LowerValueProperty, temp);
-            _lowerTextBox.Text = LowerValue.ToString(CultureInfo.CurrentCulture);
+            _lowerTextBox.Text = _lastValidLowerText;
+            _lowerTextBox.CaretIndex = _lastValidLowerText.Length;
         }
     }
 
     private void OnUpperTextBoxTextChanged(object sender, RoutedEventArgs e)
     {
         if (_upperTextBox == null) return;
-        string text = _upperTextBox.Text;
-        bool isValid = double.TryParse(text, NumberStyles.Any, CultureInfo.CurrentCulture, out double newValue);
-        if (string.Equals(text, UpperValue.ToString(CultureInfo.CurrentCulture))) return;
+        string newText = _upperTextBox.Text;
+        if (newText == _lastValidUpperText) return;
 
-        if (isValid)
+        if (double.TryParse(newText, NumberStyles.Any, CultureInfo.CurrentCulture, out double newValue))
         {
             newValue = Math.Max(LowerValue + Step, Math.Min(Maximum, newValue));
             newValue = RoundToStep(newValue);
             if (Math.Abs(newValue - UpperValue) > double.Epsilon)
-            {
                 SetCurrentValue(UpperValueProperty, newValue);
-            }
-            _upperTextBox.Text = UpperValue.ToString(CultureInfo.CurrentCulture);
-        }
-        else if (text == "")
-        {
-            if (UpperValue != 0) SetCurrentValue(UpperValueProperty, 0);
-            else
+            _lastValidUpperText = newText;
+
+            string finalText = UpperValue.ToString(CultureInfo.CurrentCulture);
+            if (_upperTextBox.Text != finalText)
             {
-                // Если ноль присваиваем временнное значение
-                // Нужно чтобы SetCurrentValue вызвалось, и вместо пустой строки дальше прошли нормальные значения
-                SetCurrentValue(UpperValueProperty, 1);
-                SetCurrentValue(UpperValueProperty, 0);
+                _upperTextBox.Text = finalText;
+                _upperTextBox.CaretIndex = finalText.Length;
             }
-            _upperTextBox.Text = UpperValue.ToString(CultureInfo.CurrentCulture);
+        }
+        else if (newText == "")
+        {
+            // SetCurrentValue сообщает только если значение изменилось, а мне нужно гарантированно обновить текст на экране
+            SetCurrentValue(UpperValueProperty, Minimum);
+            _upperTextBox.Text = Minimum.ToString(CultureInfo.CurrentCulture);
+            _lastValidUpperText = Minimum.ToString(CultureInfo.CurrentCulture);
         }
         else
         {
-            // Сбрасываем значение через смену туда сюда
-            var temp = UpperValue;
-            SetCurrentValue(UpperValueProperty, temp - 1);
-            SetCurrentValue(UpperValueProperty, temp);
-            _upperTextBox.Text = UpperValue.ToString(CultureInfo.CurrentCulture);
+            _upperTextBox.Text = _lastValidUpperText;
+            _upperTextBox.CaretIndex = _lastValidUpperText.Length;
         }
     }
 
@@ -563,6 +621,9 @@ public class RangeSlider : TemplatedControl
 
     #region Вспомогательные методы для отрисовки
 
+    /// <summary>
+    /// Вычисление позиций засечек для отрисовки
+    /// </summary>
     private List<double> GetTickPositions(double min, double max, double trackLength)
     {
         var ticks = new List<double>();
@@ -598,6 +659,9 @@ public class RangeSlider : TemplatedControl
         return ticks;
     }
 
+    /// <summary>
+    /// Обновление позиции ползунков
+    /// </summary>
     private void UpdateThumbPositions()
     {
         if (_lowerThumb == null || _upperThumb == null || _trackCanvas == null) return;
@@ -639,14 +703,6 @@ public class RangeSlider : TemplatedControl
         if (normalized <= 2) return 2 * magnitude;
         if (normalized <= 5) return 5 * magnitude;
         return 10 * magnitude;
-    }
-
-    private double PositionToValue(double pos, double trackWidth)
-    {
-        double range = Maximum - Minimum;
-        if (range <= 0 || trackWidth <= 0) return Minimum;
-        double ratio = Math.Clamp(pos / trackWidth, 0, 1);
-        return Minimum + ratio * range;
     }
 
     private double ValueToPosition(double value, double trackWidth)

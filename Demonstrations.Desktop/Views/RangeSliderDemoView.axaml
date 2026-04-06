@@ -45,7 +45,7 @@
 
             <CheckBox Content="End Stops" IsChecked="{Binding ShowEndStops}" ToolTip.Tip="Ограничители по краям"/>
             <TextBlock Text="TickStep:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <TextBox Text="{Binding TickStepText}" Width="60" ToolTip.Tip="Auto / *число / число"/>
+            <TextBox Text="{Binding TickStepText}" Width="60" ToolTip.Tip="Auto / число* / число"/>
             <TextBlock Text="Length:" VerticalAlignment="Center" Margin="5,0,2,0"/>
             <NumericUpDown Value="{Binding TickLength}" Minimum="0" Maximum="20" Increment="1" Width="120"/>
         </controls:Toolbar>
