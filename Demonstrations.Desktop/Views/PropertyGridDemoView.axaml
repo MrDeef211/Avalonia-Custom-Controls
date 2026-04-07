@@ -13,12 +13,7 @@
             <Button Command="{Binding MakeReadOnlyCommand}" ToolTip.Tip="Режим только чтение">
                 <TextBlock Text="🔒" />
             </Button>
-            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
-            <Button Command="{Binding ClearChangesCommand}" ToolTip.Tip="Сбросить флаг изменений">
-                <TextBlock Text="✓" />
-            </Button>
-            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
-            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="10,0,0,0" FontStyle="Italic"/>
+            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>    
             <TextBlock Text="{Binding Error, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
                        Foreground="Red" Margin="10,0,0,0" VerticalAlignment="Center"/>
         </controls:Toolbar>
@@ -26,7 +21,8 @@
         <Border Padding="10" Background="White">
             <controls:PropertyGridControl x:Name="PropertyGrid"
                                           SelectedObject="{Binding SelectedObject}"
-                                          IsReadOnly="{Binding IsReadOnly}" />
+                                          IsReadOnly="{Binding IsReadOnly}"
+                                          Error="{Binding Error}"/>
         </Border>
     </DockPanel>
 </UserControl>

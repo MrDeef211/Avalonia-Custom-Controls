@@ -12,7 +12,6 @@ namespace Demonstrations.Desktop.ViewModels
         private DemoObject _selectedObject;
         private bool _isReadOnly;
         private string _statusMessage = string.Empty;
-        private bool _hasChanges;
         private string _error = string.Empty;
 
         public PropertyGridDemoViewModel()
@@ -24,10 +23,6 @@ namespace Demonstrations.Desktop.ViewModels
             // Команды
             NewObjectCommand = ReactiveCommand.Create(NewObject);
             MakeReadOnlyCommand = ReactiveCommand.Create(() => { IsReadOnly = !IsReadOnly; });
-            ClearChangesCommand = ReactiveCommand.Create(ClearChanges);
-
-            this.WhenAnyValue(x => x.HasChanges)
-                .Subscribe(hasChanges => StatusMessage = hasChanges ? "Есть несохранённые изменения" : "Нет изменений");
         }
 
         public DemoObject SelectedObject
@@ -48,12 +43,6 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _statusMessage, value);
         }
 
-        public bool HasChanges
-        {
-            get => _hasChanges;
-            set => this.RaiseAndSetIfChanged(ref _hasChanges, value);
-        }
-
         public string Error
         {
             get => _error;
@@ -67,12 +56,6 @@ namespace Demonstrations.Desktop.ViewModels
         private void NewObject()
         {
             SelectedObject = new DemoObject();
-            HasChanges = false; 
-        }
-
-        private void ClearChanges()
-        {
-            HasChanges = false; 
         }
     }
 }

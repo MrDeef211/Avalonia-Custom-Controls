@@ -15,22 +15,5 @@ public partial class PropertyGridDemoView : ReactiveUserControl<PropertyGridDemo
     public PropertyGridDemoView()
     {
         InitializeComponent();
-
-        this.WhenActivated(disposables =>
-        {
-            PropertyGrid.PropertyChanged += (sender, e) =>
-            {
-                if (e.Property == PropertyGridControl.HasChangesProperty)
-                {
-                    if (ViewModel != null)
-                        ViewModel.HasChanges = (bool)e.NewValue;
-                }
-                else if (e.Property == PropertyGridControl.ErrorProperty)
-                {
-                    if (ViewModel != null)
-                        ViewModel.Error = (string?)e.NewValue ?? string.Empty;
-                }
-            };
-        });
     }
 }

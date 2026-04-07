@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
 using System.Reactive;
@@ -40,27 +41,27 @@ public abstract class BaseEditorControl : TemplatedControl
         set => SetValue(IsReadOnlyProperty, value);
     }
 
-    #endregion
-
-    #region Direct Properties
-
-    public static readonly DirectProperty<BaseEditorControl, bool> HasChangesProperty =
-            AvaloniaProperty.RegisterDirect<BaseEditorControl, bool>(nameof(HasChanges), o => o.HasChanges);
+    public static readonly StyledProperty<bool> HasChangesProperty =
+    AvaloniaProperty.Register<BaseEditorControl, bool>(nameof(HasChanges), defaultBindingMode: BindingMode.TwoWay);
 
     public bool HasChanges
     {
-        get => _hasChanges;
-        protected set => SetAndRaise(HasChangesProperty, ref _hasChanges, value);
+        get => GetValue(HasChangesProperty);
+        protected set => SetValue(HasChangesProperty, value);
     }
 
-    public static readonly DirectProperty<BaseEditorControl, string> ErrorProperty =
-        AvaloniaProperty.RegisterDirect<BaseEditorControl, string>(nameof(Error), o => o.Error);
+    public static readonly StyledProperty<string> ErrorProperty =
+        AvaloniaProperty.Register<BaseEditorControl, string>(nameof(Error), defaultBindingMode: BindingMode.TwoWay);
 
     public string Error
     {
-        get => _error;
-        protected set => SetAndRaise(ErrorProperty, ref _error, value);
+        get => GetValue(ErrorProperty);
+        protected set => SetValue(ErrorProperty, value);
     }
+
+    #endregion
+
+    #region Direct Properties
 
     #endregion
 
