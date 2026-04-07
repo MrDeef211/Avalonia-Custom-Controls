@@ -23,7 +23,8 @@
                                       SelectedObject="{Binding SelectedObject}"
                                       IsReadOnly="{Binding IsReadOnly}"
                                       HasChanges="{Binding HasChanges}"
-                                      Error="{Binding Error}"/>
+                                      Error="{Binding Error}"
+                                      SaveCommand="{Binding SaveCommand}"/>
         </Border>
     </DockPanel>
 </UserControl>

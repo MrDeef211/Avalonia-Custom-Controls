@@ -135,7 +135,7 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _highlightPoints, value);
         }
 
-        private bool _showLabels = true;
+        private bool _showLabels = false;
         public bool ShowLabels
         {
             get => _showLabels;

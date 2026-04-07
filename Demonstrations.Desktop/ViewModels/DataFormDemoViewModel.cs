@@ -3,24 +3,24 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Reactive;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 
 namespace Demonstrations.Desktop.ViewModels
 {
     public class DataFormDemoViewModel : PageViewModelBase
     {
         private DemoObject _selectedObject;
-        private bool _isReadOnly;
-        private string _statusMessage = string.Empty;
-        private string _error = string.Empty;
-        private bool _hasChanges;
-
         public DataFormDemoViewModel()
         {
             Title = "DataForm - Форма данных";
             NewObject();
+
+            SaveCommand = ReactiveCommand.Create<object?>(OnSave);
         }
 
+        private bool _isReadOnly;
         public DemoObject SelectedObject
         {
             get => _selectedObject;
@@ -33,18 +33,21 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _isReadOnly, value);
         }
 
+        private string _statusMessage = string.Empty;
         public string StatusMessage
         {
             get => _statusMessage;
             set => this.RaiseAndSetIfChanged(ref _statusMessage, value);
         }
 
+        private string _error = string.Empty;
         public string Error
         {
             get => _error;
             set => this.RaiseAndSetIfChanged(ref _error, value);
         }
 
+        private bool _hasChanges;
         public bool HasChanges
         {
             get => _hasChanges;
@@ -52,6 +55,15 @@ namespace Demonstrations.Desktop.ViewModels
         }
 
         private void NewObject() => SelectedObject = new DemoObject();
+
+        public ReactiveCommand<object?, Unit> SaveCommand { get; }
+
+        private void OnSave(object? savedObject)
+        {
+            StatusMessage = $"Сохранён объект: {savedObject}";
+            Thread.Sleep(1000);
+            StatusMessage = string.Empty;
+        }
 
     }
 }

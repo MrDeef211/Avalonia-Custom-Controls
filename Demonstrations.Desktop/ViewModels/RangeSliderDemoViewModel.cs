@@ -17,19 +17,6 @@ namespace Demonstrations.Desktop.ViewModels
         {
             Title = "Диапазон (RangeSlider)";
 
-            // Генерация случайных значений
-            RandomizeCommand = ReactiveCommand.Create(() =>
-            {
-                var rand = new Random();
-                double min = rand.Next(0, 50);
-                double max = min + rand.Next(20, 80);
-                Minimum = min;
-                Maximum = max;
-                LowerValue = min + rand.NextDouble() * (max - min) * 0.3;
-                UpperValue = max - rand.NextDouble() * (max - min) * 0.3;
-                Step = rand.Next(1, 10);
-            });
-
             this.ValidationRule(
                 vm => vm.TickStepText,
                 text => IsValidGridLength(text),

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
+using System.Reactive.Subjects;
 using System.Reflection;
 
 namespace Common.Controls;
@@ -21,7 +22,7 @@ public class PropertyGridControl : BaseEditorControl
     public ObservableCollection<CategoryModel> Categories { get; } = new();
 
     #region Настраиваемые визуальные свойства
-    
+
     public static readonly StyledProperty<GridLength> PropertyNameColumnWidthProperty =
         AvaloniaProperty.Register<PropertyGridControl, GridLength>(nameof(PropertyNameColumnWidth), GridLength.Auto);
 

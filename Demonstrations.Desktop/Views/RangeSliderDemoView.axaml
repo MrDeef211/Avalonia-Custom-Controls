@@ -7,13 +7,6 @@
     <DockPanel>
         <controls:Toolbar DockPanel.Dock="Top" Background="White">
 
-            <Button Command="{Binding RandomizeCommand}">
-                <PathIcon Data="M100,100L300,100L200,300Z" Foreground="Blue" Width="16" Height="16" />
-                <ToolTip.Tip>Случайные значения</ToolTip.Tip>
-            </Button>
-
-            <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
-
             <TextBlock Text="Min:" VerticalAlignment="Center" Margin="5,0,2,0"/>
             <NumericUpDown Value="{Binding Minimum}" Minimum="-1000" Maximum="1000" Increment="1" Width="120"/>
             <TextBlock Text="Max:" VerticalAlignment="Center" Margin="10,0,2,0"/>

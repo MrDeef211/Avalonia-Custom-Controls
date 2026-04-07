@@ -9,10 +9,6 @@ namespace Demonstrations.Desktop.ViewModels
 {
     public class PropertyGridDemoViewModel : PageViewModelBase
     {
-        private DemoObject _selectedObject;
-        private bool _isReadOnly;
-        private string _statusMessage = string.Empty;
-        private string _error = string.Empty;
 
         public PropertyGridDemoViewModel()
         {
@@ -25,24 +21,28 @@ namespace Demonstrations.Desktop.ViewModels
             MakeReadOnlyCommand = ReactiveCommand.Create(() => { IsReadOnly = !IsReadOnly; });
         }
 
+        private DemoObject _selectedObject;
         public DemoObject SelectedObject
         {
             get => _selectedObject;
             set => this.RaiseAndSetIfChanged(ref _selectedObject, value);
         }
 
+        private bool _isReadOnly;
         public bool IsReadOnly
         {
             get => _isReadOnly;
             set => this.RaiseAndSetIfChanged(ref _isReadOnly, value);
         }
 
+        private string _statusMessage = string.Empty;
         public string StatusMessage
         {
             get => _statusMessage;
             set => this.RaiseAndSetIfChanged(ref _statusMessage, value);
         }
 
+        private string _error = string.Empty;
         public string Error
         {
             get => _error;

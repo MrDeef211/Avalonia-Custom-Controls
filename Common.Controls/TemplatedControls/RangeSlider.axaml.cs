@@ -404,20 +404,6 @@ public class RangeSlider : TemplatedControl
         }, DispatcherPriority.Loaded);
     }
 
-    //private void LowerValueChanged(double e)
-    //{
-    //    double newValue = Math.Max(Minimum, Math.Min(UpperValue - Step, e));
-    //    if (Math.Abs(LowerValue - newValue) > double.Epsilon)
-    //        SetCurrentValue(LowerValueProperty, newValue);
-    //}
-
-    //private void UpperValueChanged(double e)
-    //{
-    //    double newValue = Math.Min(Maximum, Math.Max(LowerValue + Step, e));
-    //    if (Math.Abs(UpperValue - newValue) > double.Epsilon)
-    //        SetCurrentValue(UpperValueProperty, newValue);  
-    //}
-
     private void OnLowerThumbPointerPressed(object sender, PointerPressedEventArgs e)
     {
         if (!IsLowerThumbEnabled) return;

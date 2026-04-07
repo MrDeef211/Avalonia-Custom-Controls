@@ -3,9 +3,11 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using System;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
+using System.Reactive.Subjects;
 
 namespace Common.Controls;
 
@@ -16,10 +18,6 @@ public abstract class BaseEditorControl : TemplatedControl
 {
     private CompositeDisposable? _subscriptions;
     protected CompositeDisposable? Subscriptions => _subscriptions;
-
-    private bool _hasChanges;
-    private string _error = string.Empty;
-
 
     #region Styled Properties
 
@@ -65,7 +63,7 @@ public abstract class BaseEditorControl : TemplatedControl
 
     #endregion
 
-    #region Комманды
+    #region Комманды и события
 
     private ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit>? _commitChangesCommand;
     public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> CommitChangesCommand =>

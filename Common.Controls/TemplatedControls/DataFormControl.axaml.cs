@@ -9,7 +9,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables.Fluent;
+using System.Reactive.Subjects;
 using System.Reflection;
+using System.Windows.Input;
 
 namespace Common.Controls;
 
@@ -103,6 +105,18 @@ public class DataFormControl : BaseEditorControl
         set => SetValue(CategoryHeaderFontWeightProperty, value);
     }
 
+    public static readonly StyledProperty<ICommand?> SaveCommandProperty =
+    AvaloniaProperty.Register<DataFormControl, ICommand?>(nameof(SaveCommand));
+
+    /// <summary>
+    /// Команда, выполняемая после успешного сохранения данных.
+    /// </summary>
+    public ICommand? SaveCommand
+    {
+        get => GetValue(SaveCommandProperty);
+        set => SetValue(SaveCommandProperty, value);
+    }
+
     #endregion
 
     protected override void GenerateEditors(object? target)
@@ -190,6 +204,9 @@ public class DataFormControl : BaseEditorControl
             field.UpdateOriginal();
         }
         SetHasChanges(false);
+
+        if (SaveCommand?.CanExecute(SelectedObject) == true)
+            SaveCommand.Execute(SelectedObject);
     }
 
     protected override void CancelChanges()
