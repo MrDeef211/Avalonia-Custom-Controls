@@ -35,6 +35,7 @@ namespace Demonstrations.Desktop.Models
             set => this.RaiseAndSetIfChanged(ref _isActive, value);
         }
 
+        [Browsable(false)]
         [DisplayName("Прогресс")]
         public double Progress
         {

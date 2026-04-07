@@ -21,7 +21,6 @@ public class PropertyGridControl : BaseEditorControl
     public ObservableCollection<CategoryModel> Categories { get; } = new();
 
     #region Настраиваемые визуальные свойства
-
     
     public static readonly StyledProperty<GridLength> PropertyNameColumnWidthProperty =
         AvaloniaProperty.Register<PropertyGridControl, GridLength>(nameof(PropertyNameColumnWidth), GridLength.Auto);

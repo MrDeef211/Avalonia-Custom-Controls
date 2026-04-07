@@ -25,7 +25,8 @@ namespace Demonstrations.Desktop.ViewModels
                 new ChartDemoViewModel(),
                 new PieChartDemoViewModel(),
                 new RangeSliderDemoViewModel(),
-                new PropertyGridDemoViewModel()
+                new PropertyGridDemoViewModel(),
+                new DataFormDemoViewModel()
             };
 
             CurrentPage = Pages[0];
