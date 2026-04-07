@@ -31,6 +31,9 @@ public class PieChart : TemplatedControl
     public static readonly StyledProperty<bool> HighlightSectorProperty =
         AvaloniaProperty.Register<PieChart, bool>(nameof(HighlightSector), true);
 
+    public static readonly StyledProperty<HighlightType> HighlightTypeProperty =
+        AvaloniaProperty.Register<PieChart, HighlightType>(nameof(HighlightType), HighlightType.Push);
+
     public static readonly StyledProperty<bool> ShowLabelsProperty =
         AvaloniaProperty.Register<PieChart, bool>(nameof(ShowLabels), true);
 
@@ -100,10 +103,22 @@ public class PieChart : TemplatedControl
         set => SetValue(SectorColorsProperty, value);
     }
 
+    /// <summary>
+    /// Выделять сектор указанный курсором
+    /// </summary>
     public bool HighlightSector
     {
         get => GetValue(HighlightSectorProperty);
         set => SetValue(HighlightSectorProperty, value);
+    }
+
+    /// <summary>
+    /// Способ выделения сектора
+    /// </summary>
+    public HighlightType HighlightType
+    {
+        get => GetValue(HighlightTypeProperty);
+        set => SetValue(HighlightTypeProperty, value);
     }
 
     /// <summary>
@@ -342,54 +357,47 @@ public class PieChart : TemplatedControl
     {
         if (sweepDeg <= 0) return;
 
-        double startRad = startDeg * Math.PI / 180;
-        double sweepRad = sweepDeg * Math.PI / 180;
+        var (offset, effectiveOuterR, effectiveInnerR, effectiveStartDeg, effectiveSweepDeg)
+            = GetHighlightTransform(center.X, center.Y, outerR, innerR, startDeg, sweepDeg, isHighlighted);
+
+        double startRad = effectiveStartDeg * Math.PI / 180;
+        double sweepRad = effectiveSweepDeg * Math.PI / 180;
         double endRad = startRad + sweepRad;
 
-        Point offset = new Point();
-        if (isHighlighted)
-        {
-            double midRad = startRad + sweepRad / 2;
-            double shift = outerR * 0.05;
-            offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
-        }
-
         var geometry = new StreamGeometry();
-        using (var context = geometry.Open())
+        using (var ctx = geometry.Open())
         {
-            bool isLargeArc = sweepDeg > 180;
+            bool isLargeArc = effectiveSweepDeg > 180;
 
-            if (innerR <= 0)
+            if (effectiveInnerR <= 0)
             {
-                // Обычный сектор
-                context.BeginFigure(center + offset, true);
-                context.LineTo(new Point(
-                    center.X + outerR * Math.Cos(startRad) + offset.X,
-                    center.Y + outerR * Math.Sin(startRad) + offset.Y));
-                context.ArcTo(
-                    new Point(center.X + outerR * Math.Cos(endRad) + offset.X,
-                              center.Y + outerR * Math.Sin(endRad) + offset.Y),
-                    new Size(outerR, outerR), 0, isLargeArc, SweepDirection.Clockwise);
+                ctx.BeginFigure(center + offset, true);
+                ctx.LineTo(new Point(
+                    center.X + effectiveOuterR * Math.Cos(startRad) + offset.X,
+                    center.Y + effectiveOuterR * Math.Sin(startRad) + offset.Y));
+                ctx.ArcTo(
+                    new Point(center.X + effectiveOuterR * Math.Cos(endRad) + offset.X,
+                              center.Y + effectiveOuterR * Math.Sin(endRad) + offset.Y),
+                    new Size(effectiveOuterR, effectiveOuterR), 0, isLargeArc, SweepDirection.Clockwise);
             }
             else
             {
-                // Кольцевой сектор
-                Point outerStart = new Point(center.X + outerR * Math.Cos(startRad) + offset.X,
-                                             center.Y + outerR * Math.Sin(startRad) + offset.Y);
-                Point outerEnd = new Point(center.X + outerR * Math.Cos(endRad) + offset.X,
-                                           center.Y + outerR * Math.Sin(endRad) + offset.Y);
-                Point innerStart = new Point(center.X + innerR * Math.Cos(startRad) + offset.X,
-                                             center.Y + innerR * Math.Sin(startRad) + offset.Y);
-                Point innerEnd = new Point(center.X + innerR * Math.Cos(endRad) + offset.X,
-                                           center.Y + innerR * Math.Sin(endRad) + offset.Y);
+                Point outerStart = new Point(center.X + effectiveOuterR * Math.Cos(startRad) + offset.X,
+                                             center.Y + effectiveOuterR * Math.Sin(startRad) + offset.Y);
+                Point outerEnd = new Point(center.X + effectiveOuterR * Math.Cos(endRad) + offset.X,
+                                           center.Y + effectiveOuterR * Math.Sin(endRad) + offset.Y);
+                Point innerStart = new Point(center.X + effectiveInnerR * Math.Cos(startRad) + offset.X,
+                                             center.Y + effectiveInnerR * Math.Sin(startRad) + offset.Y);
+                Point innerEnd = new Point(center.X + effectiveInnerR * Math.Cos(endRad) + offset.X,
+                                           center.Y + effectiveInnerR * Math.Sin(endRad) + offset.Y);
 
-                context.BeginFigure(outerStart, true);
-                context.ArcTo(outerEnd, new Size(outerR, outerR), 0, isLargeArc, SweepDirection.Clockwise);
-                context.LineTo(innerEnd);
-                context.ArcTo(innerStart, new Size(innerR, innerR), 0, isLargeArc, SweepDirection.CounterClockwise);
+                ctx.BeginFigure(outerStart, true);
+                ctx.ArcTo(outerEnd, new Size(effectiveOuterR, effectiveOuterR), 0, isLargeArc, SweepDirection.Clockwise);
+                ctx.LineTo(innerEnd);
+                ctx.ArcTo(innerStart, new Size(effectiveInnerR, effectiveInnerR), 0, isLargeArc, SweepDirection.CounterClockwise);
             }
 
-            context.EndFigure(true);
+            ctx.EndFigure(true);
         }
 
         dc.DrawGeometry(brush, null, geometry);
@@ -501,6 +509,79 @@ public class PieChart : TemplatedControl
         }
     }
 
+    /// <summary>
+    /// Рассчитывает модифицированные параметры для отрисовки выделенного сектора.
+    /// </summary>
+    private (Point offset, double outerRadius, double innerRadius, double startAngle, double sweepAngle)
+        GetHighlightTransform(double centerX, double centerY, double originalOuterR, double originalInnerR,
+                              double originalStartDeg, double originalSweepDeg, bool isHighlighted)
+    {
+        if (!isHighlighted || !HighlightSector)
+            return (new Point(0, 0), originalOuterR, originalInnerR, originalStartDeg, originalSweepDeg);
+
+        const double pushFactor = 0.05;      
+        const double reduceAngleFactor = 0.05; 
+
+        double midRad = (originalStartDeg + originalSweepDeg / 2) * Math.PI / 180;
+        double shift = originalOuterR * pushFactor;
+        Point offset = new Point(0, 0);
+
+        double newOuterR = originalOuterR;
+        double newInnerR = originalInnerR;
+        double newStartDeg = originalStartDeg;
+        double newSweepDeg = originalSweepDeg;
+
+        switch (HighlightType)
+        {
+            case HighlightType.Push:
+                // только смещение
+                offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
+                break;
+
+            case HighlightType.Increase:
+                // увеличение внешнего радиуса, без смещения
+                newOuterR = originalOuterR * (1 + pushFactor);
+                break;
+
+            case HighlightType.IncreaseOut:
+                // смещение + увеличение внешнего радиуса
+                newInnerR = originalInnerR * (1 + pushFactor * 0.7);
+                offset = new Point(Math.Cos(midRad) * shift * 0.3, Math.Sin(midRad) * shift * 0.3);
+                newOuterR = originalOuterR * (1 + pushFactor * 0.7);
+                break;
+
+            case HighlightType.Decrease:
+                // уменьшение внешнего радиуса, без смещения
+                newOuterR = Math.Max(originalOuterR * (1 - pushFactor), originalInnerR + 1);
+                break;
+
+            case HighlightType.Reduce:
+                // пропорциональное уменьшение
+                // параметры и сами преобразования были выбраны методом подбора на основе субьективной оценки результатов эксперементов
+                // Min, Max и первый if (тот который для вычисления отступа) нужны для обработки граничных ситуаций
+                // второй if (тот который для внутреннего радиуса) нужен, в основном, для улучшения внешнего вида при средних углах
+                if (originalInnerR / originalOuterR  < 1 - pushFactor && originalInnerR / originalOuterR > 0.1)
+                    offset = new Point(Math.Cos(midRad) * shift * 0.3, Math.Sin(midRad) * shift * 0.3);
+                else if (originalInnerR / originalOuterR <= 0.1)
+                    offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
+
+                newOuterR = Math.Max(originalOuterR * (1 - pushFactor), (originalOuterR + originalInnerR) / 2);
+                double angleDelta = originalSweepDeg * reduceAngleFactor;
+
+                if (originalInnerR / originalOuterR < 0.1 || originalInnerR / originalOuterR > 0.75)
+                    newInnerR = Math.Min(originalInnerR * (1 + pushFactor * 0.3), (originalOuterR + 2 * originalInnerR) / 3);
+                else
+                    newInnerR = Math.Min(originalInnerR + originalOuterR * pushFactor * 0.5, (originalOuterR + 2 * originalInnerR) / 3);
+
+                newStartDeg = originalStartDeg + angleDelta;
+                newSweepDeg = originalSweepDeg - 2 * angleDelta;
+                if (newSweepDeg <= 0) newSweepDeg = 0.1; 
+                break;
+        }
+
+        return (offset, newOuterR, newInnerR, newStartDeg, newSweepDeg);
+    }
+
     #endregion
 
     /// <summary>
@@ -583,4 +664,22 @@ public enum ImageScaling
 
     // По короткой стороне (заполнить целиком)
     Cover
+}
+
+public enum HighlightType
+{
+    // Выталкивать без изменения формы
+    Push,
+
+    // Увеличить радиус без выталкивания
+    Increase,
+
+    // Увеличить с выталкиванием
+    IncreaseOut,
+
+    // Уменьшить только радиус
+    Decrease,
+
+    // Уменьшить пропорционально
+    Reduce
 }

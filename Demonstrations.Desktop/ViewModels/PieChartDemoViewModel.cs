@@ -69,6 +69,15 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _highlightSector, value);
         }
 
+        public IEnumerable<HighlightType> AllHighlightType =>
+            Enum.GetValues(typeof(HighlightType)).Cast<HighlightType>();
+        private HighlightType _highlightType = HighlightType.Push;
+        public HighlightType HighlightType
+        {
+            get => _highlightType;
+            set => this.RaiseAndSetIfChanged(ref _highlightType, value);
+        }
+
         private bool _showLabels = true;
         public bool ShowLabels
         {

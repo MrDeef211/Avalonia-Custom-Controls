@@ -28,6 +28,10 @@
                       IsChecked="{Binding HighlightSector}" 
                       ToolTip.Tip="Выделять сектора при наведении"/>
 
+            <ComboBox ItemsSource="{Binding AllHighlightType}"
+                SelectedItem="{Binding HighlightType}"
+                Width="100" VerticalAlignment="Center"/>
+
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
             <CheckBox Content="Labels" 
@@ -84,6 +88,7 @@
                            Padding="20"
                            SectorColors="{Binding SectorColors}"
                            HighlightSector="{Binding HighlightSector}"
+                           HighlightType="{Binding HighlightType}"
                            ShowLabels="{Binding ShowLabels}"
                            LabelPlacement="{Binding LabelPlacement}"
                            ShowPercentages="{Binding ShowPercentages}"

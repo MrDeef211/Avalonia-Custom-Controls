@@ -18,8 +18,9 @@ namespace Demonstrations.Desktop.ViewModels
         public ChartDemoViewModel()
         {
             Title = "График";
-            ChartData = new ChartDataBase();
             _chartGenerator = new();
+            ChartData = _chartGenerator.Generate();
+         
 
             // Команды
             ClickCommand = ReactiveCommand.Create(() =>
