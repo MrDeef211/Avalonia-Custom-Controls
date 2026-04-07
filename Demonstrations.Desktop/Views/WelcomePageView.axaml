@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Demonstrations.Desktop.ViewModels"
+             x:Class="Demonstrations.Desktop.Views.WelcomePageView"
+             x:DataType="vm:WelcomePageViewModel">
+    <ScrollViewer>
+        <StackPanel Margin="20">
+            <TextBlock Text="Добро пожаловать в демонстрационное приложение!"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10" />
+            <TextBlock Text="Здесь представлены примеры использования кастомных контролов AvaloniaUI:"
+                       FontSize="16"
+                       Margin="0,0,0,20" />
+
+            <ItemsControl ItemsSource="{Binding Controls}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:ControlDescription">
+                        <Border Background="{DynamicResource SystemControlBackgroundAltLowBrush}"
+                                CornerRadius="8"
+                                Padding="12"
+                                Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SystemAccentColor}" />
+                                <TextBlock Text="{Binding Description}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,5,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

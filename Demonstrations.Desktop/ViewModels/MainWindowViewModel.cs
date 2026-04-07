@@ -21,7 +21,7 @@ namespace Demonstrations.Desktop.ViewModels
         {
             Pages = new ObservableCollection<PageViewModelBase>
             {
-                new ChartDemoViewModel(),
+                new WelcomePageViewModel(),
                 new ChartDemoViewModel(),
                 new PieChartDemoViewModel(),
                 new RangeSliderDemoViewModel(),
