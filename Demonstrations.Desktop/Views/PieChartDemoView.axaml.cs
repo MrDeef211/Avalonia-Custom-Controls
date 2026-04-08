@@ -1,47 +1,39 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Avalonia.Media;
 using Demonstrations.Desktop.ViewModels;
-using System;
+using ReactiveUI;
+using ReactiveUI.Avalonia;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
-namespace Demonstrations.Desktop.Views;
-
-public partial class PieChartDemoView : UserControl
+namespace Demonstrations.Desktop.Views
 {
-    public PieChartDemoView()
+    public partial class PieChartDemoView : ReactiveUserControl<PieChartDemoViewModel>
     {
-        InitializeComponent();
-        this.DataContextChanged += OnDataContextChanged;
-    }
-
-    private void OnDataContextChanged(object? sender, EventArgs e)
-    {
-        if (DataContext is PieChartDemoViewModel vm)
+        public PieChartDemoView()
         {
-            RegisterHandlers(vm);
-        }
-    }
+            InitializeComponent();
 
-    private void RegisterHandlers(PieChartDemoViewModel vm)
-    {
-        // Диалог выбора файла
-        vm.ShowOpenFileDialog.RegisterHandler(async context =>
-        {
-            var dialog = new OpenFileDialog
+            this.WhenActivated(disposables =>
             {
-                Title = "Выберите изображение",
-                AllowMultiple = false,
-                Filters = new System.Collections.Generic.List<FileDialogFilter>
+                // Регистрация диалога выбора файла
+                ViewModel!.ShowOpenFileDialog.RegisterHandler(async context =>
+                {
+                    var dialog = new OpenFileDialog
                     {
-                        new FileDialogFilter { Name = "Изображения", Extensions = { "png", "jpg", "jpeg", "bmp", "gif" } }
-                    }
-            };
-            var owner = TopLevel.GetTopLevel(this) as Window;
-            var result = await dialog.ShowAsync(owner);
-            var path = result?.FirstOrDefault();
-            context.SetOutput(path);
-        });
+                        Title = "Выберите изображение",
+                        AllowMultiple = false,
+                        Filters = new System.Collections.Generic.List<FileDialogFilter>
+                        {
+                            new FileDialogFilter { Name = "Изображения", Extensions = { "png", "jpg", "jpeg", "bmp", "gif" } }
+                        }
+                    };
+                    var owner = TopLevel.GetTopLevel(this) as Window;
+                    var result = await dialog.ShowAsync(owner);
+                    var path = result?.FirstOrDefault();
+                    context.SetOutput(path);
+                }).DisposeWith(disposables);
+            });
+        }
     }
 }

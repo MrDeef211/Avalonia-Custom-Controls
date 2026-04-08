@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Common.Controls"
+             xmlns:vm="using:Demonstrations.Desktop.ViewModels"
+             x:Class="Demonstrations.Desktop.Views.ZoomDemoView"
+             x:DataType="vm:ZoomDemoViewModel">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10" Spacing="10">
+            <Button Command="{Binding PickImageCommand}">Выбрать изображение</Button>
+            <Button Command="{Binding ElementName=ZoomCtrl, Path=ResetZoomCommand}">Сброс масштаба</Button>
+            <TextBlock Text="{Binding ZoomState.Scale, StringFormat='Масштаб: {0:F2}'}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <controls:ZoomControl x:Name="ZoomCtrl"
+                              ZoomState="{Binding ZoomState}"
+                              Background="LightGray"
+                              MaxScale="50">
+            <Panel>
+                <Image Source="{Binding CurrentImage}"
+                       Stretch="Uniform"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+                <TextBlock Text="Нет изображения. Нажмите &quot;Выбрать изображение&quot;"
+                           Foreground="Gray"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding CurrentImage, Converter={x:Static ObjectConverters.IsNull}}"/>
+            </Panel>
+        </controls:ZoomControl>
+    </DockPanel>
+</UserControl>

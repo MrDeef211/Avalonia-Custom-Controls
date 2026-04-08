@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Common.Controls"
+                    x:CompileBindings="False">
+
+    <Design.PreviewWith>
+        <controls:ZoomControl Width="400" Height="300">
+            <Image Source="/Assets/demo.jpg" Stretch="UniformToFill"/>
+        </controls:ZoomControl>
+    </Design.PreviewWith>
+
+    <ControlTheme x:Key="{x:Type controls:ZoomControl}" TargetType="controls:ZoomControl">
+    <Setter Property="Template">
+        <ControlTemplate>
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}">
+                <Border Name="PART_Presenter"
+                        Background="{TemplateBinding Background}"
+                        ClipToBounds="True"
+                        HorizontalAlignment="Stretch" 
+                        VerticalAlignment="Stretch"
+                        RenderTransformOrigin="0,0">
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                </Border>
+            </Border>
+        </ControlTemplate>
+    </Setter>
+</ControlTheme>
+</ResourceDictionary>
