@@ -242,6 +242,14 @@ public class ZoomControl : ContentControl
         SyncZoomState();
     }
 
+    private void JumpToMatrix(Matrix newMatrix)
+    {
+        _targetMatrix = newMatrix; 
+        _matrix = newMatrix; 
+        UpdateTransform();
+        SyncZoomState();
+    }
+
     private void SmoothSetMatrix(Matrix target)
     {
         _targetMatrix = target;
@@ -262,18 +270,25 @@ public class ZoomControl : ContentControl
         _redoStack.Push(_matrix);
         var previous = _undoStack.Last.Value;
         _undoStack.RemoveLast();
-        SetMatrix(previous);
+        JumpToMatrix(previous);
     }
 
     private void Redo()
     {
         if (_redoStack.Count == 0) return;
         _undoStack.AddLast(_matrix);
-        SetMatrix(_redoStack.Pop());
+        JumpToMatrix(_redoStack.Pop());
     }
 
-    private void ResetZoom() => SetMatrix(Matrix.Identity);
+    private void ResetZoom()
+    {
+        PushState();
+        JumpToMatrix(Matrix.Identity);
+    }
+
+    // Пока одинаковые
     private void FitToScreen() => ResetZoom();
+
     private void OnDoubleTapped(object? sender, TappedEventArgs e) => ResetZoom();
 
     private void ZoomAtPoint(Point point, double delta)

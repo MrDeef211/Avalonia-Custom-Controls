@@ -4,28 +4,78 @@
              xmlns:vm="using:Demonstrations.Desktop.ViewModels"
              x:Class="Demonstrations.Desktop.Views.ZoomDemoView"
              x:DataType="vm:ZoomDemoViewModel">
-    <DockPanel>
+
+    <UserControl.Resources>
+        <ControlTheme x:Key="KeyHint" TargetType="HeaderedContentControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Grid ColumnDefinitions="140,*">
+                            <Border Grid.Column="0" 
+                                    Background="#44FFFFFF" 
+                                    CornerRadius="4" 
+                                    Padding="4,2"
+                                    HorizontalAlignment="Left">
+                                <TextBlock Text="{Binding Header, RelativeSource={RelativeSource TemplatedParent}}" 
+                                    FontSize="11" 
+                                    FontWeight="SemiBold"
+                                    FontFamily="Consolas" 
+                                    Foreground="Gold"/>
+                            </Border>
+                            <TextBlock Grid.Column="1" 
+                                   Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" 
+                                   FontSize="11" 
+                                   Foreground="#CCFFFFFF" 
+                                   VerticalAlignment="Center"
+                                   Margin="10,0,0,0"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </ControlTheme>
+    </UserControl.Resources>
+        <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10" Spacing="10">
             <Button Command="{Binding PickImageCommand}">Выбрать изображение</Button>
             <Button Command="{Binding ElementName=ZoomCtrl, Path=ResetZoomCommand}">Сброс масштаба</Button>
             <TextBlock Text="{Binding ZoomState.Scale, StringFormat='Масштаб: {0:F2}'}" VerticalAlignment="Center"/>
         </StackPanel>
 
-        <controls:ZoomControl x:Name="ZoomCtrl"
-                              ZoomState="{Binding ZoomState}"
-                              Background="LightGray"
-                              MaxScale="50">
-            <Panel>
-                <Image Source="{Binding CurrentImage}"
-                       Stretch="Uniform"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center"/>
-                <TextBlock Text="Нет изображения. Нажмите &quot;Выбрать изображение&quot;"
-                           Foreground="Gray"
-                           HorizontalAlignment="Center"
+        <Grid>
+            <controls:ZoomControl x:Name="ZoomCtrl"
+                                  ZoomState="{Binding ZoomState}"
+                                  Background="LightGray"
+                                  MaxScale="50">
+                <Panel>
+                    <Image Source="{Binding CurrentImage}"
+                           Stretch="Uniform"
                            VerticalAlignment="Center"
-                           IsVisible="{Binding CurrentImage, Converter={x:Static ObjectConverters.IsNull}}"/>
-            </Panel>
-        </controls:ZoomControl>
+                           HorizontalAlignment="Center"/>
+                    <TextBlock Text="Нет изображения. Нажмите &quot;Выбрать изображение&quot;"
+                               Foreground="Gray"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding CurrentImage, Converter={x:Static ObjectConverters.IsNull}}"/>
+                </Panel>
+            </controls:ZoomControl>
+
+            <Border Background="#AA000000" 
+                    CornerRadius="8" 
+                    Padding="12" 
+                    Margin="20"
+                    HorizontalAlignment="Right" 
+                    VerticalAlignment="Bottom"
+                    IsHitTestVisible="False"> 
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Управление:" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
+                
+                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="WASD / ←↑→↓" Content="Перемещение"/>
+                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Wheel / +/-" Content="Масштаб"/>
+                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Double Click / Ctrl+0" Content="Сброс камеры"/>
+                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Home" Content="Сброс позиции"/>
+                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Ctrl+Z / Y" Content="История"/>
+                </StackPanel>
+            </Border>
+        </Grid>
     </DockPanel>
 </UserControl>
