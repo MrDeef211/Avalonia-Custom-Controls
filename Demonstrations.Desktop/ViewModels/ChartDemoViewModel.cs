@@ -120,7 +120,7 @@ namespace Demonstrations.Desktop.ViewModels
 
         public IEnumerable<ChartStyle> AllChartStyles =>
             Enum.GetValues(typeof(ChartStyle)).Cast<ChartStyle>();
-
+        
         private ChartStyle _selectedChartStyle = ChartStyle.Line;
         public ChartStyle SelectedChartStyle
         {
