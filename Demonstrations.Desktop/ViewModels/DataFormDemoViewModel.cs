@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Demonstrations.Desktop.ViewModels
 {
@@ -58,10 +59,10 @@ namespace Demonstrations.Desktop.ViewModels
 
         public ReactiveCommand<object?, Unit> SaveCommand { get; }
 
-        private void OnSave(object? savedObject)
+        private async void OnSave(object? savedObject)
         {
             StatusMessage = $"Сохранён объект: {savedObject}";
-            Thread.Sleep(1000);
+            await Task.Delay(3000);
             StatusMessage = string.Empty;
         }
 

@@ -111,6 +111,9 @@ public class DataFormControl : BaseEditorControl
     /// <summary>
     /// Команда, выполняемая после успешного сохранения данных.
     /// </summary>
+    /// <remarks>
+    /// Параметр сохранённый обьект
+    /// </remarks>
     public ICommand? SaveCommand
     {
         get => GetValue(SaveCommandProperty);
@@ -155,34 +158,10 @@ public class DataFormControl : BaseEditorControl
 
     private void OnFieldValueChanged(FormFieldModel fieldModel)
     {
-        fieldModel.ValidationError = string.Empty;
-        SetError(string.Empty);
-
-        // Валидация буферного значения
-        if (fieldModel.Value == null)
-        {
-            var propType = fieldModel.PropertyInfo.PropertyType;
-            if (propType.IsValueType && Nullable.GetUnderlyingType(propType) == null)
-            {
-                fieldModel.ValidationError = "Значение не может быть null";
-                SetError(fieldModel.ValidationError);
-                return;
-            }
-        }
+        if (!string.IsNullOrEmpty(fieldModel.ValidationError))
+            SetError(fieldModel.ValidationError);
         else
-        {
-            var targetType = Nullable.GetUnderlyingType(fieldModel.PropertyInfo.PropertyType) ?? fieldModel.PropertyInfo.PropertyType;
-            try
-            {
-                _ = Convert.ChangeType(fieldModel.Value, targetType);
-            }
-            catch (Exception ex)
-            {
-                fieldModel.ValidationError = $"Ошибка: {ex.Message}";
-                SetError(fieldModel.ValidationError);
-                return;
-            }
-        }
+            SetError(string.Empty);
 
         UpdateHasChanges();
     }
@@ -190,7 +169,7 @@ public class DataFormControl : BaseEditorControl
     private void UpdateHasChanges()
     {
         bool hasChanges = Sections.SelectMany(s => s.Fields)
-            .Any(f => !Equals(f.Value, f.OriginalValue));
+            .Any(f => !Equals(f.ConvertedValue, f.OriginalValue));
         SetHasChanges(hasChanges);
     }
 
@@ -198,13 +177,14 @@ public class DataFormControl : BaseEditorControl
     {
         foreach (var field in Sections.SelectMany(s => s.Fields))
         {
-            if (Equals(field.Value, field.OriginalValue)) continue;
-            // Записываем буферное значение в реальный объект
-            field.PropertyInfo.SetValue(field.Target, field.Value);
+            if (field.ValidationError != null && field.ValidationError != string.Empty)
+                continue; 
+
+            if (Equals(field.ConvertedValue, field.OriginalValue)) continue;
+            field.PropertyInfo.SetValue(field.Target, field.ConvertedValue);
             field.UpdateOriginal();
         }
         SetHasChanges(false);
-
         if (SaveCommand?.CanExecute(SelectedObject) == true)
             SaveCommand.Execute(SelectedObject);
     }

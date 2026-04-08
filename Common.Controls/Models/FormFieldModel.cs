@@ -10,6 +10,7 @@ namespace Common.Controls.Models
     {
         private object? _originalValue;
         private object? _value;
+        private object? _convertedValue;
         private bool _isReadOnly;
         private string _validationError = string.Empty;
 
@@ -30,7 +31,17 @@ namespace Common.Controls.Models
         public object? Value
         {
             get => _value;
-            set => this.RaiseAndSetIfChanged(ref _value, value);
+            set 
+            { 
+                this.RaiseAndSetIfChanged(ref _value, value);
+                TryConvertValue();
+            }
+        }
+
+        public object? ConvertedValue
+        {
+            get => _convertedValue;
+            private set => this.RaiseAndSetIfChanged(ref _convertedValue, value);
         }
 
         public object? OriginalValue => _originalValue;
@@ -51,6 +62,36 @@ namespace Common.Controls.Models
         {
             get => _validationError;
             set => this.RaiseAndSetIfChanged(ref _validationError, value);
+        }
+
+        private void TryConvertValue()
+        {
+            ValidationError = string.Empty;
+
+            if (_value == null)
+            {
+                var propType = PropertyInfo.PropertyType;
+                if (propType.IsValueType && Nullable.GetUnderlyingType(propType) == null)
+                {
+                    ValidationError = "Значение не может быть null";
+                    ConvertedValue = null;
+                    return;
+                }
+                ConvertedValue = null;
+                return;
+            }
+
+            var targetType = Nullable.GetUnderlyingType(PropertyInfo.PropertyType) ?? PropertyInfo.PropertyType;
+            try
+            {
+                var converted = Convert.ChangeType(_value, targetType);
+                ConvertedValue = converted;
+            }
+            catch (Exception ex)
+            {
+                ValidationError = $"Ошибка: {ex.Message}";
+                ConvertedValue = null;
+            }
         }
 
         /// <summary>
