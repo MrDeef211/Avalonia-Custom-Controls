@@ -1,5 +1,6 @@
 ﻿using Avalonia.Media.Imaging;
 using Common.Controls.Models;
+using Demonstrations.Desktop.Models;
 using ReactiveUI;
 using System;
 using System.Linq;
@@ -10,59 +11,49 @@ namespace Demonstrations.Desktop.ViewModels
 {
     public class CombinedFirstDemoViewModel : PageViewModelBase
     {
-        private readonly ChartGenerator _generator = new();
+
+        private CombinedFirstDemoModel _model = new();
 
         public CombinedFirstDemoViewModel()
         {
             Title = "Совместная работа: График + Zoom + RangeSlider";
-            GenerateNewData();
 
             // Команды
-            GenerateCommand = ReactiveCommand.Create(GenerateNewData);
+            GenerateCommand = ReactiveCommand.Create(() => _model.GenerateNewData());
             ToggleOverlayCommand = ReactiveCommand.Create(() => { ShowOverlay = !ShowOverlay; });
 
-            this.WhenAnyValue(x => x.LowerX, x => x.UpperX)
-                .Subscribe(_ => ApplyFilter());
+            this.WhenAnyValue(x => x._model.LowerX, x => x._model.LowerX)
+                .Subscribe(_ =>
+                {
+                    this.RaisePropertyChanged(nameof(ShowLabel));
+                    this.RaisePropertyChanged(nameof(ChartThickness));
+                    this.RaisePropertyChanged(nameof(HighlightPoints));
+                });
 
-            this.WhenAnyValue(x => x.LowerX, x => x.UpperX)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(ShowLabel)));
-
-            this.WhenAnyValue(x => x.LowerX, x => x.UpperX)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(ChartThickness)));
-
-            this.WhenAnyValue(x => x.LowerX, x => x.UpperX)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(HighlightPoints)));
-
-            this.WhenAnyValue(x => x.FullChartData)
-                .Subscribe(_ => ApplyFilter());
+            this.WhenAnyValue(x => x._model.FilteredChartData)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(FilteredChartData)));
         }
 
-        private ChartDataBase _fullChartData;
-        public ChartDataBase FullChartData
-        {
-            get => _fullChartData;
-            set => this.RaiseAndSetIfChanged(ref _fullChartData, value);
-        }
+        public ChartDataBase FilteredChartData => _model.FilteredChartData;
 
-        private ChartDataBase _filteredChartData;
-        public ChartDataBase FilteredChartData
-        {
-            get => _filteredChartData;
-            private set => this.RaiseAndSetIfChanged(ref _filteredChartData, value);
-        }
-
-        private double _lowerX = -200;
         public double LowerX
         {
-            get => _lowerX;
-            set => this.RaiseAndSetIfChanged(ref _lowerX, value);
+            get => _model.LowerX;
+            set
+            {
+                _model.LowerX = value;
+                this.RaisePropertyChanged();
+            }
         }
 
-        private double _upperX = 199;
         public double UpperX
         {
-            get => _upperX;
-            set => this.RaiseAndSetIfChanged(ref _upperX, value);
+            get => _model.UpperX;
+            set
+            {
+                _model.UpperX = value;
+                this.RaisePropertyChanged();
+            }
         }
 
         private bool _showOverlay = true;
@@ -87,23 +78,5 @@ namespace Demonstrations.Desktop.ViewModels
 
         public ReactiveCommand<Unit, Unit> GenerateCommand { get; }
         public ReactiveCommand<Unit, Unit> ToggleOverlayCommand { get; }
-
-        private void GenerateNewData()
-        {
-            FullChartData = _generator.Generate(-500, 500);
-        }
-
-        private void ApplyFilter()
-        {
-            if (FullChartData == null) return;
-
-            var filtered = new ChartDataBase();
-            foreach (var point in FullChartData.Chart)
-            {
-                if (point.Key >= LowerX && point.Key <= UpperX)
-                    filtered.Add(point.Key, point.Value);
-            }
-            FilteredChartData = filtered;
-        }
     }
 }
