@@ -3,6 +3,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Common.Controls;
 using Common.Controls.Models;
+using Demonstrations.Desktop.Models;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -17,50 +18,34 @@ namespace Demonstrations.Desktop.ViewModels
 {
     public class PieChartDemoViewModel : PageViewModelBase
     {
-        PieChartGenerator _generator;
+
+        private PieChartDemoModel _model;
+
         public PieChartDemoViewModel()
         {
             Title = "Круговая диаграмма";
 
-            Content = new PieChartDataBase();
-            _generator = new();
-            Content = _generator.GenerateDefaultData();
-
-            SectorColors = new List<IBrush>
-            {
-                Brushes.DodgerBlue,
-                Brushes.OrangeRed,
-                Brushes.Gold,
-                Brushes.MediumSeaGreen,
-                Brushes.MediumPurple,
-                Brushes.HotPink,
-                Brushes.Teal,
-                Brushes.Coral
-            };
+            _model = new();
 
             HoleColor = Brushes.WhiteSmoke;
 
             // Команды
-            GenerateRandomDataCommand = ReactiveCommand.Create(() => { Content = _generator.GenerateRandomData(); });
+            GenerateRandomDataCommand = ReactiveCommand.Create(() => _model.Generate());
             PickCenterImageCommand = ReactiveCommand.CreateFromTask(PickCenterImageAsync);
 
             // Взаимодействия
             ShowOpenFileDialog = new Interaction<Unit, string?>();
+
+            _model.WhenAnyValue(x => x.PieChart)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(Content)));
+
+            _model.WhenAnyValue(x => x.SectorColors)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(SectorColors)));
         }
 
-        private PieChartDataBase _content;
-        public PieChartDataBase Content
-        {
-            get => _content;
-            set => this.RaiseAndSetIfChanged(ref _content, value);
-        }
+        public PieChartDataBase Content => _model.PieChart;
 
-        private IList<IBrush> _sectorColors;
-        public IList<IBrush> SectorColors
-        {
-            get => _sectorColors;
-            set => this.RaiseAndSetIfChanged(ref _sectorColors, value);
-        }
+        public IList<IBrush> SectorColors => _model.SectorColors;
 
         private bool _highlightSector = true;
         public bool HighlightSector

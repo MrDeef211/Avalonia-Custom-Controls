@@ -29,8 +29,6 @@ namespace Demonstrations.Desktop.ViewModels
                         TickStep = GridLength.Parse(text);
                 });
 
-            this.WhenAnyValue(x => x.LowerValue, x => x.UpperValue)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(Range)));
         }
 
         private double _minimum = 0;
@@ -167,8 +165,6 @@ namespace Demonstrations.Desktop.ViewModels
             get => _tickLength;
             set => this.RaiseAndSetIfChanged(ref _tickLength, value);
         }
-
-        public double Range => UpperValue - LowerValue;
 
         public ReactiveCommand<Unit, Unit> RandomizeCommand { get; }
 

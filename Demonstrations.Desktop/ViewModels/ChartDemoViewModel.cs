@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Common.Controls;
 using Common.Controls.Models;
+using Demonstrations.Desktop.Models;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using System;
@@ -13,27 +14,15 @@ namespace Demonstrations.Desktop.ViewModels
 {
     internal class ChartDemoViewModel : PageViewModelBase
     {
-        private ChartGenerator _chartGenerator;
-
+        private ChartDemoModel _model;
         public ChartDemoViewModel()
         {
-            Title = "График";
-            _chartGenerator = new();
-            ChartData = _chartGenerator.Generate();
-         
+            Title = "График";   
+            
+            _model = new ChartDemoModel();
 
             // Команды
-            ClickCommand = ReactiveCommand.Create(() =>
-            {
-                TestCommandIsActive = !TestCommandIsActive;
-            });
-
-            TestCommand = ReactiveCommand.Create(() => { }, this.WhenAnyValue(x => x.TestCommandIsActive));
-
-            DrawCommand = ReactiveCommand.Create(() =>
-            {
-                ChartData = _chartGenerator.Generate();
-            }, this.WhenAnyValue(x => x.TestCommandIsActive));
+            DrawCommand = ReactiveCommand.Create(() => _model.Generate(), this.WhenAnyValue(x => x.TestCommandIsActive));
 
             // Валидация
             this.ValidationRule(
@@ -60,7 +49,12 @@ namespace Demonstrations.Desktop.ViewModels
                     if (IsValidGridLength(text))
                         GridSizeY = GridLength.Parse(text);
                 });
+
+            this.WhenAnyValue(x => x._model.ChartData)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(ChartData)));
         }
+
+        public ChartDataBase ChartData => _model.ChartData;
 
         private bool _testCommandIsActive = true;
         public bool TestCommandIsActive
@@ -111,13 +105,6 @@ namespace Demonstrations.Desktop.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _gridSizeY, value);
         }
 
-        private ChartDataBase _chartData;
-        public ChartDataBase ChartData
-        {
-            get => _chartData;
-            set => this.RaiseAndSetIfChanged(ref _chartData, value);
-        }
-
         public IEnumerable<ChartStyle> AllChartStyles =>
             Enum.GetValues(typeof(ChartStyle)).Cast<ChartStyle>();
         
@@ -160,8 +147,6 @@ namespace Demonstrations.Desktop.ViewModels
         }
 
         // Команды
-        public ReactiveCommand<Unit, Unit> ClickCommand { get; }
-        public ReactiveCommand<Unit, Unit> TestCommand { get; }
         public ReactiveCommand<Unit, Unit> DrawCommand { get; }
 
         private bool IsValidGridLength(string? input)
