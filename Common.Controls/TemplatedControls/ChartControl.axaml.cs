@@ -42,6 +42,9 @@ public class ChartControl : TemplatedControl
     public static readonly StyledProperty<IBrush> ChartColorProperty =
         AvaloniaProperty.Register<ChartControl, IBrush>(nameof(ChartColor), Brushes.DodgerBlue);
 
+    public static readonly StyledProperty<double> ChartThicknessProperty =
+        AvaloniaProperty.Register<ChartControl, double>(nameof(ChartThickness), 2);
+
     public static readonly StyledProperty<bool> FillProperty =
         AvaloniaProperty.Register<ChartControl, bool>(nameof(Fill), false);
 
@@ -130,6 +133,12 @@ public class ChartControl : TemplatedControl
         set => SetValue(ChartColorProperty, value);
     }
 
+    public double ChartThickness
+    {
+        get => GetValue(ChartThicknessProperty);
+        set => SetValue(ChartThicknessProperty, value);
+    }
+
     /// <summary>
     /// Заполнять область под графиком
     /// </summary>
@@ -170,7 +179,7 @@ public class ChartControl : TemplatedControl
     /// Размер сетки по X в еденицах измерения графика
     /// </summary>
     /// <remarks>
-    /// Auto - автоматические целые значения, примерно 80 px между линиями; * - автоматически примерно 10 ячеек сетки
+    /// Auto - автоматические целые значения, примерно 80 px между линиями; "число + *" - конкретно конечное количество ячеек
     /// </remarks>
     public GridLength GridSizeX
     {
@@ -182,7 +191,7 @@ public class ChartControl : TemplatedControl
     /// Размер сетки по Y в еденицах измерения графика 
     /// </summary>
     /// <remarks>
-    /// Auto - автоматические целые значения, примерно 80 px между линиями; * - автоматически примерно 10 ячеек сетки
+    /// Auto - автоматические целые значения, примерно 80 px между линиями; "число + *" - конкретно количество ячеек
     /// </remarks>
     public GridLength GridSizeY
     {
@@ -387,7 +396,7 @@ public class ChartControl : TemplatedControl
     /// </summary>
     private void DrawChartGeometry(DrawingContext context, List<Point> screenPoints)
     {
-        var pen = new Pen(ChartColor, 2);
+        var pen = new Pen(ChartColor, ChartThickness);
         var geometry = new StreamGeometry();
 
         using (var sgc = geometry.Open())
@@ -448,7 +457,7 @@ public class ChartControl : TemplatedControl
                 if (Fill)
                     context.DrawLine(pen, p, new Point(p.X, Bounds.Height));
                 else
-                    context.DrawEllipse(ChartColor, pen, p, 1, 1);
+                    context.DrawEllipse(ChartColor, pen, p, ChartThickness / 2, ChartThickness / 2);
             }
         }
     }
@@ -546,7 +555,7 @@ public class ChartControl : TemplatedControl
             var p = closestScreenPoint.Value;
             var data = closestDataPoint.Value;
 
-            context.DrawEllipse(null, new Pen(ChartColor, 2), p, 5, 5);
+            context.DrawEllipse(null, new Pen(ChartColor, ChartThickness), p, ChartThickness * 2.5, ChartThickness * 2.5);
 
             string tooltipText = $"X: {FormatNumber(data.Key)}\nY: {FormatNumber(data.Value)}";
             var ft = new FormattedText(
@@ -615,7 +624,7 @@ public class ChartControl : TemplatedControl
         }
         else if (size.IsStar)
         {
-            step = range / 10.0;
+            step = range / size.Value;
         }
         else
         {

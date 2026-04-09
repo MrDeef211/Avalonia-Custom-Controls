@@ -27,6 +27,12 @@ namespace Demonstrations.Desktop.ViewModels
             this.WhenAnyValue(x => x.LowerX, x => x.UpperX)
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(ShowLabel)));
 
+            this.WhenAnyValue(x => x.LowerX, x => x.UpperX)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(ChartThickness)));
+
+            this.WhenAnyValue(x => x.LowerX, x => x.UpperX)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(HighlightPoints)));
+
             this.WhenAnyValue(x => x.FullChartData)
                 .Subscribe(_ => ApplyFilter());
         }
@@ -75,12 +81,16 @@ namespace Demonstrations.Desktop.ViewModels
 
         public bool ShowLabel => (FilteredChartData.Count <= 200);
 
+        public bool HighlightPoints => (FilteredChartData.Count < 300);
+
+        public double ChartThickness => (FilteredChartData.Count < 300 ? 2 : 1);
+
         public ReactiveCommand<Unit, Unit> GenerateCommand { get; }
         public ReactiveCommand<Unit, Unit> ToggleOverlayCommand { get; }
 
         private void GenerateNewData()
         {
-            FullChartData = _generator.Generate();
+            FullChartData = _generator.Generate(-500, 500);
         }
 
         private void ApplyFilter()

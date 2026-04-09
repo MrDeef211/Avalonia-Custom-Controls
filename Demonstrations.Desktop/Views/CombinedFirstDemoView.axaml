@@ -40,7 +40,7 @@
             </Button>
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
             <TextBlock Text="X диапазон:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <controls:RangeSlider Minimum="-200" Maximum="199"
+            <controls:RangeSlider Minimum="-500" Maximum="500"
                                   LowerValue="{Binding LowerX}"
                                   UpperValue="{Binding UpperX}"
                                   Step="1"
@@ -62,12 +62,13 @@
                                   MaxScale="20"
                                   RestrictPan="True">
                 <controls:ChartControl Content="{Binding FilteredChartData}"
-                                       ChartStyle="Line"
+                                       ChartStyle="Spline"
                                        ChartColor="Red"
+                                       ChartThickness="{Binding ChartThickness}"
                                        Fill="False"
                                        Background="WhiteSmoke"
                                        Grid="True"
-                                       HighlightPoints="True"
+                                       HighlightPoints="{Binding HighlightPoints}"
                                        ShowPointsLabels="{Binding ShowLabel}"/>
             </controls:ZoomControl>
 
