@@ -5,11 +5,6 @@
                     xmlns:converters="using:Common.Controls.Converters"
                     x:CompileBindings="False"> 
 
-    <Design.PreviewWith>
-        <StackPanel Width="400" Spacing="10">
-            <controls:PropertyGridControl />
-        </StackPanel>
-    </Design.PreviewWith>
 
 <ControlTheme x:Key="{x:Type controls:PropertyGridControl}" TargetType="controls:PropertyGridControl">
     <Setter Property="Template">

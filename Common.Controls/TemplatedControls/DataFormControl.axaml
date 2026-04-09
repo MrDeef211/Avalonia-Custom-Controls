@@ -5,11 +5,6 @@
                     xmlns:converters="using:Common.Controls.Converters"
                     x:CompileBindings="False">
 
-    <Design.PreviewWith>
-        <StackPanel Width="400" Spacing="10">
-            <controls:DataFormControl />
-        </StackPanel>
-    </Design.PreviewWith>
 
     <ControlTheme x:Key="{x:Type controls:DataFormControl}" TargetType="controls:DataFormControl">
         <Setter Property="Template">

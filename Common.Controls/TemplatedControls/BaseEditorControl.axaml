@@ -10,13 +10,6 @@
          https://docs.avaloniaui.net/docs/guides/styles-and-resources/how-to-use-theme-variants
   -->
   
-  <Design.PreviewWith>
-    <StackPanel Width="400" Spacing="10">      
-        <StackPanel Background="{DynamicResource SystemRegionBrush}">
-          <controls:BaseEditorControl />
-        </StackPanel>
-    </StackPanel>
-  </Design.PreviewWith>
  
   <ControlTheme x:Key="{x:Type controls:BaseEditorControl}" TargetType="controls:BaseEditorControl">
     <Setter Property="Template">

@@ -246,6 +246,14 @@ public class ChartControl : TemplatedControl
 
     #endregion
 
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        double width = double.IsInfinity(availableSize.Width) ? 800 : availableSize.Width;
+        double height = double.IsInfinity(availableSize.Height) ? 400 : availableSize.Height;
+
+        return new Size(width, height);
+    }
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
@@ -264,6 +272,10 @@ public class ChartControl : TemplatedControl
     {
         base.Render(context);
         if (Content == null || Content.Chart.Count < 2) return;
+
+        if (Bounds.Width <= PaddingLeft + PaddingRight ||
+            Bounds.Height <= PaddingTop + PaddingBottom)
+            return;
 
         var points = Content.Chart.OrderBy(x => x.Key).ToList();
         double minX = points.Min(p => p.Key);

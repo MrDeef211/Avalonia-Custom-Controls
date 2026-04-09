@@ -72,7 +72,7 @@
                     <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="WASD / ←↑→↓" Content="Перемещение"/>
                     <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Wheel / +/-" Content="Масштаб"/>
                     <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Double Click / Ctrl+0" Content="Сброс камеры"/>
-                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Home" Content="Сброс позиции"/>
+                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Home" Content="Вписать в экран"/>
                     <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Ctrl+Z / Y" Content="История"/>
                 </StackPanel>
             </Border>

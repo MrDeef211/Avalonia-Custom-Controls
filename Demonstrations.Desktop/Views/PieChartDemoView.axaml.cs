@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using Demonstrations.Desktop.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
@@ -16,21 +17,31 @@ namespace Demonstrations.Desktop.Views
 
             this.WhenActivated(disposables =>
             {
-                // Регистрация диалога выбора файла
                 ViewModel!.ShowOpenFileDialog.RegisterHandler(async context =>
                 {
-                    var dialog = new OpenFileDialog
+
+                    var topLevel = TopLevel.GetTopLevel(this);
+                    if (topLevel == null) return;
+
+                    var options = new FilePickerOpenOptions
                     {
                         Title = "Выберите изображение",
                         AllowMultiple = false,
-                        Filters = new System.Collections.Generic.List<FileDialogFilter>
+                        FileTypeFilter = new[]
                         {
-                            new FileDialogFilter { Name = "Изображения", Extensions = { "png", "jpg", "jpeg", "bmp", "gif" } }
-                        }
+                new FilePickerFileType("Изображения")
+                {
+                    Patterns = new[] { "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif" },
+                    MimeTypes = new[] { "image/*" }
+                }
+            }
                     };
-                    var owner = TopLevel.GetTopLevel(this) as Window;
-                    var result = await dialog.ShowAsync(owner);
-                    var path = result?.FirstOrDefault();
+
+                    var result = await topLevel.StorageProvider.OpenFilePickerAsync(options);
+
+                    var selectedFile = result.FirstOrDefault();
+                    var path = selectedFile?.Path.LocalPath;
+
                     context.SetOutput(path);
                 }).DisposeWith(disposables);
             });

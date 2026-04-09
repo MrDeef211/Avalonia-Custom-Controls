@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Common.Controls.Models;
 using ReactiveUI;
@@ -186,42 +187,18 @@ public class ZoomControl : ContentControl
             });
     }
 
-    private Matrix ClampMatrix(Matrix matrix)
+    #region События
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        double scale = matrix.M11;
-        double clampedScale = Math.Clamp(scale, MinScale, MaxScale);
-
-        Matrix correctedMatrix = matrix;
-        if (Math.Abs(scale - clampedScale) > 0.0001)
+        base.OnApplyTemplate(e);
+        _presenter = e.NameScope.Find<Border>("PART_Presenter");
+        if (_presenter != null)
         {
-            correctedMatrix = new Matrix(
-                clampedScale, matrix.M12,
-                matrix.M21, clampedScale,
-                matrix.M31, matrix.M32);
-
-            scale = clampedScale;
+            RenderOptions.SetBitmapInterpolationMode(_presenter, BitmapInterpolationMode.HighQuality);
+            RenderOptions.SetEdgeMode(_presenter, EdgeMode.Antialias);
         }
-
-        if (!RestrictPan || _presenter?.Child == null) return correctedMatrix;
-
-        var content = _presenter.Child;
-
-        double virtualAreaWidth = Bounds.Width / MinScale;
-        double virtualAreaHeight = Bounds.Height / MinScale;
-
-        double minX = Bounds.Width - content.Bounds.Width * scale - (virtualAreaWidth - Bounds.Width) / 2;
-        double maxX = (virtualAreaWidth - Bounds.Width) / 2;
-        double minY = Bounds.Height - content.Bounds.Height * scale - (virtualAreaHeight - Bounds.Height) / 2;
-        double maxY = (virtualAreaHeight - Bounds.Height) / 2;
-
-        if (minX > maxX) (minX, maxX) = (maxX, minX);
-        if (minY > maxY) (minY, maxY) = (maxY, minY);
-
-        return new Matrix(
-            correctedMatrix.M11, correctedMatrix.M12,
-            correctedMatrix.M21, correctedMatrix.M22,
-            Math.Clamp(correctedMatrix.M31, minX, maxX),
-            Math.Clamp(correctedMatrix.M32, minY, maxY));
+        UpdateTransform();
     }
 
     private void OnAnimationTick(object? sender, EventArgs e)
@@ -260,107 +237,7 @@ public class ZoomControl : ContentControl
         SetMatrix(ClampMatrix(nextMatrix));
     }
 
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
-        _presenter = e.NameScope.Find<Border>("PART_Presenter");
-        UpdateTransform();
-    }
-
-    private void UpdateTransform()
-    {
-        if (_presenter != null)
-            _presenter.RenderTransform = new MatrixTransform(_matrix);
-    }
-
-    private void SyncZoomState()
-    {
-        if (ZoomState != null)
-        {
-            double scale = Math.Sqrt(_matrix.M11 * _matrix.M11 + _matrix.M12 * _matrix.M12);
-            double offsetX = _matrix.M31;
-            double offsetY = _matrix.M32;
-            ZoomState.Scale = scale;
-            ZoomState.OffsetX = offsetX;
-            ZoomState.OffsetY = offsetY;
-        }
-    }
-
-    private void SetMatrix(Matrix newMatrix)
-    {
-        _matrix = newMatrix;
-        UpdateTransform();
-        SyncZoomState();
-    }
-
-    private void JumpToMatrix(Matrix newMatrix)
-    {
-        var clamped = ClampMatrix(newMatrix);
-        _targetMatrix = clamped; 
-        _matrix = clamped; 
-        UpdateTransform();
-        SyncZoomState();
-    }
-
-    private void SmoothSetMatrix(Matrix target)
-    {
-        _targetMatrix = ClampMatrix(target);
-        if (!_animationTimer.IsEnabled) _animationTimer.Start();
-    }
-
-    private void PushState()
-    {
-        _undoStack.AddLast(_matrix);
-        if (_undoStack.Count > MaxHistorySize)
-            _undoStack.RemoveFirst();
-        _redoStack.Clear();
-    }
-
-    private void Undo()
-    {
-        if (_undoStack.Count == 0) return;
-        _redoStack.Push(_matrix);
-        var previous = _undoStack.Last.Value;
-        _undoStack.RemoveLast();
-        JumpToMatrix(previous);
-    }
-
-    private void Redo()
-    {
-        if (_redoStack.Count == 0) return;
-        _undoStack.AddLast(_matrix);
-        JumpToMatrix(_redoStack.Pop());
-    }
-
-    private void ResetZoom()
-    {
-        PushState();
-        JumpToMatrix(Matrix.Identity);
-    }
-
-    // Пока одинаковые
-    private void FitToScreen() => ResetZoom();
-
     private void OnDoubleTapped(object? sender, TappedEventArgs e) => ResetZoom();
-
-    private void ZoomAtPoint(Point point, double delta)
-    {
-        double oldScale = _matrix.M11;
-        double scaleFactor = delta > 0 ? ZoomSpeed : 1 / ZoomSpeed;
-        double newScale = Math.Clamp(oldScale * scaleFactor, MinScale, MaxScale);
-
-        double actualFactor = newScale / oldScale;
-        if (Math.Abs(actualFactor - 1.0) < 0.0001) return;
-
-        PushState();
-
-        var nextTarget = _targetMatrix *
-                        Matrix.CreateTranslation(-point.X, -point.Y) *
-                        Matrix.CreateScale(actualFactor, actualFactor) *
-                        Matrix.CreateTranslation(point.X, point.Y);
-
-        SmoothSetMatrix(nextTarget);
-    }
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
@@ -427,10 +304,6 @@ public class ZoomControl : ContentControl
         }
     }
 
-
-    private bool IsMovementKeyPressed() =>
-        _pressedKeys.Any(k => k is Key.W or Key.A or Key.S or Key.D or Key.Up or Key.Down or Key.Left or Key.Right);
-
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
         _pressedKeys.Add(e.Key);
@@ -483,4 +356,158 @@ public class ZoomControl : ContentControl
             e.Handled = true;
         }
     }
+
+    #endregion
+
+    #region Основные действия
+
+    private void UpdateTransform()
+    {
+        if (_presenter != null)
+        { 
+            _presenter.RenderTransform = new MatrixTransform(_matrix);
+            _presenter.Opacity = _presenter.Opacity == 1.0 ? 0.9999 : 1.0;
+            InvalidateVisual();
+        }
+    }
+
+    private void SyncZoomState()
+    {
+        if (ZoomState != null)
+        {
+            double scale = Math.Sqrt(_matrix.M11 * _matrix.M11 + _matrix.M12 * _matrix.M12);
+            double offsetX = _matrix.M31;
+            double offsetY = _matrix.M32;
+            ZoomState.Scale = scale;
+            ZoomState.OffsetX = offsetX;
+            ZoomState.OffsetY = offsetY;
+        }
+    }
+
+    private void SetMatrix(Matrix newMatrix)
+    {
+        _matrix = newMatrix;
+        UpdateTransform();
+        SyncZoomState();
+    }
+
+    private void JumpToMatrix(Matrix newMatrix)
+    {
+        var clamped = ClampMatrix(newMatrix);
+        _targetMatrix = clamped;
+        _matrix = clamped;
+        UpdateTransform();
+        SyncZoomState();
+    }
+
+    private void SmoothSetMatrix(Matrix target)
+    {
+        _targetMatrix = ClampMatrix(target);
+        if (!_animationTimer.IsEnabled) _animationTimer.Start();
+    }
+
+    private void PushState()
+    {
+        _undoStack.AddLast(_matrix);
+        if (_undoStack.Count > MaxHistorySize)
+            _undoStack.RemoveFirst();
+        _redoStack.Clear();
+    }
+
+    #endregion
+
+    #region Обработка команд
+
+    private void ZoomAtPoint(Point point, double delta)
+    {
+        double oldScale = _targetMatrix.M11;
+        double scaleFactor = delta > 0 ? ZoomSpeed : 1 / ZoomSpeed;
+
+        double newScale = Math.Clamp(oldScale * scaleFactor, MinScale, MaxScale);
+
+        double actualFactor = newScale / oldScale;
+
+        if (Math.Abs(actualFactor - 1.0) < 0.0001) return;
+
+        PushState();
+
+        var nextTarget = _targetMatrix *
+                        Matrix.CreateTranslation(-point.X, -point.Y) *
+                        Matrix.CreateScale(actualFactor, actualFactor) *
+                        Matrix.CreateTranslation(point.X, point.Y);
+
+        SmoothSetMatrix(nextTarget);
+    }
+
+    private void Undo()
+    {
+        if (_undoStack.Count == 0) return;
+        _redoStack.Push(_matrix);
+        var previous = _undoStack.Last.Value;
+        _undoStack.RemoveLast();
+        JumpToMatrix(previous);
+    }
+
+    private void Redo()
+    {
+        if (_redoStack.Count == 0) return;
+        _undoStack.AddLast(_matrix);
+        JumpToMatrix(_redoStack.Pop());
+    }
+
+    private void ResetZoom()
+    {
+        PushState();
+        JumpToMatrix(Matrix.Identity);
+    }
+
+    // Пока одинаковые
+    private void FitToScreen() => ResetZoom();
+
+    #endregion
+
+    #region Вспомогательные вычисления
+
+    private Matrix ClampMatrix(Matrix matrix)
+    {
+        double scale = matrix.M11;
+        double clampedScale = Math.Clamp(scale, MinScale, MaxScale);
+
+        Matrix correctedMatrix = matrix;
+        if (Math.Abs(scale - clampedScale) > 0.0001)
+        {
+            correctedMatrix = new Matrix(
+                clampedScale, matrix.M12,
+                matrix.M21, clampedScale,
+                matrix.M31, matrix.M32);
+
+            scale = clampedScale;
+        }
+
+        if (!RestrictPan || _presenter?.Child == null) return correctedMatrix;
+
+        var content = _presenter.Child;
+
+        double virtualAreaWidth = Bounds.Width / MinScale;
+        double virtualAreaHeight = Bounds.Height / MinScale;
+
+        double minX = Bounds.Width - content.Bounds.Width * scale - (virtualAreaWidth - Bounds.Width) / 2;
+        double maxX = (virtualAreaWidth - Bounds.Width) / 2;
+        double minY = Bounds.Height - content.Bounds.Height * scale - (virtualAreaHeight - Bounds.Height) / 2;
+        double maxY = (virtualAreaHeight - Bounds.Height) / 2;
+
+        if (minX > maxX) (minX, maxX) = (maxX, minX);
+        if (minY > maxY) (minY, maxY) = (maxY, minY);
+
+        return new Matrix(
+            correctedMatrix.M11, correctedMatrix.M12,
+            correctedMatrix.M21, correctedMatrix.M22,
+            Math.Clamp(correctedMatrix.M31, minX, maxX),
+            Math.Clamp(correctedMatrix.M32, minY, maxY));
+    }
+
+    private bool IsMovementKeyPressed() =>
+    _pressedKeys.Any(k => k is Key.W or Key.A or Key.S or Key.D or Key.Up or Key.Down or Key.Left or Key.Right);
+
+    #endregion
 }
