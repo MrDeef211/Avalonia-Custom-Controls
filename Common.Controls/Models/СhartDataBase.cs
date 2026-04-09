@@ -40,5 +40,7 @@ namespace Common.Controls.Models
 
         public void Remove(double key) =>
             _chart.TryRemove(key, out _);
+
+        public int Count => _chart.Count;
     }
 }

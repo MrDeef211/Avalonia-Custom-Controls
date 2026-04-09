@@ -32,6 +32,11 @@
                     <MenuItem Header="Контрол зумирования" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[6]}" />
                 </MenuItem>
             </MenuItem>
+            <MenuItem Header="Готовые примеры"
+                      BorderBrush="DarkGray"
+                      BorderThickness="1">
+                <MenuItem Header="Интерактивный график" Command="{Binding NavigateCommand}" CommandParameter="{Binding Pages[7]}" />
+            </MenuItem>
         </Menu>
 
 

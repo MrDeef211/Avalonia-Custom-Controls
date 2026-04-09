@@ -27,7 +27,8 @@ namespace Demonstrations.Desktop.ViewModels
                 new RangeSliderDemoViewModel(),
                 new PropertyGridDemoViewModel(),
                 new DataFormDemoViewModel(),
-                new ZoomDemoViewModel()
+                new ZoomDemoViewModel(),
+                new CombinedFirstDemoViewModel()
             };
 
             CurrentPage = Pages[0];

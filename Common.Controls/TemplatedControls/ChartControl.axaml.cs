@@ -75,6 +75,9 @@ public class ChartControl : TemplatedControl
     public static readonly StyledProperty<bool> ShowPointsLabelsProperty =
         AvaloniaProperty.Register<ChartControl, bool>(nameof(ShowPointsLabels), false);
 
+    public static readonly StyledProperty<IBrush> PointsLabelsColorProperty =
+        AvaloniaProperty.Register<ChartControl, IBrush>(nameof(PointsLabelsColor), Brushes.Black);
+
     #endregion
 
     private Point? _mousePosition;
@@ -230,6 +233,15 @@ public class ChartControl : TemplatedControl
     {
         get => GetValue(ShowPointsLabelsProperty);
         set => SetValue(ShowPointsLabelsProperty, value);
+    }
+
+    /// <summary>
+    /// Цвет подписей на точках
+    /// </summary>
+    public IBrush PointsLabelsColor
+    {
+        get => GetValue(PointsLabelsColorProperty);
+        set => SetValue(PointsLabelsColorProperty, value);
     }
 
     #endregion
@@ -476,16 +488,20 @@ public class ChartControl : TemplatedControl
     /// </summary>
     private void DrawPointsAndLabels(DrawingContext context, List<KeyValuePair<double, double>> points, Func<double, double, Point> normalize)
     {
-        var pen = new Pen(ChartColor, 2);
+        var pointsPen = new Pen(ChartColor, 2);
         foreach (var point in points)
         {
             var nPoint = normalize(point.Key, point.Value);
-            context.DrawEllipse(ChartColor, pen, nPoint, 2, 2);
+            context.DrawEllipse(ChartColor, pointsPen, nPoint, 2, 2);
 
             if (ShowPointsLabels)
             {
-                DrawText(context, FormatNumber(point.Value), new Point(nPoint.X + 5, nPoint.Y - 15),
-                    -45, TextAlignment.Center, ChartColor);
+                double TextAngle = 0;
+                TextAngle = Content.Count >= 50 ? -45 : TextAngle;
+                TextAngle = Content.Count >= 100 ? -60 : TextAngle;
+
+                DrawText(context, FormatNumber(point.Value), new Point(nPoint.X, nPoint.Y - 15),
+                    TextAngle, TextAlignment.Center, PointsLabelsColor);
             }
         }
     }

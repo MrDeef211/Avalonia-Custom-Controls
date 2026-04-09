@@ -23,7 +23,7 @@ public class PieChart : TemplatedControl
     #region Styled Property
 
     public static readonly StyledProperty<PieChartDataBase> ContentProperty =
-    AvaloniaProperty.Register<PieChart, PieChartDataBase>(nameof(Content), new PieChartDataBase());
+        AvaloniaProperty.Register<PieChart, PieChartDataBase>(nameof(Content), new PieChartDataBase());
 
     public static readonly StyledProperty<IList<IBrush>> SectorColorsProperty =
         AvaloniaProperty.Register<PieChart, IList<IBrush>>(nameof(SectorColors), new List<IBrush>());

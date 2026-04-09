@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -109,7 +110,7 @@ public class ZoomControl : ContentControl
     }
 
     public static readonly StyledProperty<ZoomState?> ZoomStateProperty =
-        AvaloniaProperty.Register<ZoomControl, ZoomState?>(nameof(ZoomState));
+        AvaloniaProperty.Register<ZoomControl, ZoomState?>(nameof(ZoomState), defaultBindingMode: BindingMode.TwoWay);
 
     /// <summary>
     /// Состояние положения камеры
@@ -118,6 +119,18 @@ public class ZoomControl : ContentControl
     {
         get => GetValue(ZoomStateProperty);
         set => SetValue(ZoomStateProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> RestrictPanProperty =
+        AvaloniaProperty.Register<ZoomControl, bool>(nameof(RestrictPan), true);
+
+    /// <summary>
+    /// Ограничивать область перемещения границами видимой зоны при минимальном зуме
+    /// </summary>
+    public bool RestrictPan
+    {
+        get => GetValue(RestrictPanProperty);
+        set => SetValue(RestrictPanProperty, value);
     }
 
     #endregion
@@ -173,6 +186,44 @@ public class ZoomControl : ContentControl
             });
     }
 
+    private Matrix ClampMatrix(Matrix matrix)
+    {
+        double scale = matrix.M11;
+        double clampedScale = Math.Clamp(scale, MinScale, MaxScale);
+
+        Matrix correctedMatrix = matrix;
+        if (Math.Abs(scale - clampedScale) > 0.0001)
+        {
+            correctedMatrix = new Matrix(
+                clampedScale, matrix.M12,
+                matrix.M21, clampedScale,
+                matrix.M31, matrix.M32);
+
+            scale = clampedScale;
+        }
+
+        if (!RestrictPan || _presenter?.Child == null) return correctedMatrix;
+
+        var content = _presenter.Child;
+
+        double virtualAreaWidth = Bounds.Width / MinScale;
+        double virtualAreaHeight = Bounds.Height / MinScale;
+
+        double minX = Bounds.Width - content.Bounds.Width * scale - (virtualAreaWidth - Bounds.Width) / 2;
+        double maxX = (virtualAreaWidth - Bounds.Width) / 2;
+        double minY = Bounds.Height - content.Bounds.Height * scale - (virtualAreaHeight - Bounds.Height) / 2;
+        double maxY = (virtualAreaHeight - Bounds.Height) / 2;
+
+        if (minX > maxX) (minX, maxX) = (maxX, minX);
+        if (minY > maxY) (minY, maxY) = (maxY, minY);
+
+        return new Matrix(
+            correctedMatrix.M11, correctedMatrix.M12,
+            correctedMatrix.M21, correctedMatrix.M22,
+            Math.Clamp(correctedMatrix.M31, minX, maxX),
+            Math.Clamp(correctedMatrix.M32, minY, maxY));
+    }
+
     private void OnAnimationTick(object? sender, EventArgs e)
     {
         double dx = 0, dy = 0;
@@ -206,7 +257,7 @@ public class ZoomControl : ContentControl
             _matrix.M32 + (_targetMatrix.M32 - _matrix.M32) * Smoothness
         );
 
-        SetMatrix(nextMatrix);
+        SetMatrix(ClampMatrix(nextMatrix));
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -244,15 +295,16 @@ public class ZoomControl : ContentControl
 
     private void JumpToMatrix(Matrix newMatrix)
     {
-        _targetMatrix = newMatrix; 
-        _matrix = newMatrix; 
+        var clamped = ClampMatrix(newMatrix);
+        _targetMatrix = clamped; 
+        _matrix = clamped; 
         UpdateTransform();
         SyncZoomState();
     }
 
     private void SmoothSetMatrix(Matrix target)
     {
-        _targetMatrix = target;
+        _targetMatrix = ClampMatrix(target);
         if (!_animationTimer.IsEnabled) _animationTimer.Start();
     }
 

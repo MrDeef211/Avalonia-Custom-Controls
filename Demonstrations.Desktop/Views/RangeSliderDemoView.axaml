@@ -47,8 +47,8 @@
             <controls:RangeSlider
                 Minimum="{Binding Minimum}"
                 Maximum="{Binding Maximum}"
-                LowerValue="{Binding LowerValue}"
-                UpperValue="{Binding UpperValue}"
+                LowerValue="{Binding LowerValue, Mode=TwoWay}"
+                UpperValue="{Binding UpperValue, Mode=TwoWay}"
                 Step="{Binding Step}"
                 ShowTextBoxes="{Binding ShowTextBoxes}"
                 TextBoxWidth="{Binding TextBoxWidth}"

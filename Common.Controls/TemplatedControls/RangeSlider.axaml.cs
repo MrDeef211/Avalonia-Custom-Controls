@@ -44,10 +44,10 @@ public class RangeSlider : TemplatedControl
         AvaloniaProperty.Register<RangeSlider, double>(nameof(Maximum), 100.0);
 
     public static readonly StyledProperty<double> LowerValueProperty =
-        AvaloniaProperty.Register<RangeSlider, double>(nameof(LowerValue), 0.0);
+        AvaloniaProperty.Register<RangeSlider, double>(nameof(LowerValue), 0.0, defaultBindingMode: BindingMode.TwoWay);
 
     public static readonly StyledProperty<double> UpperValueProperty =
-        AvaloniaProperty.Register<RangeSlider, double>(nameof(UpperValue), 100.0);
+        AvaloniaProperty.Register<RangeSlider, double>(nameof(UpperValue), 100.0, defaultBindingMode: BindingMode.TwoWay);
 
     public static readonly StyledProperty<double> StepProperty =
         AvaloniaProperty.Register<RangeSlider, double>(nameof(Step), 1.0);
