@@ -1,7 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:Common.Controls"
-             xmlns:vm="using:Demonstrations.Desktop.ViewModels"
+             xmlns:vm="using:Demonstrations.Desktop.ViewModels"             
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              x:Class="Demonstrations.Desktop.Views.CombinedFirstDemoView"
              x:DataType="vm:CombinedFirstDemoViewModel">
     <UserControl.Resources>
@@ -69,7 +71,8 @@
                                        Background="WhiteSmoke"
                                        Grid="True"
                                        HighlightPoints="{Binding HighlightPoints}"
-                                       ShowPointsLabels="{Binding ShowLabel}"/>
+                                       ShowPointsLabels="{Binding ShowLabel}"
+                                       PointerWheelChanged="OnPointerWheelChanged"/>
             </controls:ZoomControl>
 
             <Border Background="#AA000000" 

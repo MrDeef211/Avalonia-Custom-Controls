@@ -8,8 +8,14 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
-    <Folder Include="Pages\" />
-    <Folder Include="Views\" />
+    <AvaloniaXaml Remove="Pages\**" />
+    <AvaloniaXaml Remove="Views\**" />
+    <Compile Remove="Pages\**" />
+    <Compile Remove="Views\**" />
+    <EmbeddedResource Remove="Pages\**" />
+    <EmbeddedResource Remove="Views\**" />
+    <None Remove="Pages\**" />
+    <None Remove="Views\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +30,7 @@
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.3.0.6" />
     <PackageReference Include="ReactiveUI.Avalonia" Version="11.4.12" />
     <PackageReference Include="ReactiveUI.Validation" Version="7.0.5" />
   </ItemGroup>

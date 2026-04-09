@@ -245,16 +245,8 @@ public class ZoomControl : ContentControl
         var point = e.GetPosition(this);
         var delta = e.Delta.Y;
 
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Shift))
-        {
-            PushState();
-            var translate = Matrix.CreateTranslation(delta * (WheelSensitivity / _matrix.M11), 0);
-            SetMatrix(_matrix * translate);
-        }
-        else
-        {
-            ZoomAtPoint(point, delta);
-        }
+        ZoomAtPoint(point, delta);
+
         e.Handled = true;
     }
 

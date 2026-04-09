@@ -1,4 +1,5 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia.Input;
+using Avalonia.Media.Imaging;
 using Common.Controls.Models;
 using Demonstrations.Desktop.Models;
 using ReactiveUI;
