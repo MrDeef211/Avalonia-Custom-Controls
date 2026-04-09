@@ -6,6 +6,7 @@
              x:DataType="vm:PropertyGridDemoViewModel">
     <DockPanel>
         <controls:Toolbar DockPanel.Dock="Top" Background="#F0F0F0">
+
             <Button Command="{Binding NewObjectCommand}" ToolTip.Tip="Новый объект">
                 <PathIcon Data="M100,100 L300,100 L200,300Z" Width="16" Height="16" />
             </Button>
@@ -16,6 +17,7 @@
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>    
             <TextBlock Text="{Binding Error, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
                        Foreground="Red" Margin="10,0,0,0" VerticalAlignment="Center"/>
+
         </controls:Toolbar>
 
         <Border Padding="10" Background="White">

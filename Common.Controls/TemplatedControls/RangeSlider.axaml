@@ -3,12 +3,6 @@
                     xmlns:controls="using:Common.Controls"
                     xmlns:conv="using:Avalonia.Data.Converters">
 
-    <Design.PreviewWith>
-        <StackPanel Width="400" Spacing="10">
-            <controls:RangeSlider Width="300" ShowTextBoxes="True" />
-        </StackPanel>
-    </Design.PreviewWith>
-
     <ControlTheme x:Key="{x:Type controls:RangeSlider}" TargetType="controls:RangeSlider">
         <Setter Property="Template">
             <ControlTemplate>
