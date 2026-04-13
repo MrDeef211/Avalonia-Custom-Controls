@@ -30,12 +30,16 @@ namespace Demonstrations.Desktop.ViewModels
                     this.RaisePropertyChanged(nameof(ChartThickness));
                     this.RaisePropertyChanged(nameof(HighlightPoints));
                 });
-
-            this.WhenAnyValue(x => x._model.FilteredChartData)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(FilteredChartData)));
         }
 
-        public ChartDataBase FilteredChartData => _model.FilteredChartData;
+        public ChartDataBase FullChartData => _model.FullChartData;
+
+        private ChartDataBase _currentData;
+        public ChartDataBase CurrentData
+        {
+            get => _currentData;
+            set => this.RaiseAndSetIfChanged(ref _currentData, value);
+        }
 
         public double LowerX
         {
@@ -43,7 +47,7 @@ namespace Demonstrations.Desktop.ViewModels
             set
             {
                 _model.LowerX = value;
-                this.RaisePropertyChanged();
+
             }
         }
 
@@ -53,7 +57,7 @@ namespace Demonstrations.Desktop.ViewModels
             set
             {
                 _model.UpperX = value;
-                this.RaisePropertyChanged();
+
             }
         }
 
@@ -71,11 +75,9 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _zoomState, value);
         }
 
-        public bool ShowLabel => (FilteredChartData.Count <= 200);
-
-        public bool HighlightPoints => (FilteredChartData.Count < 300);
-
-        public double ChartThickness => (FilteredChartData.Count < 300 ? 2 : 1);
+        public bool ShowLabel => CurrentData?.Count <= 200;
+        public bool HighlightPoints => CurrentData?.Count < 300;
+        public double ChartThickness => CurrentData?.Count < 300 ? 2 : 1;
 
         public ReactiveCommand<Unit, Unit> GenerateCommand { get; }
         public ReactiveCommand<Unit, Unit> ToggleOverlayCommand { get; }

@@ -17,7 +17,7 @@ namespace Common.Controls.Models
         }
 
         public ChartDataBase(Dictionary<double, double> Chart) =>
-            this.Chart = Chart ?? throw new ArgumentNullException(nameof(Chart));
+            this.Chart = Chart == null ? throw new ArgumentNullException(nameof(Chart)) : Chart.ToDictionary(x => x.Key, x => x.Value);
 
         public ChartDataBase() => Chart = new();
 

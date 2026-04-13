@@ -2,6 +2,7 @@
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Demonstrations.Desktop.Models
@@ -13,13 +14,6 @@ namespace Demonstrations.Desktop.Models
         public CombinedFirstDemoModel()
         {
             GenerateNewData();
-
-
-            this.WhenAnyValue(x => x.FullChartData)
-                .Subscribe(_ => ApplyFilter());
-
-            this.WhenAnyValue(x => x.LowerX, x => x.UpperX)
-                .Subscribe(_ => ApplyFilter());
         }
 
         private ChartDataBase _fullChartData;
@@ -29,21 +23,14 @@ namespace Demonstrations.Desktop.Models
             set => this.RaiseAndSetIfChanged(ref _fullChartData, value);
         }
 
-        private ChartDataBase _filteredChartData;
-        public ChartDataBase FilteredChartData
-        {
-            get => _filteredChartData;
-            private set => this.RaiseAndSetIfChanged(ref _filteredChartData, value);
-        }
-
-        private double _lowerX = -200;
+        private double _lowerX;
         public double LowerX
         {
             get => _lowerX;
             set => this.RaiseAndSetIfChanged(ref _lowerX, value);
         }
 
-        private double _upperX = 199;
+        private double _upperX;
         public double UpperX
         {
             get => _upperX;
@@ -52,20 +39,10 @@ namespace Demonstrations.Desktop.Models
 
         public void GenerateNewData()
         {
-            FullChartData = _generator.Generate(-500, 500);
-        }
-
-        private void ApplyFilter()
-        {
-            if (FullChartData == null) return;
-
-            var filtered = new ChartDataBase();
-            foreach (var point in FullChartData.Chart)
-            {
-                if (point.Key >= LowerX && point.Key <= UpperX)
-                    filtered.Add(point.Key, point.Value);
-            }
-            FilteredChartData = filtered;
+            FullChartData = _generator.Generate(-1000, 1000);
+            var keys = FullChartData.Chart.Keys.OrderBy(k => k).ToList();
+            LowerX = keys.First();
+            UpperX = keys.Last();
         }
     }
 }

@@ -42,13 +42,13 @@
             </Button>
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
             <TextBlock Text="X диапазон:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <controls:RangeSlider Minimum="-500" Maximum="500"
+            <controls:RangeSlider Minimum="-1000" Maximum="1000"
                                   LowerValue="{Binding LowerX}"
                                   UpperValue="{Binding UpperX}"
                                   Step="1"
                                   ShowTextBoxes="True"
                                   TextBoxWidth="60"
-                                  Width="300"
+                                  Width="600"
                                   VerticalAlignment="Center"/>
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
             <Button Command="{Binding ToggleOverlayCommand}" ToolTip.Tip="Показать/скрыть подсказку">
@@ -58,12 +58,15 @@
 
         <Grid>
             <controls:ZoomControl x:Name="ZoomCtrl"
-                                  ZoomState="{Binding ZoomState}"
-                                  Background="White"
-                                  MinScale="1"
-                                  MaxScale="20"
-                                  RestrictPan="True">
-                <controls:ChartControl Content="{Binding FilteredChartData}"
+                                   ZoomState="{Binding ZoomState}"
+                                   Background="White"
+                                   MinScale="1"
+                                   MaxScale="20"
+                                   RestrictPan="True">
+                <controls:ChartControl Content="{Binding FullChartData}"
+                                       Minimum="{Binding LowerX, Mode=TwoWay}"
+                                       Maximum="{Binding UpperX, Mode=TwoWay}"
+                                       SortedData="{Binding CurrentData}"
                                        ChartStyle="Spline"
                                        ChartColor="Red"
                                        ChartThickness="{Binding ChartThickness}"
@@ -72,7 +75,8 @@
                                        Grid="True"
                                        HighlightPoints="{Binding HighlightPoints}"
                                        ShowPointsLabels="{Binding ShowLabel}"
-                                       PointerWheelChanged="OnPointerWheelChanged"/>
+                                       Interactive="True"
+                                       InteractiveModifier="Shift"/>
             </controls:ZoomControl>
 
             <Border Background="#AA000000" 
@@ -86,9 +90,11 @@
                 <StackPanel Spacing="5">
                     <TextBlock Text="Управление ZoomControl:" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
                     <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="WASD / ←↑→↓" Content="Перемещение"/>
-                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Wheel / +/-" Content="Масштаб"/>
+                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Wheel / +/-" Content="Приближение"/>
                     <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Double Click / Ctrl+0" Content="Сброс камеры"/>
                     <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Ctrl+Z / Y" Content="История"/>
+                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Shift + Wheel" Content="Масштаб графика"/>
+                    <HeaderedContentControl Theme="{StaticResource KeyHint}" Header="Shift + Mouse Move" Content="Перемещение по графику"/>
                 </StackPanel>
             </Border>
         </Grid>

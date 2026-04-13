@@ -5,6 +5,7 @@
   <ControlTheme x:Key="{x:Type controls:ChartControl}" TargetType="controls:ChartControl">
     <Setter Property="Background" Value="Transparent"  />
     <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="Padding" Value="50, 30, 30, 50" />
     <Setter Property="Template">
       <ControlTemplate>
         <Border 

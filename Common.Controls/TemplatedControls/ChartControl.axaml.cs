@@ -1,15 +1,19 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Common.Controls.Models;
 using Common.Controls.TemplatedControls;
+using DynamicData.Aggregation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Common.Controls;
@@ -17,13 +21,7 @@ namespace Common.Controls;
 public class ChartControl : TemplatedControl
 {
 
-    // Константы отступов от внутренних краёв
-    private const double PaddingLeft = 50;
-    private const double PaddingRight = 30;
-    private const double PaddingTop = 30;
-    private const double PaddingBottom = 50;
-
-    // Поля для кэширования координат области рисования
+    // Поля для координат области рисования
     private double _left;
     private double _right;
     private double _top;
@@ -31,10 +29,40 @@ public class ChartControl : TemplatedControl
     private double _axisX;
     private double _axisY;
 
+    // Ограничения: X - глобально (весь график), Y - локально (область отрисовки)
+    private double _minX;
+    private double _maxX;
+    private double _minY;
+    private double _maxY;
+
+    // Для работы с указателем
+    private Point? _mousePosition;
+    private Point _prevMousePosition;
+    private bool _isDraging = false;
+
+    // Кешированные данные
+    private List<KeyValuePair<double, double>> _sortedContentPoints; 
+    private List<KeyValuePair<double, double>> _sortedVisiblePoints; 
+
+    // Кешированные даные кистей
+    private Pen _gridPen;
+    private Pen _axisPen;
+    private Pen _chartPen;
+    private Pen _pointsPen;
+
     #region Styled Property
 
     public static readonly StyledProperty<ChartDataBase> ContentProperty =
         AvaloniaProperty.Register<ChartControl, ChartDataBase>(nameof(Content), new());
+
+    public static readonly StyledProperty<ChartDataBase> SortedDataProperty =
+        AvaloniaProperty.Register<ChartControl, ChartDataBase>(nameof(SortedData), new(), defaultBindingMode: BindingMode.OneWayToSource);
+
+    public static readonly StyledProperty<double> MinimumProperty =
+        AvaloniaProperty.Register<ChartControl, double>(nameof(Minimum), defaultBindingMode: BindingMode.OneWayToSource);
+
+    public static readonly StyledProperty<double> MaximumProperty =
+        AvaloniaProperty.Register<ChartControl, double>(nameof(Maximum), defaultBindingMode: BindingMode.OneWayToSource);
 
     public static readonly StyledProperty<ChartStyle> ChartStyleProperty =
         AvaloniaProperty.Register<ChartControl, ChartStyle>(nameof(ChartStyle), ChartStyle.Simple);
@@ -81,14 +109,21 @@ public class ChartControl : TemplatedControl
     public static readonly StyledProperty<IBrush> PointsLabelsColorProperty =
         AvaloniaProperty.Register<ChartControl, IBrush>(nameof(PointsLabelsColor), Brushes.Black);
 
-    #endregion
+    public static readonly StyledProperty<bool> InteractiveProperty =
+        AvaloniaProperty.Register<ChartControl, bool>(nameof(Interactive), false);
 
-    private Point? _mousePosition;
+    public static readonly StyledProperty<KeyModifiers> InteractiveModifierProperty =
+        AvaloniaProperty.Register<ChartControl, KeyModifiers>(nameof(InteractiveModifier), KeyModifiers.None);
+
+    #endregion 
 
     static ChartControl()
     {
         AffectsRender<ChartControl>(
-            ContentProperty, 
+            ContentProperty,
+            SortedDataProperty,
+            MinimumProperty,
+            MaximumProperty,
             ChartStyleProperty, 
             ChartColorProperty, 
             FillProperty,
@@ -101,18 +136,54 @@ public class ChartControl : TemplatedControl
             AxisColorProperty,
             LabelModeXProperty,
             LabelModeYProperty,
-            ShowPointsLabelsProperty);
+            ShowPointsLabelsProperty,
+            InteractiveProperty);
+    }
+
+    public ChartControl()
+    {
+        _gridPen = new Pen(GridColor, 0.5);
+        _axisPen = new Pen(AxisColor, 1);
+        _chartPen = new Pen(ChartColor, ChartThickness);
+        _pointsPen = new Pen(ChartColor, 2);
     }
 
     #region Свойства
 
     /// <summary>
-    /// Массив точек для построения
+    /// Данные для графика
     /// </summary>
     public ChartDataBase Content
     {
         get => GetValue(ContentProperty);
         set => SetValue(ContentProperty, value);
+    }
+
+    /// <summary>
+    /// Список точек используемых для построения в данный момент. Используется для расчётов
+    /// </summary>
+    public ChartDataBase SortedData
+    {
+        get => GetValue(SortedDataProperty);
+        set => SetValue(SortedDataProperty, value);
+    }
+
+    /// <summary>
+    /// Ограничение снизу по X
+    /// </summary>
+    public double Minimum
+    {
+        get => GetValue(MinimumProperty);
+        set => SetValue(MinimumProperty, value);
+    }
+
+    /// <summary>
+    /// Ограничение сверху по X
+    /// </summary>
+    public double Maximum
+    {
+        get => GetValue(MaximumProperty);
+        set => SetValue(MaximumProperty, value);
     }
 
     /// <summary>
@@ -133,6 +204,9 @@ public class ChartControl : TemplatedControl
         set => SetValue(ChartColorProperty, value);
     }
 
+    /// <summary>
+    /// Толщина линии графика
+    /// </summary>
     public double ChartThickness
     {
         get => GetValue(ChartThicknessProperty);
@@ -253,7 +327,27 @@ public class ChartControl : TemplatedControl
         set => SetValue(PointsLabelsColorProperty, value);
     }
 
+    /// <summary>
+    /// Сделать график интерактивным (масштабирование, перетаскивание)
+    /// </summary>
+    public bool Interactive
+    {
+        get => GetValue(InteractiveProperty);
+        set => SetValue(InteractiveProperty, value);
+    }
+
+    /// <summary>
+    /// Клавиша модификатор для интерактивного взаимодействия с графиком
+    /// </summary>
+    public KeyModifiers InteractiveModifier
+    {
+        get => GetValue(InteractiveModifierProperty);
+        set => SetValue(InteractiveModifierProperty, value);
+    }
+
     #endregion
+
+    #region События
 
     protected override Size MeasureOverride(Size availableSize)
     {
@@ -263,11 +357,87 @@ public class ChartControl : TemplatedControl
         return new Size(width, height);
     }
 
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+
+        if (e.Property == ContentProperty || e.Property == InteractiveProperty)
+            RefreshData();
+        else if (e.Property == MinimumProperty || e.Property == MaximumProperty)
+            UpdateData();
+        else if (e.Property == GridColorProperty)
+            _gridPen = new Pen(GridColor, 0.5);
+        else if (e.Property == AxisColorProperty)
+            _axisPen = new Pen(AxisColor, 1);
+        else if (e.Property == ChartColorProperty || e.Property == ChartThicknessProperty)
+        {
+            _chartPen = new Pen(ChartColor, ChartThickness);
+            _pointsPen = new Pen(ChartColor, 2);
+        }
+
+    }
+
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        var props = e.GetCurrentPoint(this).Properties;
+        bool isLeft = props.IsLeftButtonPressed;
+
+        if (!isLeft || InteractiveModifier != KeyModifiers.None
+            && !e.KeyModifiers.HasFlag(InteractiveModifier))
+        {
+            base.OnPointerPressed(e);
+            return;
+        }
+
+        _isDraging = true;
+        _mousePosition = e.GetPosition(this);
+        _prevMousePosition = e.GetPosition(this);
+
+        e.Handled = true;
+
+        base.OnPointerPressed(e);
+    }
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
-        base.OnPointerMoved(e);
         _mousePosition = e.GetPosition(this);
-        InvalidateVisual();
+        if (_isDraging)
+        {
+            var dx = PointToValue(_mousePosition.Value.X, 0).X - PointToValue(_prevMousePosition.X, 0).X;
+
+            double range = Maximum - Minimum;
+            double threshold = Math.Max(range * 0.005, 0.1);
+
+            if (Math.Abs(dx) > threshold)
+            {
+                if (dx > 0)
+                {
+                    var min = Minimum;
+                    var delta = (min - dx >= _minX) ? dx : min - _minX;
+                    SetValue(MinimumProperty, Minimum - delta);
+                    SetValue(MaximumProperty, Maximum - delta);
+                }
+                else if (dx < 0)
+                {
+                    var max = Maximum;
+                    var delta = (max - dx <= _maxX) ? dx : max - _maxX;
+                    SetValue(MinimumProperty, Minimum - delta);
+                    SetValue(MaximumProperty, Maximum - delta);
+                }
+
+                _prevMousePosition = e.GetPosition(this); 
+
+                e.Handled = true;
+            }
+        }
+
+        base.OnPointerMoved(e);
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        _isDraging = false;
     }
 
     protected override void OnPointerExited(PointerEventArgs e)
@@ -277,36 +447,64 @@ public class ChartControl : TemplatedControl
         InvalidateVisual();
     }
 
+    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+    {
+        if (InteractiveModifier != KeyModifiers.None 
+            && !e.KeyModifiers.HasFlag(InteractiveModifier))
+        {
+            base.OnPointerWheelChanged(e);
+            return;
+        }
+
+        double center = PointToValue(e.GetPosition(this).X, 0).X;
+        double step = 0.1;
+
+        double dxUp = (Maximum - center) * step;
+        double dxDw = (center - Minimum) * step;
+        dxUp = dxUp < 1 ? 1 : dxUp;
+        dxDw = dxDw < 1 ? 1 : dxDw;
+
+        var sortedKeys = SortedData.Chart.Keys.OrderBy(k => k).ToList();
+
+        double aproxDelta = sortedKeys
+            .Zip(sortedKeys.Skip(1), (current, next) => next - current)
+            .Average();
+
+        if (e.Delta.Y > 0)
+        {
+            var newMax = Maximum - (Maximum - dxUp > center + aproxDelta ? dxUp : 0);
+            var newMin = Minimum + (Minimum + dxDw < center - aproxDelta ? dxDw : 0);
+            SetValue(MaximumProperty, newMax);
+            SetValue(MinimumProperty, newMin);
+        }
+        else if (e.Delta.Y < 0)
+        {
+            var newMax = (Maximum + dxUp < _maxX) ? Maximum + dxUp : _maxX;
+            var newMin = (Minimum - dxDw > _minX) ? Minimum - dxDw : _minX;
+            SetValue(MaximumProperty, newMax);
+            SetValue(MinimumProperty, newMin);
+        }
+
+        e.Handled = true;
+
+        base.OnPointerWheelChanged(e);
+    }
+
+    #endregion
+
     public override void Render(DrawingContext context)
     {
         base.Render(context);
-        if (Content == null || Content.Chart.Count < 2) return;
+        if (SortedData == null || SortedData.Chart.Count < 2) return;
 
-        if (Bounds.Width <= PaddingLeft + PaddingRight ||
-            Bounds.Height <= PaddingTop + PaddingBottom)
+        if (Bounds.Width <= Padding.Left + Padding.Right ||
+            Bounds.Height <= Padding.Top + Padding.Bottom)
             return;
 
-        var points = Content.Chart.OrderBy(x => x.Key).ToList();
-        double minX = points.Min(p => p.Key);
-        double maxX = points.Max(p => p.Key);
-        double minY = points.Min(p => p.Value);
-        double maxY = points.Max(p => p.Value);
-
-        _left = PaddingLeft;
-        _right = Bounds.Width - PaddingRight;
-        _top = PaddingTop;
-        _bottom = Bounds.Height - PaddingBottom;
-
-        // Функция нормализации
-        Point Normalize(double x, double y)
-        {
-            double availableWidth = Bounds.Width - PaddingLeft - PaddingRight;
-            double availableHeight = Bounds.Height - PaddingTop - PaddingBottom;
-
-            double px = PaddingLeft + (x - minX) / (maxX - minX) * availableWidth;
-            double py = (PaddingTop + availableHeight) - ((y - minY) / (maxY - minY) * availableHeight);
-            return new Point(px, py);
-        }
+        _left = Padding.Left;
+        _right = Bounds.Width - Padding.Right;
+        _top = Padding.Top;
+        _bottom = Bounds.Height - Padding.Bottom;
 
         // Подготовка данных для сетки и осей
         List<double> xGridLines = null;
@@ -314,46 +512,51 @@ public class ChartControl : TemplatedControl
         List<double> xLabels = null;
         List<double> yLabels = null;
 
-        
+        var points = _sortedVisiblePoints;
 
         if (Grid || Axis)
         {
-            var origin = Normalize(0, 0);
+            var origin = ValueToPoint(0, 0);
             _axisX = Math.Clamp(origin.X, _left, _right);
             _axisY = Math.Clamp(origin.Y, _top, _bottom);
 
             double availableWidth = _right - _left;
             double availableHeight = _bottom - _top;
 
-            xGridLines = GetGridValues(minX, maxX, GridSizeX, availableWidth, 200);
-            yGridLines = GetGridValues(minY, maxY, GridSizeY, availableHeight, 100);
-            xLabels = GetLabelValues(minX, maxX, LabelModeX, GridSizeX, availableWidth, points, false);
-            yLabels = GetLabelValues(minY, maxY, LabelModeY, GridSizeY, availableHeight, points, true);
+            xGridLines = GetGridValues(Minimum, Maximum, GridSizeX, availableWidth, 200);
+            yGridLines = GetGridValues(_minY, _maxY, GridSizeY, availableHeight, 100);
+            xLabels = GetLabelValues(Minimum, Maximum, LabelModeX, GridSizeX, availableWidth, points, false);
+            yLabels = GetLabelValues(_minY, _maxY, LabelModeY, GridSizeY, availableHeight, points, true);
         }
 
         // 1. Фон
         context.FillRectangle(Background ?? Brushes.Transparent, new Rect(Bounds.Size));
 
-        // 2. Сетка и оси (линии)
-        DrawGridAndAxesLines(context, xGridLines, yGridLines, Normalize);
+        // 2. Сетка и оси
+        DrawGridAndAxesLines(context, xGridLines, yGridLines, ValueToPoint);
 
         // 3. Геометрия графика
-        var screenPoints = points.Select(p => Normalize(p.Key, p.Value)).ToList();
+        var screenPoints = points.Select(p => ValueToPoint(p.Key, p.Value)).ToList();
         DrawChartGeometry(context, screenPoints);
 
-        // 4. Подписи осей
-        if (Axis && xLabels != null && yLabels != null)
-        {
-            DrawAxesTicksAndLabels(context, xLabels, yLabels, points, Normalize);
-        }
-
-        // 5. Точки и подписи
+        // 4. Точки и подписи
         if (HighlightPoints)
         {
-            DrawPointsAndLabels(context, points, Normalize);
+            DrawPointsAndLabels(context, points, ValueToPoint);
         }
 
-        // 6. Подсказка мыши
+        // 5. Рамка
+        var pen = new Pen(Background, 1);
+        context.DrawRectangle(Background, pen, new Rect(0, 0, _left, Bounds.Height));
+        context.DrawRectangle(Background, pen, new Rect(_right, 0, Bounds.Width, Bounds.Height));
+
+        // 6. Подписи осей
+        if (Axis && xLabels != null && yLabels != null)
+        {
+            DrawAxesTicksAndLabels(context, xLabels, yLabels, points, ValueToPoint);
+        }
+
+        // 7. Подсказка мыши
         if (_mousePosition.HasValue)
         {
             DrawTooltip(context, points, screenPoints);
@@ -370,24 +573,22 @@ public class ChartControl : TemplatedControl
     {
         if (Grid && xGridLines != null && yGridLines != null)
         {
-            var gridPen = new Pen(GridColor, 0.5);
             foreach (var val in xGridLines)
             {
                 var p = normalize(val, 0);
-                context.DrawLine(gridPen, new Point(p.X, _top), new Point(p.X, _bottom));
+                context.DrawLine(_gridPen, new Point(p.X, _top), new Point(p.X, _bottom));
             }
             foreach (var val in yGridLines)
             {
                 var p = normalize(0, val);
-                context.DrawLine(gridPen, new Point(_left, p.Y), new Point(_right, p.Y));
+                context.DrawLine(_gridPen, new Point(_left, p.Y), new Point(_right, p.Y));
             }
         }
 
         if (Axis)
         {
-            var axisPen = new Pen(AxisColor, 1);
-            context.DrawLine(axisPen, new(_axisX, _top), new(_axisX, _bottom));
-            context.DrawLine(axisPen, new(_left, _axisY), new(_right, _axisY));
+            context.DrawLine(_axisPen, new(_axisX, _top), new(_axisX, _bottom));
+            context.DrawLine(_axisPen, new(_left, _axisY), new(_right, _axisY));
         }
     }
 
@@ -396,7 +597,6 @@ public class ChartControl : TemplatedControl
     /// </summary>
     private void DrawChartGeometry(DrawingContext context, List<Point> screenPoints)
     {
-        var pen = new Pen(ChartColor, ChartThickness);
         var geometry = new StreamGeometry();
 
         using (var sgc = geometry.Open())
@@ -447,7 +647,7 @@ public class ChartControl : TemplatedControl
 
         if (ChartStyle != ChartStyle.Simple)
         {
-            context.DrawGeometry(Fill ? ChartColor : null, pen, geometry);
+            context.DrawGeometry(Fill ? ChartColor : null, _chartPen, geometry);
         }
         else
         {
@@ -455,9 +655,9 @@ public class ChartControl : TemplatedControl
             foreach (var p in screenPoints)
             {
                 if (Fill)
-                    context.DrawLine(pen, p, new Point(p.X, Bounds.Height));
+                    context.DrawLine(_chartPen, p, new Point(p.X, Bounds.Height));
                 else
-                    context.DrawEllipse(ChartColor, pen, p, ChartThickness / 2, ChartThickness / 2);
+                    context.DrawEllipse(ChartColor, _chartPen, p, ChartThickness / 2, ChartThickness / 2);
             }
         }
     }
@@ -468,8 +668,6 @@ public class ChartControl : TemplatedControl
     private void DrawAxesTicksAndLabels(DrawingContext context, List<double> xLabels, List<double> yLabels,
     List<KeyValuePair<double, double>> points, Func<double, double, Point> normalize)
     {
-        var axisPen = new Pen(AxisColor, 1);
-
         // Засечки и подписи по X
         double angleX = xLabels.Count > 10 ? (xLabels.Count > 40 ? 90 : 45) : 0;
         foreach (var val in xLabels)
@@ -478,7 +676,7 @@ public class ChartControl : TemplatedControl
             if (p.X < _left - 1 || p.X > _right + 1) continue;
 
             // Засечка
-            context.DrawLine(axisPen, new Point(p.X, _axisY - 3), new Point(p.X, _axisY + 3));
+            context.DrawLine(_axisPen, new Point(p.X, _axisY - 3), new Point(p.X, _axisY + 3));
 
             // Подпись
             DrawText(context, FormatNumber(val), new Point(p.X, _axisY + 15), angleX,
@@ -496,7 +694,7 @@ public class ChartControl : TemplatedControl
             if (p.Y < _top - 1 || p.Y > _bottom + 1) continue;
 
             // Засечка
-            context.DrawLine(axisPen, new Point(_axisX - 3, p.Y), new Point(_axisX + 3, p.Y));
+            context.DrawLine(_axisPen, new Point(_axisX - 3, p.Y), new Point(_axisX + 3, p.Y));
 
             // Подпись
             DrawText(context, FormatNumber(val), new Point(_axisX - 20, p.Y), 0, TextAlignment.Right);
@@ -509,17 +707,16 @@ public class ChartControl : TemplatedControl
     /// </summary>
     private void DrawPointsAndLabels(DrawingContext context, List<KeyValuePair<double, double>> points, Func<double, double, Point> normalize)
     {
-        var pointsPen = new Pen(ChartColor, 2);
         foreach (var point in points)
         {
             var nPoint = normalize(point.Key, point.Value);
-            context.DrawEllipse(ChartColor, pointsPen, nPoint, 2, 2);
+            context.DrawEllipse(ChartColor, _pointsPen, nPoint, 2, 2);
 
             if (ShowPointsLabels)
             {
                 double TextAngle = 0;
-                TextAngle = Content.Count >= 50 ? -45 : TextAngle;
-                TextAngle = Content.Count >= 100 ? -60 : TextAngle;
+                TextAngle = SortedData.Count >= 50 ? -45 : TextAngle;
+                TextAngle = SortedData.Count >= 100 ? -60 : TextAngle;
 
                 DrawText(context, FormatNumber(point.Value), new Point(nPoint.X, nPoint.Y - 15),
                     TextAngle, TextAlignment.Center, PointsLabelsColor);
@@ -678,7 +875,56 @@ public class ChartControl : TemplatedControl
         return res;
     }
 
+    /// <summary>
+    /// Обновляет данные при привязке
+    /// </summary>
+    private void RefreshData()
+    {
+        if (Content == null || Content.Count < 2)
+            return;
+
+        SortedData = new(Content.Chart);
+        _sortedContentPoints = Content.Chart.OrderBy(p => p.Key).ToList();
+
+        _minX = _sortedContentPoints[0].Key;
+        _maxX = _sortedContentPoints[^1].Key;
+        _minY = _sortedContentPoints.Min(p => p.Value);
+        _maxY = _sortedContentPoints.Max(p => p.Value);
+
+        Minimum = _minX;
+        Maximum = _maxX;
+    }
+
+    /// <summary>
+    /// Обновить отсортированные данные
+    /// </summary>
+    private void UpdateData()
+    {
+        if (Content == null || Content.Count < 2)
+            return;
+
+        int firstIdx = _sortedContentPoints.BinarySearch(new KeyValuePair<double, double>(Minimum, 0), 
+            Comparer<KeyValuePair<double, double>>.Create((a, b) => a.Key.CompareTo(b.Key)));
+        if (firstIdx < 0) firstIdx = ~firstIdx;
+
+        int lastIdx = _sortedContentPoints.BinarySearch(new KeyValuePair<double, double>(Maximum, 0), 
+            Comparer<KeyValuePair<double, double>>.Create((a, b) => a.Key.CompareTo(b.Key)));
+        if (lastIdx < 0) lastIdx = ~lastIdx - 1;
+
+        firstIdx = Math.Max(0, firstIdx - 1);
+
+        lastIdx = Math.Min(_sortedContentPoints.Count - 1, lastIdx + 1);
+
+        _sortedVisiblePoints = _sortedContentPoints.GetRange(firstIdx, lastIdx - firstIdx + 1);
+
+        SortedData = new ChartDataBase(_sortedVisiblePoints.ToDictionary(p => p.Key, p => p.Value));
+
+        _minY = _sortedVisiblePoints.Min(p => p.Value);
+        _maxY = _sortedVisiblePoints.Max(p => p.Value);
+    }
+
     #endregion
+
 
     /// <summary>
     /// Форматирует число для отображения на осях и в подсказках.
@@ -692,7 +938,27 @@ public class ChartControl : TemplatedControl
         return value.ToString("0.#");
     }
 
+    private Point ValueToPoint(double x, double y)
+    {
+        double availableWidth = Bounds.Width - Padding.Left - Padding.Right;
+        double availableHeight = Bounds.Height - Padding.Top - Padding.Bottom;
 
+        double px = Padding.Left + (x - Minimum) / (Maximum - Minimum) * availableWidth;
+        double py = (Padding.Top + availableHeight) - ((y - _minY) / (_maxY - _minY) * availableHeight);
+
+        return new Point(px, py);
+    }
+
+    private Point PointToValue(double x, double y)
+    {
+        double availableWidth = Bounds.Width - Padding.Left - Padding.Right;
+        double availableHeight = Bounds.Height - Padding.Top - Padding.Bottom;
+
+        double vx = Minimum + ((x - Padding.Left) / availableWidth) * (Maximum - Minimum);
+        double vy = _minY + ((Padding.Top + availableHeight - y) / availableHeight) * (_maxY - _minY);
+
+        return new Point(vx, vy);
+    }
 }
 
 public enum ChartStyle

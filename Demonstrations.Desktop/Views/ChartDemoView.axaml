@@ -89,6 +89,8 @@
                                HighlightPoints="{Binding HighlightPoints}"
                                ShowPointsLabels="{Binding ShowLabels}"
                                LabelModeX="{Binding LabelModeX}"
-                               LabelModeY="{Binding LabelModeY}"/>
+                               LabelModeY="{Binding LabelModeY}"
+                               Interactive="True"
+                               InteractiveModifier="None"/>
     </DockPanel>
 </UserControl>
