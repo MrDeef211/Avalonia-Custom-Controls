@@ -146,6 +146,8 @@ public class ChartControl : TemplatedControl
         _axisPen = new Pen(AxisColor, 1);
         _chartPen = new Pen(ChartColor, ChartThickness);
         _pointsPen = new Pen(ChartColor, 2);
+
+        Focusable = true;
     }
 
     #region Свойства
@@ -410,20 +412,7 @@ public class ChartControl : TemplatedControl
 
             if (Math.Abs(dx) > threshold)
             {
-                if (dx > 0)
-                {
-                    var min = Minimum;
-                    var delta = (min - dx >= _minX) ? dx : min - _minX;
-                    SetValue(MinimumProperty, Minimum - delta);
-                    SetValue(MaximumProperty, Maximum - delta);
-                }
-                else if (dx < 0)
-                {
-                    var max = Maximum;
-                    var delta = (max - dx <= _maxX) ? dx : max - _maxX;
-                    SetValue(MinimumProperty, Minimum - delta);
-                    SetValue(MaximumProperty, Maximum - delta);
-                }
+                MoveChart(-dx);
 
                 _prevMousePosition = e.GetPosition(this); 
 
@@ -436,8 +425,10 @@ public class ChartControl : TemplatedControl
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        base.OnPointerReleased(e);
+        if (Interactive && !IsFocused)
+            Focus();
         _isDraging = false;
+        base.OnPointerReleased(e);
     }
 
     protected override void OnPointerExited(PointerEventArgs e)
@@ -456,38 +447,34 @@ public class ChartControl : TemplatedControl
             return;
         }
 
-        double center = PointToValue(e.GetPosition(this).X, 0).X;
-        double step = 0.1;
+        var center = PointToValue(e.GetPosition(this).X, 0);
 
-        double dxUp = (Maximum - center) * step;
-        double dxDw = (center - Minimum) * step;
-        dxUp = dxUp < 1 ? 1 : dxUp;
-        dxDw = dxDw < 1 ? 1 : dxDw;
-
-        var sortedKeys = SortedData.Chart.Keys.OrderBy(k => k).ToList();
-
-        double aproxDelta = sortedKeys
-            .Zip(sortedKeys.Skip(1), (current, next) => next - current)
-            .Average();
-
-        if (e.Delta.Y > 0)
-        {
-            var newMax = Maximum - (Maximum - dxUp > center + aproxDelta ? dxUp : 0);
-            var newMin = Minimum + (Minimum + dxDw < center - aproxDelta ? dxDw : 0);
-            SetValue(MaximumProperty, newMax);
-            SetValue(MinimumProperty, newMin);
-        }
-        else if (e.Delta.Y < 0)
-        {
-            var newMax = (Maximum + dxUp < _maxX) ? Maximum + dxUp : _maxX;
-            var newMin = (Minimum - dxDw > _minX) ? Minimum - dxDw : _minX;
-            SetValue(MaximumProperty, newMax);
-            SetValue(MinimumProperty, newMin);
-        }
+        ZoomChart(center, e.Delta.Y / Math.Abs(e.Delta.Y) * 0.1);
 
         e.Handled = true;
 
         base.OnPointerWheelChanged(e);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+
+        if (InteractiveModifier != KeyModifiers.None
+            && !e.KeyModifiers.HasFlag(InteractiveModifier))
+        {
+            base.OnKeyDown(e);
+            return;
+        }
+
+        double dx = (Maximum - Minimum) * 0.05;
+
+        if (e.Key == Key.Left) MoveChart(-dx);
+        else if (e.Key == Key.Right) MoveChart(dx);
+        else if (e.Key == Key.Up) ZoomChart(new Point((Maximum + Minimum) / 2, 0), 0.2);
+        else if (e.Key == Key.Down) ZoomChart(new Point((Maximum + Minimum) / 2, 0), -0.2);
+
+        e.Handled = true;
+        base.OnKeyDown(e);
     }
 
     #endregion
@@ -801,7 +788,7 @@ public class ChartControl : TemplatedControl
 
     #endregion
 
-    #region Вычисление значений сетки и подписей
+    #region Вычисление значений
 
     /// <summary>
     /// Возвращает список значений для линий сетки с автоматическим или заданным шагом.
@@ -921,6 +908,58 @@ public class ChartControl : TemplatedControl
 
         _minY = _sortedVisiblePoints.Min(p => p.Value);
         _maxY = _sortedVisiblePoints.Max(p => p.Value);
+    }
+
+    private void MoveChart(double dx)
+    {
+        dx = -dx;
+        if (dx > 0)
+        {
+            var min = Minimum;
+            var delta = (min - dx >= _minX) ? dx : min - _minX;
+            SetValue(MinimumProperty, Minimum - delta);
+            SetValue(MaximumProperty, Maximum - delta);
+        }
+        else if (dx < 0)
+        {
+            var max = Maximum;
+            var delta = (max - dx <= _maxX) ? dx : max - _maxX;
+            SetValue(MinimumProperty, Minimum - delta);
+            SetValue(MaximumProperty, Maximum - delta);
+        }
+    }
+
+    private void ZoomChart(Point point, double delta)
+    {
+        
+        double step = Math.Abs(delta);
+        double center = point.X;
+
+        double dxUp = (Maximum - center) * step;
+        double dxDw = (center - Minimum) * step;
+        dxUp = dxUp < 1 ? 1 : dxUp;
+        dxDw = dxDw < 1 ? 1 : dxDw;
+
+        var sortedKeys = SortedData.Chart.Keys.OrderBy(k => k).ToList();
+
+        double aproxDelta = sortedKeys
+            .Zip(sortedKeys.Skip(1), (current, next) => next - current)
+            .Average();
+
+        if (delta > 0)
+        {
+            var newMax = Maximum - (Maximum - dxUp > center + aproxDelta ? dxUp : 0);
+            var newMin = Minimum + (Minimum + dxDw < center - aproxDelta ? dxDw : 0);
+            SetValue(MaximumProperty, newMax);
+            SetValue(MinimumProperty, newMin);
+        }
+        else if (delta < 0)
+        {
+            var newMax = (Maximum + dxUp < _maxX) ? Maximum + dxUp : _maxX;
+            var newMin = (Minimum - dxDw > _minX) ? Minimum - dxDw : _minX;
+            SetValue(MaximumProperty, newMax);
+            SetValue(MinimumProperty, newMin);
+        }
     }
 
     #endregion

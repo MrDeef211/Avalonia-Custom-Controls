@@ -23,7 +23,7 @@ namespace Demonstrations.Desktop.ViewModels
             GenerateCommand = ReactiveCommand.Create(() => _model.GenerateNewData());
             ToggleOverlayCommand = ReactiveCommand.Create(() => { ShowOverlay = !ShowOverlay; });
 
-            this.WhenAnyValue(x => x._model.LowerX, x => x._model.UpperX)
+            this.WhenAnyValue(x => x.LowerX, x => x.UpperX)
                 .Subscribe(_ =>
                 {
                     this.RaisePropertyChanged(nameof(ShowLabel));
@@ -47,7 +47,7 @@ namespace Demonstrations.Desktop.ViewModels
             set
             {
                 _model.LowerX = value;
-
+                this.RaisePropertyChanged(nameof(LowerX));
             }
         }
 
@@ -57,7 +57,7 @@ namespace Demonstrations.Desktop.ViewModels
             set
             {
                 _model.UpperX = value;
-
+                this.RaisePropertyChanged(nameof(UpperX));
             }
         }
 
