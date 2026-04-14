@@ -9,7 +9,6 @@
     <selectors:EditorTemplateSelector x:Key="EditorTemplateSelector" />
     <converters:BoolToGlyphConverter x:Key="BoolToGlyphConverter" />
     <converters:BoolToCursorConverter x:Key="BoolToCursorConverter" />
-    <converters:BoolToOrientationConverter x:Key="BoolToOrientationConverter" />
 
     <ControlTheme x:Key="{x:Type controls:DataFormControl}" TargetType="controls:DataFormControl">
         <Setter Property="Template">
@@ -18,88 +17,87 @@
                     <ItemsControl ItemsSource="{Binding Sections, RelativeSource={RelativeSource TemplatedParent}}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="models:FormSectionModel">
-    <StackPanel Margin="0,0,0,12">
+                                <StackPanel Margin="0,0,0,12">
 
-        <Button Command="{Binding ToggleCommand}"
-                IsEnabled="{Binding CanCollapse}"
-                Cursor="{Binding CanCollapse, Converter={StaticResource BoolToCursorConverter}}"
-                Background="Transparent"
-                BorderThickness="0"
-                Padding="8,4"
-                HorizontalAlignment="Stretch"
-                HorizontalContentAlignment="Left">
-            <Button.Styles>
-                <Style Selector="Button:pointerover /template/ ContentPresenter">
-                    <Setter Property="Background" Value="Transparent" />
-                </Style>
-                <Style Selector="Button:disabled /template/ ContentPresenter">
-                    <Setter Property="Background" Value="Transparent" />
-                </Style>
-                <Style Selector="Button:disabled">
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="Opacity" Value="1" />
-                </Style>
-            </Button.Styles>
-            <DockPanel>
-                <TextBlock Text="{Binding IsExpanded, Converter={StaticResource BoolToGlyphConverter}}"
-                           FontSize="12"
-                           VerticalAlignment="Center"
-                           Margin="0,0,8,0"
-                           DockPanel.Dock="Left"
-                           IsVisible="{Binding CanCollapse}" />
-                <TextBlock Text="{Binding Name}"
-                           FontSize="{Binding CategoryHeaderFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                           FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                           Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                           VerticalAlignment="Center" />
-            </DockPanel>
-        </Button>
+                                    <Button Command="{Binding ToggleCommand}"
+                                            IsEnabled="{Binding CanCollapse}"
+                                            Cursor="{Binding CanCollapse, Converter={StaticResource BoolToCursorConverter}}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="8,4"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Left">
+                                        <Button.Styles>
+                                            <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </Style>
+                                            <Style Selector="Button:disabled /template/ ContentPresenter">
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </Style>
+                                            <Style Selector="Button:disabled">
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="Opacity" Value="1" />
+                                            </Style>
+                                        </Button.Styles>
+                                        <DockPanel>
+                                            <TextBlock Text="{Binding IsExpanded, Converter={StaticResource BoolToGlyphConverter}}"
+                                                       FontSize="12"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,8,0"
+                                                       DockPanel.Dock="Left"
+                                                       IsVisible="{Binding CanCollapse}" />
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontSize="{Binding CategoryHeaderFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                       FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                       Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                       VerticalAlignment="Center" />
+                                        </DockPanel>
+                                    </Button>
 
-        <ItemsControl ItemsSource="{Binding Rows}" IsVisible="{Binding IsExpanded}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="models:FormRowModel">
-                    <ItemsControl ItemsSource="{Binding Fields}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="{Binding IsHorizontal, Converter={StaticResource BoolToOrientationConverter}}" 
-                                            Spacing="8" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="models:FormFieldModel">
-                                <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="{Binding LabelColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0"
-                                               Text="{Binding DisplayName}"
-                                               VerticalAlignment="Center"
-                                               FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                               FontWeight="{Binding LabelFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                               Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                               Margin="0,0,16,0"
-                                               IsVisible="{Binding ShowLabel}" />
-                                    <ContentControl Grid.Column="1"
-                                                    Content="{Binding}"
-                                                    ContentTemplate="{StaticResource EditorTemplateSelector}" />
-                                    <TextBlock Grid.Column="2"
-                                               Text="⚠️"
-                                               Foreground="Red"
-                                               IsVisible="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
-                                               Margin="8,0,0,0" />
-                                </Grid>
+                                    <ItemsControl ItemsSource="{Binding Rows}" IsVisible="{Binding IsExpanded}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="models:FormRowModel">
+                                                <ItemsControl ItemsSource="{Binding Fields}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel Orientation="{Binding Orientation}" Spacing="8" />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate DataType="models:FormFieldModel">
+                                                            <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="{Binding LabelColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock Grid.Column="0"
+                                                                           Text="{Binding DisplayName}"
+                                                                           VerticalAlignment="Center"
+                                                                           FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                                           FontWeight="{Binding LabelFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                                           Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                                           Margin="0,0,16,0"
+                                                                           IsVisible="{Binding ShowLabel}" />
+                                                                <ContentControl Grid.Column="1"
+                                                                                Content="{Binding}"
+                                                                                ContentTemplate="{StaticResource EditorTemplateSelector}" />
+                                                                <TextBlock Grid.Column="2"
+                                                                           Text="⚠️"
+                                                                           Foreground="Red"
+                                                                           IsVisible="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
+                                                                           Margin="8,0,0,0" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <Rectangle Height="1" Fill="LightGray" Margin="0,8,0,0" />
+                                </StackPanel>
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-
-        <Rectangle Height="1" Fill="LightGray" Margin="0,8,0,0" />
-    </StackPanel>
-</DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>

@@ -7,12 +7,18 @@ using System.Reactive;
 
 namespace Common.Controls.Models
 {
+    /// <summary>
+    /// Модель секции (категории) формы.
+    /// </summary>
     public class FormSectionModel : ReactiveObject
     {
-        private string _name;
         private bool _isExpanded = true;
-        private bool _canCollapse = false;
+        private bool _canCollapse;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="FormSectionModel"/>.
+        /// </summary>
+        /// <param name="name">Название секции.</param>
         public FormSectionModel(string name)
         {
             Name = name;
@@ -23,23 +29,42 @@ namespace Common.Controls.Models
             });
         }
 
+        /// <summary>
+        /// Название секции.
+        /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// Коллекция полей, входящих в секцию.
+        /// </summary>
         public ObservableCollection<FormFieldModel> Fields { get; } = new();
 
+        /// <summary>
+        /// Коллекция строк, сгруппированных из полей.
+        /// </summary>
         public ObservableCollection<FormRowModel> Rows { get; } = new();
 
+        /// <summary>
+        /// Флаг, указывающий, развёрнута ли секция.
+        /// </summary>
         public bool IsExpanded
         {
             get => _isExpanded;
             set => this.RaiseAndSetIfChanged(ref _isExpanded, value);
         }
 
+        /// <summary>
+        /// Флаг, указывающий, может ли пользователь сворачивать/разворачивать секцию.
+        /// </summary>
         public bool CanCollapse
         {
             get => _canCollapse;
             set => this.RaiseAndSetIfChanged(ref _canCollapse, value);
         }
 
+        /// <summary>
+        /// Команда переключения состояния свёрнутости.
+        /// </summary>
         public ReactiveCommand<Unit, Unit> ToggleCommand { get; }
     }
 }

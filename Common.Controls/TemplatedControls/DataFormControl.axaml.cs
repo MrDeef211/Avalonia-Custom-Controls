@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Subjects;
 using System.Reflection;
@@ -17,14 +18,39 @@ using System.Windows.Input;
 
 namespace Common.Controls;
 
-public class DataFormControl : BaseEditorControl
+public class DataFormControl : BaseEditorControl, IDisposable
 {
+    private readonly CompositeDisposable _disposables = new();
+    private readonly CompositeDisposable _fieldSubscriptions = new();
+
+    public DataFormControl()
+    {
+        this.WhenAnyValue(x => x.Sections)
+        .Subscribe(sections =>
+        {
+            _fieldSubscriptions.Clear();
+            var fields = sections?.SelectMany(s => s.Fields) ?? Enumerable.Empty<FormFieldModel>();
+            foreach (var field in fields)
+            {
+                var sub = field.WhenAnyValue(
+                    f => f.IsTouched,
+                    f => f.ConvertedValue,
+                    f => f.OriginalValue,
+                    (touched, converted, original) => touched && !Equals(converted, original))
+                    .Subscribe(_ => UpdateHasChanges())
+                    .DisposeWith(_fieldSubscriptions);
+            }
+            UpdateHasChanges();
+        })
+        .DisposeWith(_disposables);
+    }
+
     public ObservableCollection<FormSectionModel> Sections { get; } = new();
 
     #region Настраиваемые визуальные свойства
 
     public static readonly StyledProperty<DataFormConfig?> FormConfigProperty =
-    AvaloniaProperty.Register<DataFormControl, DataFormConfig?>(nameof(FormConfig));
+        AvaloniaProperty.Register<DataFormControl, DataFormConfig?>(nameof(FormConfig));
 
     /// <summary>
     /// Конфигурация формы
@@ -120,13 +146,13 @@ public class DataFormControl : BaseEditorControl
     }
 
     public static readonly StyledProperty<ICommand?> SaveCommandProperty =
-    AvaloniaProperty.Register<DataFormControl, ICommand?>(nameof(SaveCommand));
+        AvaloniaProperty.Register<DataFormControl, ICommand?>(nameof(SaveCommand));
 
     /// <summary>
     /// Команда, выполняемая после успешного сохранения данных.
     /// </summary>
     /// <remarks>
-    /// Параметр сохранённый обьект
+    /// Параметр сохранённый объект
     /// </remarks>
     public ICommand? SaveCommand
     {
@@ -136,9 +162,24 @@ public class DataFormControl : BaseEditorControl
 
     #endregion
 
+    protected override void OnSelectedObjectChanged(object? oldValue, object? newValue)
+    {
+        base.OnSelectedObjectChanged(oldValue, newValue);
+        GenerateEditors(newValue);
+    }
+
     protected override void GenerateEditors(object? target)
     {
+        _fieldSubscriptions.Clear();
+        foreach (var section in Sections)
+        {
+            foreach (var field in section.Fields)
+            {
+                field.Dispose();
+            }
+        }
         Sections.Clear();
+
         if (target == null) return;
 
         var properties = target.GetType()
@@ -160,17 +201,6 @@ public class DataFormControl : BaseEditorControl
                 configuredProperties.Add((prop, cfg));
         }
 
-        Dictionary<string, int>? normalizedOrders = null;
-        if (FormConfig?.CategoryOrders != null)
-        {
-            normalizedOrders = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            foreach (var kv in FormConfig.CategoryOrders)
-            {
-                var normalizedKey = NormalizeCategoryName(kv.Key);
-                normalizedOrders[normalizedKey] = kv.Value;
-            }
-        }
-
         var itemsWithCategory = new List<(PropertyInfo Property, DataFormFieldConfig? Config, string Category, int CategoryOrder, int Order)>();
         foreach (var item in configuredProperties)
         {
@@ -178,17 +208,10 @@ public class DataFormControl : BaseEditorControl
             var normalizedCategory = NormalizeCategoryName(rawCategory);
             int categoryOrder = 0;
             if (FormConfig?.CategoryOrders != null && FormConfig.CategoryOrders.TryGetValue(normalizedCategory, out var orderFromDict))
-            {
                 categoryOrder = orderFromDict;
-            }
             else if (item.Config?.CategoryOrder.HasValue == true)
-            {
                 categoryOrder = item.Config.CategoryOrder.Value;
-            }
-            else
-            {
-                categoryOrder = 0;
-            }
+
             itemsWithCategory.Add((item.Property, item.Config, rawCategory, categoryOrder, item.Config?.Order ?? 0));
         }
 
@@ -209,9 +232,6 @@ public class DataFormControl : BaseEditorControl
             foreach (var item in sortedFields)
             {
                 var fieldModel = new FormFieldModel(item.Property, target, IsReadOnly, item.Config);
-                fieldModel.WhenAnyValue(x => x.Value)
-                    .Subscribe(Observer.Create<object?>(_ => OnFieldValueChanged(fieldModel)))
-                    .DisposeWith(Subscriptions!);
                 section.Fields.Add(fieldModel);
             }
             Sections.Add(section);
@@ -232,7 +252,7 @@ public class DataFormControl : BaseEditorControl
                     var row = new FormRowModel();
                     row.RowGroup = -1;
                     row.Fields.Add(field);
-                    row.IsHorizontal = false;
+                    row.Orientation = Avalonia.Layout.Orientation.Vertical;
                     section.Rows.Add(row);
                 }
             }
@@ -242,28 +262,16 @@ public class DataFormControl : BaseEditorControl
                 row.RowGroup = group.Key;
                 foreach (var field in group)
                     row.Fields.Add(field);
-                row.IsHorizontal = (group.Count() > 1);
+                row.Orientation = row.Fields.Count > 1 ? Avalonia.Layout.Orientation.Horizontal : Avalonia.Layout.Orientation.Vertical;
                 section.Rows.Add(row);
             }
         }
     }
 
-    private void OnFieldValueChanged(FormFieldModel fieldModel)
-    {
-        if (!fieldModel.IsTouched) return;
-
-        bool isValid = fieldModel.TryConvert();
-        if (!isValid)
-            SetError(fieldModel.ValidationError);
-        else
-            SetError(string.Empty);
-        UpdateHasChanges();
-    }
-
     private void UpdateHasChanges()
     {
         bool hasChanges = Sections.SelectMany(s => s.Fields)
-            .Any(f => !Equals(f.ConvertedValue, f.OriginalValue));
+            .Any(f => f.IsTouched && !Equals(f.ConvertedValue, f.OriginalValue));
         SetHasChanges(hasChanges);
     }
 
@@ -277,9 +285,7 @@ public class DataFormControl : BaseEditorControl
             field.PropertyInfo.SetValue(field.Target, field.ConvertedValue);
             field.UpdateOriginal();
         }
-        SetHasChanges(false);
-        if (SaveCommand?.CanExecute(SelectedObject) == true)
-            SaveCommand.Execute(SelectedObject);
+        SaveCommand?.Execute(SelectedObject);
     }
 
     protected override void CancelChanges()
@@ -288,11 +294,23 @@ public class DataFormControl : BaseEditorControl
         {
             field.ResetToOriginal();
         }
-        SetHasChanges(false);
     }
 
-    private string NormalizeCategoryName(string category)
+    private static string NormalizeCategoryName(string category)
     {
         return category?.Trim() ?? "Общие";
+    }
+
+    public void Dispose()
+    {
+        _fieldSubscriptions.Dispose();
+        _disposables.Dispose();
+        foreach (var section in Sections)
+        {
+            foreach (var field in section.Fields)
+            {
+                field.Dispose();
+            }
+        }
     }
 }

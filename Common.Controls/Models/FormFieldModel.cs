@@ -2,26 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Common.Controls.Models
 {
     public class FormFieldModel : ReactiveObject
     {
-        private object? _originalValue;
         private object? _value;
-        private object? _convertedValue;
         private bool _isReadOnly;
         private string _validationError = string.Empty;
-        private bool _isTouched = false;
-        private DateTimeOffset? _dateValue;
-        private EnumItem? _selectedEnumItem;
+        private bool _isTouched;
+        private int _rowGroup = -1;
         private IEnumerable<EnumItem>? _enumDisplayItems;
-        public bool HideLabel { get; set; }
-        public DataFormFieldValidation? ValidationConfig { get; set; }
-        public FieldLayout Layout { get; set; }
 
         public FormFieldModel(PropertyInfo propertyInfo, object target, bool isReadOnly, DataFormFieldConfig? fieldConfig = null)
         {
@@ -30,51 +28,48 @@ namespace Common.Controls.Models
             PropertyName = propertyInfo.Name;
             var displayNameAttr = propertyInfo.GetCustomAttribute<DisplayNameAttribute>();
             DisplayName = displayNameAttr?.DisplayName ?? PropertyName;
-            _originalValue = propertyInfo.GetValue(target);
-            _value = _originalValue;
+            _value = propertyInfo.GetValue(target);
+            OriginalValue = _value;
             _isReadOnly = isReadOnly;
             PropertyType = propertyInfo.PropertyType;
 
             if (PropertyType.IsEnum)
             {
-                EnumValues = Enum.GetValues(PropertyType).Cast<object>().ToList();
-                EnumDisplayItems = EnumValues
+                var values = Enum.GetValues(PropertyType).Cast<object>();
+                EnumDisplayItems = values
+                    .Select(v => new EnumItem(v, GetEnumDisplayName(v)))
+                    .ToList();
+            }
+
+            if (PropertyType.IsEnum)
+            {
+                var values = Enum.GetValues(PropertyType).Cast<object>();
+                EnumDisplayItems = values
                     .Select(v => new EnumItem(v, GetEnumDisplayName(v)))
                     .ToList();
 
-                if (_value != null)
-                    SelectedEnumItem = EnumDisplayItems.FirstOrDefault(i => Equals(i.Value, _value));
+                _selectedEnumItem = _value != null
+                    ? EnumDisplayItems.FirstOrDefault(i => Equals(i.Value, _value))
+                    : null;
             }
 
-            if (PropertyType == typeof(DateTime) || PropertyType == typeof(DateTime?))
-            {
-                if (_value is DateTime dt)
-                    _dateValue = new DateTimeOffset(dt);
-                else
-                {
-                    var dtn = _value as DateTime?;
-                    _dateValue = dtn.HasValue ? new DateTimeOffset(dtn.Value) : (DateTimeOffset?)null;
-                }
-            }
+            ApplyConfiguration(fieldConfig);
 
-            if (fieldConfig != null)
-            {
-                if (!string.IsNullOrEmpty(fieldConfig.DisplayName))
-                    DisplayName = fieldConfig.DisplayName;
-                if (fieldConfig.IsReadOnly.HasValue)
-                    IsReadOnly = fieldConfig.IsReadOnly.Value;
-                HideLabel = fieldConfig.HideLabel;
-                Layout = fieldConfig.Layout;
-                RowGroup = fieldConfig.RowGroup;
-                ValidationConfig = fieldConfig.Validation;
-            }
+            this.WhenAnyValue(x => x.Value)
+                .Subscribe(_ => UpdateConvertedValueAndValidation())
+                .DisposeWith(Disposables); 
+
+            UpdateConvertedValueAndValidation();
         }
 
+        private readonly CompositeDisposable Disposables = new();
+
         public string PropertyName { get; }
-        public string DisplayName { get; }
+        public string DisplayName { get; private set; }
         public PropertyInfo PropertyInfo { get; }
         public object Target { get; }
         public Type PropertyType { get; }
+        public object? OriginalValue { get; private set; }
 
         public object? Value
         {
@@ -85,38 +80,16 @@ namespace Common.Controls.Models
                 _value = value;
                 IsTouched = true;
                 this.RaisePropertyChanged();
-
-                if (EnumDisplayItems != null && value != null)
-                {
-                    SelectedEnumItem = EnumDisplayItems.FirstOrDefault(i => Equals(i.Value, value));
-                }
-                else if (value == null)
-                    SelectedEnumItem = null;
-
-                TryConvert();
+                this.RaisePropertyChanged(nameof(DateValue));
             }
         }
 
+        private object? _convertedValue;
         public object? ConvertedValue
         {
             get => _convertedValue;
             private set => this.RaiseAndSetIfChanged(ref _convertedValue, value);
         }
-
-        public DateTimeOffset? DateValue
-        {
-            get => _dateValue;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _dateValue, value);
-                if (value.HasValue)
-                    Value = value.Value.DateTime;
-                else
-                    Value = null;
-            }
-        }
-
-        public object? OriginalValue => _originalValue;
 
         public bool IsReadOnly
         {
@@ -128,7 +101,6 @@ namespace Common.Controls.Models
             }
         }
 
-        private int _rowGroup = -1;
         public int RowGroup
         {
             get => _rowGroup;
@@ -143,38 +115,49 @@ namespace Common.Controls.Models
             set => this.RaiseAndSetIfChanged(ref _validationError, value);
         }
 
-        public bool IsEnum => PropertyType.IsEnum;
-
-        public bool IsBool => PropertyType == typeof(bool);
-
-        public bool ShowLabel => !HideLabel;
-
         public bool IsTouched
         {
             get => _isTouched;
             private set => this.RaiseAndSetIfChanged(ref _isTouched, value);
         }
 
-        public bool IsNumeric => PropertyType == typeof(int) || PropertyType == typeof(double) ||
-                         PropertyType == typeof(float) || PropertyType == typeof(decimal) ||
-                         PropertyType == typeof(byte) || PropertyType == typeof(short) ||
-                         PropertyType == typeof(uint) || PropertyType == typeof(ushort) ||
-                         PropertyType == typeof(long) || PropertyType == typeof(ulong);
-
-        public bool IsInteger
+        public DateTimeOffset? DateValue
         {
             get
             {
-                var type = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
-                return type == typeof(int) || type == typeof(long) || type == typeof(short) ||
-                       type == typeof(byte) || type == typeof(uint) || type == typeof(ushort) ||
-                       type == typeof(ulong);
+                if (Value == null) return null;
+
+                if (Value is DateTimeOffset dto)
+                    return dto;
+
+                if (Value is DateTime dt)
+                {
+                    var offset = dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.GetUtcOffset(dt);
+                    return new DateTimeOffset(dt, offset);
+                }
+
+                if (DateTimeOffset.TryParse(Value.ToString(), out var parsedDto))
+                    return parsedDto;
+
+                return null;
+            }
+            set
+            {
+                if (value.HasValue)
+                    Value = value.Value.DateTime;
+                else
+                    Value = null;
             }
         }
 
-        public bool IsDateTime => PropertyType == typeof(DateTime) || PropertyType == typeof(DateTime?);
+        public bool IsEnum => PropertyType.IsEnum;
+        public bool IsBool => PropertyType == typeof(bool);
+        public bool ShowLabel => !HideLabel;
+        public bool HideLabel { get; private set; }
 
-        public IEnumerable<object>? EnumValues { get; }
+        public bool IsNumeric => PropertyType.IsNumericType();
+        public bool IsInteger => PropertyType.IsIntegerType();
+        public bool IsDateTime => PropertyType == typeof(DateTime) || PropertyType == typeof(DateTime?);
 
         public IEnumerable<EnumItem>? EnumDisplayItems
         {
@@ -182,6 +165,7 @@ namespace Common.Controls.Models
             private set => this.RaiseAndSetIfChanged(ref _enumDisplayItems, value);
         }
 
+        private EnumItem? _selectedEnumItem;
         public EnumItem? SelectedEnumItem
         {
             get => _selectedEnumItem;
@@ -192,39 +176,144 @@ namespace Common.Controls.Models
                 {
                     Value = value.Value;
                 }
+                else if (value == null)
+                {
+                    Value = null;
+                }
             }
         }
 
+        public DataFormFieldValidation? ValidationConfig { get; private set; }
+
         public void ResetToOriginal()
         {
-            Value = _originalValue;
-            if (IsDateTime)
-            {
-                if (_originalValue is DateTime dt)
-                    DateValue = new DateTimeOffset(dt);
-                else
-                {
-                    var dtn = _originalValue as DateTime?;
-                    DateValue = dtn.HasValue ? new DateTimeOffset(dtn.Value) : (DateTimeOffset?)null;
-                }
-            }
+            Value = OriginalValue;
             ValidationError = string.Empty;
             IsTouched = false;
         }
 
         public void UpdateOriginal()
         {
-            _originalValue = _value;
-            if (IsDateTime)
+            OriginalValue = Value;
+        }
+
+        private void UpdateConvertedValueAndValidation()
+        {
+            var (converted, error) = TryConvertValue(Value);
+            ConvertedValue = converted;
+            ValidationError = error;
+
+            if (IsEnum && EnumDisplayItems != null)
             {
-                if (_value is DateTime dt)
-                    DateValue = new DateTimeOffset(dt);
+                SelectedEnumItem = Value != null
+                    ? EnumDisplayItems.FirstOrDefault(i => Equals(i.Value, Value))
+                    : null;
+            }
+        }
+
+        private (object? converted, string error) TryConvertValue(object? input)
+        {
+            try
+            {
+                if (input == null)
+                {
+                    if (PropertyType.IsValueType && Nullable.GetUnderlyingType(PropertyType) == null)
+                        throw new InvalidOperationException("Значение не может быть null для типа значения");
+                    return (null, string.Empty);
+                }
+
+                var targetType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
+                var inputType = input.GetType();
+
+                if (inputType == targetType)
+                {
+                    var validationError = Validate(input);
+                    return (input, validationError);
+                }
+
+                object converted;
+
+                if (targetType == typeof(DateTime))
+                {
+                    converted = ConvertToDateTime(input);
+                }
+                else if (targetType == typeof(DateTime?))
+                {
+                    converted = input == null ? null : ConvertToDateTime(input);
+                }
                 else
                 {
-                    var dtn = _value as DateTime?;
-                    DateValue = dtn.HasValue ? new DateTimeOffset(dtn.Value) : (DateTimeOffset?)null;
+                    converted = Convert.ChangeType(input, targetType);
+                }
+
+                var error = Validate(converted);
+                return (converted, error);
+            }
+            catch (Exception ex)
+            {
+                return (null, ex.Message);
+            }
+        }
+
+        private static DateTime ConvertToDateTime(object value)
+        {
+            return value switch
+            {
+                DateTime dt => dt,
+                DateTimeOffset dto => dto.DateTime,
+                string s => DateTime.Parse(s),
+                _ => (DateTime)Convert.ChangeType(value, typeof(DateTime))
+            };
+        }
+
+        private string Validate(object? value)
+        {
+            var validationContext = new ValidationContext(Target ?? new object())
+            {
+                MemberName = PropertyName
+            };
+            var results = new List<ValidationResult>();
+            if (!Validator.TryValidateProperty(value, validationContext, results))
+            {
+                return results[0].ErrorMessage ?? "Некорректное значение";
+            }
+
+            if (ValidationConfig != null)
+            {
+                if (value == null) return string.Empty;
+
+                if (IsNumeric && double.TryParse(value.ToString(), out var num))
+                {
+                    if (ValidationConfig.Min.HasValue && num < ValidationConfig.Min.Value)
+                        return ValidationConfig.CustomErrorMessage ?? $"Значение не может быть меньше {ValidationConfig.Min.Value}";
+                    if (ValidationConfig.Max.HasValue && num > ValidationConfig.Max.Value)
+                        return ValidationConfig.CustomErrorMessage ?? $"Значение не может быть больше {ValidationConfig.Max.Value}";
+                }
+                else if (value is string str)
+                {
+                    if (ValidationConfig.MaxLength.HasValue && str.Length > ValidationConfig.MaxLength.Value)
+                        return ValidationConfig.CustomErrorMessage ?? $"Максимальная длина {ValidationConfig.MaxLength.Value} символов";
+                    if (!string.IsNullOrEmpty(ValidationConfig.RegexPattern) && !Regex.IsMatch(str, ValidationConfig.RegexPattern))
+                        return ValidationConfig.CustomErrorMessage ?? "Некорректный формат";
                 }
             }
+
+            return string.Empty;
+        }
+
+        private void ApplyConfiguration(DataFormFieldConfig? config)
+        {
+            if (config != null)
+            {
+                if (!string.IsNullOrEmpty(config.DisplayName))
+                    DisplayName = config.DisplayName;
+                if (config.IsReadOnly.HasValue)
+                    IsReadOnly = config.IsReadOnly.Value;
+                HideLabel = config.HideLabel;
+                RowGroup = config.RowGroup;
+                ValidationConfig = config.Validation;
+            }
+
         }
 
         private string GetEnumDisplayName(object enumValue)
@@ -234,121 +323,30 @@ namespace Common.Controls.Models
             return descAttr?.Description ?? enumValue.ToString();
         }
 
-        public bool TryConvert()
+
+        public void Dispose()
         {
-            try
-            {
-                if (Value is EnumItem enumItem)
-                {
-                    Value = enumItem.Value;
-                }
+            Disposables.Dispose();
+        }
+    }
 
-                if (Value == null)
-                {
-                    var underlying = Nullable.GetUnderlyingType(PropertyType);
-                    if (PropertyType.IsValueType && underlying == null)
-                        throw new Exception("Значение не может быть null");
-                    ConvertedValue = null;
-                    ValidationError = string.Empty;
-                    return true;
-                }
-
-                var targetType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
-                var valueType = Value.GetType();
-
-                if (valueType == targetType)
-                {
-                    ConvertedValue = Value;
-                    ValidationError = string.Empty;
-                    return true;
-                }
-
-
-                if (targetType == typeof(DateTime))
-                {
-                    if (valueType == typeof(DateTime))
-                        ConvertedValue = Value;
-                    else if (valueType == typeof(DateTime?))
-                        ConvertedValue = ((DateTime?)Value).Value;
-                    else if (valueType == typeof(DateTimeOffset))
-                        ConvertedValue = ((DateTimeOffset)Value).DateTime;
-                    else if (valueType == typeof(DateTimeOffset?))
-                        ConvertedValue = ((DateTimeOffset?)Value)?.DateTime;
-                    else if (valueType == typeof(string))
-                        ConvertedValue = DateTime.Parse((string)Value);
-                    else
-                        ConvertedValue = Convert.ChangeType(Value, targetType);
-                    ValidationError = string.Empty;
-                    return true;
-                }
-
-                if (targetType == typeof(DateTime?))
-                {
-                    if (valueType == typeof(DateTime))
-                        ConvertedValue = (DateTime?)Value;
-                    else if (valueType == typeof(DateTime?))
-                        ConvertedValue = Value;
-                    else if (valueType == typeof(DateTimeOffset))
-                        ConvertedValue = ((DateTimeOffset)Value).DateTime;
-                    else if (valueType == typeof(DateTimeOffset?))
-                        ConvertedValue = ((DateTimeOffset?)Value)?.DateTime;
-                    else if (valueType == typeof(string))
-                        ConvertedValue = DateTime.Parse((string)Value);
-                    else
-                        ConvertedValue = Convert.ChangeType(Value, targetType);
-                    ValidationError = string.Empty;
-                    return true;
-                }
-
-                ConvertedValue = Convert.ChangeType(Value, targetType);
-                if (!ValidateValue())
-                    return false;
-                ValidationError = string.Empty;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                ValidationError = ex.Message;
-                ConvertedValue = null;
-                return false;
-            }
+    internal static class TypeExtensions
+    {
+        public static bool IsNumericType(this Type type)
+        {
+            type = Nullable.GetUnderlyingType(type) ?? type;
+            return type == typeof(int) || type == typeof(double) || type == typeof(float) ||
+                   type == typeof(decimal) || type == typeof(byte) || type == typeof(short) ||
+                   type == typeof(uint) || type == typeof(ushort) || type == typeof(long) ||
+                   type == typeof(ulong);
         }
 
-        private bool ValidateValue()
+        public static bool IsIntegerType(this Type type)
         {
-            var config = ValidationConfig;
-            if (config == null) return true;
-
-            if (Value == null) return true;
-
-            if (IsNumeric)
-            {
-                double numericValue = Convert.ToDouble(Value);
-                if (config.Min.HasValue && numericValue < config.Min.Value)
-                {
-                    ValidationError = config.CustomErrorMessage ?? $"Значение не может быть меньше {config.Min.Value}";
-                    return false;
-                }
-                if (config.Max.HasValue && numericValue > config.Max.Value)
-                {
-                    ValidationError = config.CustomErrorMessage ?? $"Значение не может быть больше {config.Max.Value}";
-                    return false;
-                }
-            }
-            else if (Value is string str)
-            {
-                if (config.MaxLength.HasValue && str.Length > config.MaxLength.Value)
-                {
-                    ValidationError = config.CustomErrorMessage ?? $"Максимальная длина {config.MaxLength.Value} символов";
-                    return false;
-                }
-                if (!string.IsNullOrEmpty(config.RegexPattern) && !System.Text.RegularExpressions.Regex.IsMatch(str, config.RegexPattern))
-                {
-                    ValidationError = config.CustomErrorMessage ?? "Некорректный формат";
-                    return false;
-                }
-            }
-            return true;
+            type = Nullable.GetUnderlyingType(type) ?? type;
+            return type == typeof(int) || type == typeof(long) || type == typeof(short) ||
+                   type == typeof(byte) || type == typeof(uint) || type == typeof(ushort) ||
+                   type == typeof(ulong);
         }
     }
 }
