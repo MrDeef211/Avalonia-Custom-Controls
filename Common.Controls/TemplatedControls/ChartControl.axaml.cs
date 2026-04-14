@@ -419,6 +419,10 @@ public class ChartControl : TemplatedControl
                 e.Handled = true;
             }
         }
+        else
+        {
+            InvalidateVisual();
+        }
 
         base.OnPointerMoved(e);
     }
