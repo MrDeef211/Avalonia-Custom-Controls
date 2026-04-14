@@ -20,6 +20,7 @@
 
         <Border Padding="10" Background="White">
             <controls:DataFormControl x:Name="DataForm"
+                                      FormConfig="{Binding FormConfig}"
                                       SelectedObject="{Binding SelectedObject}"
                                       IsReadOnly="{Binding IsReadOnly}"
                                       HasChanges="{Binding HasChanges}"

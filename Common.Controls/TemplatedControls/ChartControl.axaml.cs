@@ -49,6 +49,7 @@ public class ChartControl : TemplatedControl
     private Pen _axisPen;
     private Pen _chartPen;
     private Pen _pointsPen;
+    private Pen _borderPen;
 
     #region Styled Property
 
@@ -146,6 +147,7 @@ public class ChartControl : TemplatedControl
         _axisPen = new Pen(AxisColor, 1);
         _chartPen = new Pen(ChartColor, ChartThickness);
         _pointsPen = new Pen(ChartColor, 2);
+        _borderPen = new Pen(Background, 1);
 
         Focusable = true;
     }
@@ -376,6 +378,8 @@ public class ChartControl : TemplatedControl
             _chartPen = new Pen(ChartColor, ChartThickness);
             _pointsPen = new Pen(ChartColor, 2);
         }
+        else if (e.Property == Background)
+            _borderPen = new Pen(Background, 1);
 
     }
 
@@ -497,7 +501,6 @@ public class ChartControl : TemplatedControl
         _top = Padding.Top;
         _bottom = Bounds.Height - Padding.Bottom;
 
-        // Подготовка данных для сетки и осей
         List<double> xGridLines = null;
         List<double> yGridLines = null;
         List<double> xLabels = null;
@@ -537,9 +540,8 @@ public class ChartControl : TemplatedControl
         }
 
         // 5. Рамка
-        var pen = new Pen(Background, 1);
-        context.DrawRectangle(Background, pen, new Rect(0, 0, _left, Bounds.Height));
-        context.DrawRectangle(Background, pen, new Rect(_right, 0, Bounds.Width, Bounds.Height));
+        context.DrawRectangle(Background, _borderPen, new Rect(0, 0, _left, Bounds.Height));
+        context.DrawRectangle(Background, _borderPen, new Rect(_right, 0, Bounds.Width, Bounds.Height));
 
         // 6. Подписи осей
         if (Axis && xLabels != null && yLabels != null)
@@ -914,6 +916,10 @@ public class ChartControl : TemplatedControl
         _maxY = _sortedVisiblePoints.Max(p => p.Value);
     }
 
+    /// <summary>
+    /// Сдвигает диапазон графика на некоторую величину
+    /// </summary>
+    /// <param name="dx"></param>
     private void MoveChart(double dx)
     {
         dx = -dx;
@@ -933,6 +939,11 @@ public class ChartControl : TemplatedControl
         }
     }
 
+    /// <summary>
+    /// Увелиличивает или уменьшает диапазон графика
+    /// </summary>
+    /// <param name="point">Центр</param>
+    /// <param name="delta">Относительная величина, которая прибавится к величине диапазона</param>
     private void ZoomChart(Point point, double delta)
     {
         
@@ -967,7 +978,6 @@ public class ChartControl : TemplatedControl
     }
 
     #endregion
-
 
     /// <summary>
     /// Форматирует число для отображения на осях и в подсказках.

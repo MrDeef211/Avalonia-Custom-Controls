@@ -2,8 +2,10 @@ using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Common.Controls.Models;
+using DynamicData;
 using ReactiveUI;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -20,6 +22,18 @@ public class DataFormControl : BaseEditorControl
     public ObservableCollection<FormSectionModel> Sections { get; } = new();
 
     #region Настраиваемые визуальные свойства
+
+    public static readonly StyledProperty<DataFormConfig?> FormConfigProperty =
+    AvaloniaProperty.Register<DataFormControl, DataFormConfig?>(nameof(FormConfig));
+
+    /// <summary>
+    /// Конфигурация формы
+    /// </summary>
+    public DataFormConfig? FormConfig
+    {
+        get => GetValue(FormConfigProperty);
+        set => SetValue(FormConfigProperty, value);
+    }
 
     public static readonly StyledProperty<double> LabelColumnWidthProperty =
         AvaloniaProperty.Register<DataFormControl, double>(nameof(LabelColumnWidth), 120.0);
@@ -130,23 +144,48 @@ public class DataFormControl : BaseEditorControl
         var properties = target.GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.CanRead && p.CanWrite)
-            .Where(p => p.GetCustomAttribute<BrowsableAttribute>()?.Browsable ?? true);
+            .ToList();
 
-        var grouped = properties
-            .Select(p => new
+        var configuredProperties = new List<(PropertyInfo Property, DataFormFieldConfig? Config)>();
+        foreach (var prop in properties)
+        {
+            bool browsable = true;
+            DataFormFieldConfig? cfg = null;
+            if (FormConfig?.Fields.TryGetValue(prop.Name, out cfg) == true)
+                browsable = cfg.IsBrowsable;
+            else
+                browsable = prop.GetCustomAttribute<BrowsableAttribute>()?.Browsable ?? true;
+
+            if (browsable)
+                configuredProperties.Add((prop, cfg));
+        }
+
+        var grouped = configuredProperties
+            .Select(item => new
             {
-                Property = p,
-                Category = p.GetCustomAttribute<CategoryAttribute>()?.Category ?? "Общие"
+                Property = item.Property,
+                Config = item.Config,
+                Category = item.Config?.Category ?? item.Property.GetCustomAttribute<CategoryAttribute>()?.Category ?? "Общие",
+                CategoryOrder = item.Config?.CategoryOrder ?? (FormConfig?.CategoryOrders.GetValueOrDefault(
+                    item.Config?.Category ?? item.Property.GetCustomAttribute<CategoryAttribute>()?.Category ?? "Общие", 0) ?? 0),
+                Order = item.Config?.Order ?? 0
             })
             .GroupBy(g => g.Category)
-            .OrderBy(g => g.Key);
+            .OrderBy(g => g.First().CategoryOrder)
+            .ThenBy(g => g.Key);
 
         foreach (var group in grouped)
         {
             var section = new FormSectionModel(group.Key);
-            foreach (var item in group)
+            var firstConfig = group.First().Config;
+            section.IsExpanded = firstConfig?.IsCategoryExpanded ?? true;
+            if (FormConfig?.CategoryCollapsible.TryGetValue(group.Key, out var canCollapse) == true)
+                section.CanCollapse = canCollapse;
+
+            var sortedFields = group.OrderBy(g => g.Order).ToList();
+            foreach (var item in sortedFields)
             {
-                var fieldModel = new FormFieldModel(item.Property, target, IsReadOnly);
+                var fieldModel = new FormFieldModel(item.Property, target, IsReadOnly, item.Config);
                 fieldModel.WhenAnyValue(x => x.Value)
                     .Subscribe(Observer.Create<object?>(_ => OnFieldValueChanged(fieldModel)))
                     .DisposeWith(Subscriptions!);
@@ -158,11 +197,13 @@ public class DataFormControl : BaseEditorControl
 
     private void OnFieldValueChanged(FormFieldModel fieldModel)
     {
-        if (!string.IsNullOrEmpty(fieldModel.ValidationError))
+        if (!fieldModel.IsTouched) return;
+
+        bool isValid = fieldModel.TryConvert();
+        if (!isValid)
             SetError(fieldModel.ValidationError);
         else
             SetError(string.Empty);
-
         UpdateHasChanges();
     }
 
@@ -177,9 +218,8 @@ public class DataFormControl : BaseEditorControl
     {
         foreach (var field in Sections.SelectMany(s => s.Fields))
         {
-            if (field.ValidationError != null && field.ValidationError != string.Empty)
-                continue; 
-
+            if (!string.IsNullOrEmpty(field.ValidationError))
+                continue;
             if (Equals(field.ConvertedValue, field.OriginalValue)) continue;
             field.PropertyInfo.SetValue(field.Target, field.ConvertedValue);
             field.UpdateOriginal();
