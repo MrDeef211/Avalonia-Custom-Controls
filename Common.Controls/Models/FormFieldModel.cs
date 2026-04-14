@@ -22,7 +22,6 @@ namespace Common.Controls.Models
         public bool HideLabel { get; set; }
         public DataFormFieldValidation? ValidationConfig { get; set; }
         public FieldLayout Layout { get; set; }
-        public int RowGroup { get; set; }
 
         public FormFieldModel(PropertyInfo propertyInfo, object target, bool isReadOnly, DataFormFieldConfig? fieldConfig = null)
         {
@@ -127,6 +126,13 @@ namespace Common.Controls.Models
                 this.RaiseAndSetIfChanged(ref _isReadOnly, value);
                 this.RaisePropertyChanged(nameof(IsEditable));
             }
+        }
+
+        private int _rowGroup = -1;
+        public int RowGroup
+        {
+            get => _rowGroup;
+            set => this.RaiseAndSetIfChanged(ref _rowGroup, value);
         }
 
         public bool IsEditable => !IsReadOnly;

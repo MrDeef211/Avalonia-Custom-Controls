@@ -47,10 +47,10 @@ namespace Demonstrations.Desktop.ViewModels
                 RowGroup = 1,
                 Layout = FieldLayout.Horizontal,
             });
-            FormConfig.CategoryOrders["Личные данные"] = 1;
-            FormConfig.CategoryOrders["Основные"] = 2;
-            FormConfig.CategoryOrders["Работа"] = 3;
-            FormConfig.CategoryOrders["Образование"] = 4;
+            FormConfig.SetCategoryOrder("Личные данные", 1);
+            FormConfig.SetCategoryOrder("Основные", 2);
+            FormConfig.SetCategoryOrder("Работа", 3);
+            FormConfig.SetCategoryOrder("Образование", 4);
             FormConfig.CategoryCollapsible["Работа"] = true;
             FormConfig.CategoryCollapsible["Образование"] = true;
 

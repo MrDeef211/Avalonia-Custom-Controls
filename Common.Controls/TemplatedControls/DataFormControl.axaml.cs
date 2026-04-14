@@ -160,16 +160,39 @@ public class DataFormControl : BaseEditorControl
                 configuredProperties.Add((prop, cfg));
         }
 
-        var grouped = configuredProperties
-            .Select(item => new
+        Dictionary<string, int>? normalizedOrders = null;
+        if (FormConfig?.CategoryOrders != null)
+        {
+            normalizedOrders = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in FormConfig.CategoryOrders)
             {
-                Property = item.Property,
-                Config = item.Config,
-                Category = item.Config?.Category ?? item.Property.GetCustomAttribute<CategoryAttribute>()?.Category ?? "Общие",
-                CategoryOrder = item.Config?.CategoryOrder ?? (FormConfig?.CategoryOrders.GetValueOrDefault(
-                    item.Config?.Category ?? item.Property.GetCustomAttribute<CategoryAttribute>()?.Category ?? "Общие", 0) ?? 0),
-                Order = item.Config?.Order ?? 0
-            })
+                var normalizedKey = NormalizeCategoryName(kv.Key);
+                normalizedOrders[normalizedKey] = kv.Value;
+            }
+        }
+
+        var itemsWithCategory = new List<(PropertyInfo Property, DataFormFieldConfig? Config, string Category, int CategoryOrder, int Order)>();
+        foreach (var item in configuredProperties)
+        {
+            var rawCategory = item.Config?.Category ?? item.Property.GetCustomAttribute<CategoryAttribute>()?.Category ?? "Общие";
+            var normalizedCategory = NormalizeCategoryName(rawCategory);
+            int categoryOrder = 0;
+            if (FormConfig?.CategoryOrders != null && FormConfig.CategoryOrders.TryGetValue(normalizedCategory, out var orderFromDict))
+            {
+                categoryOrder = orderFromDict;
+            }
+            else if (item.Config?.CategoryOrder.HasValue == true)
+            {
+                categoryOrder = item.Config.CategoryOrder.Value;
+            }
+            else
+            {
+                categoryOrder = 0;
+            }
+            itemsWithCategory.Add((item.Property, item.Config, rawCategory, categoryOrder, item.Config?.Order ?? 0));
+        }
+
+        var grouped = itemsWithCategory
             .GroupBy(g => g.Category)
             .OrderBy(g => g.First().CategoryOrder)
             .ThenBy(g => g.Key);
@@ -192,6 +215,36 @@ public class DataFormControl : BaseEditorControl
                 section.Fields.Add(fieldModel);
             }
             Sections.Add(section);
+            BuildRows(section);
+        }
+    }
+
+    private void BuildRows(FormSectionModel section)
+    {
+        section.Rows.Clear();
+        var groups = section.Fields.GroupBy(f => f.RowGroup);
+        foreach (var group in groups)
+        {
+            if (group.Key == -1)
+            {
+                foreach (var field in group)
+                {
+                    var row = new FormRowModel();
+                    row.RowGroup = -1;
+                    row.Fields.Add(field);
+                    row.IsHorizontal = false;
+                    section.Rows.Add(row);
+                }
+            }
+            else
+            {
+                var row = new FormRowModel();
+                row.RowGroup = group.Key;
+                foreach (var field in group)
+                    row.Fields.Add(field);
+                row.IsHorizontal = (group.Count() > 1);
+                section.Rows.Add(row);
+            }
         }
     }
 
@@ -236,5 +289,10 @@ public class DataFormControl : BaseEditorControl
             field.ResetToOriginal();
         }
         SetHasChanges(false);
+    }
+
+    private string NormalizeCategoryName(string category)
+    {
+        return category?.Trim() ?? "Общие";
     }
 }

@@ -31,7 +31,7 @@ namespace Common.Controls.Models
         public bool IsBrowsable { get; set; } = true;
         public bool IsCategoryExpanded { get; set; } = true;
         public int Order { get; set; } = 0;
-        public int CategoryOrder { get; set; } = 0;
+        public int? CategoryOrder { get; set; }
         public bool HideLabel { get; set; } = false;
         public FieldLayout Layout { get; set; } = FieldLayout.Vertical;
         public int RowGroup { get; set; } = -1;
@@ -43,5 +43,12 @@ namespace Common.Controls.Models
         public Dictionary<string, bool> CategoryCollapsible { get; set; } = new();
         public Dictionary<string, DataFormFieldConfig> Fields { get; set; } = new();
         public Dictionary<string, int> CategoryOrders { get; set; } = new();
+        public void SetCategoryOrder(string categoryName, int order)
+        {
+            var normalized = categoryName?.Trim();
+            if (string.IsNullOrEmpty(normalized))
+                throw new ArgumentException("Имя категории не может быть пустым");
+            CategoryOrders[normalized] = order;
+        }
     }
 }
