@@ -39,13 +39,11 @@ namespace Demonstrations.Desktop.ViewModels
             FormConfig.Fields.Add("Education", new DataFormFieldConfig
             {
                 RowGroup = 1,
-                Layout = FieldLayout.Horizontal,
             });
             FormConfig.Fields.Add("University", new DataFormFieldConfig
             {
                 HideLabel = true,
                 RowGroup = 1,
-                Layout = FieldLayout.Horizontal,
             });
             FormConfig.SetCategoryOrder("Личные данные", 1);
             FormConfig.SetCategoryOrder("Основные", 2);

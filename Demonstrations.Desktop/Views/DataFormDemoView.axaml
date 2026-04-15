@@ -25,7 +25,8 @@
                                       IsReadOnly="{Binding IsReadOnly}"
                                       HasChanges="{Binding HasChanges}"
                                       Error="{Binding Error}"
-                                      SaveCommand="{Binding SaveCommand}"/>
+                                      SaveCommand="{Binding SaveCommand}"
+                                      ButtonPanelPlacement="InsideBottom"/>
         </Border>
     </DockPanel>
 </UserControl>

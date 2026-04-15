@@ -57,7 +57,7 @@ namespace Common.Controls.Models
 
             this.WhenAnyValue(x => x.Value)
                 .Subscribe(_ => UpdateConvertedValueAndValidation())
-                .DisposeWith(Disposables); 
+                .DisposeWith(Disposables);
 
             UpdateConvertedValueAndValidation();
         }
@@ -154,6 +154,9 @@ namespace Common.Controls.Models
         public bool IsBool => PropertyType == typeof(bool);
         public bool ShowLabel => !HideLabel;
         public bool HideLabel { get; private set; }
+
+        public int EditorColumn => ShowLabel ? 1 : 0;
+        public int EditorColumnSpan => ShowLabel ? 1 : 2;
 
         public bool IsNumeric => PropertyType.IsNumericType();
         public bool IsInteger => PropertyType.IsIntegerType();

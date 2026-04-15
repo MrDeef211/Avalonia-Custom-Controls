@@ -41,11 +41,6 @@ namespace Common.Controls.Models
     public class DataFormFieldConfig
     {
         /// <summary>
-        /// Имя свойства, к которому применяется конфигурация.
-        /// </summary>
-        public string PropertyName { get; set; } = string.Empty;
-
-        /// <summary>
         /// Отображаемое имя поля. Если не задано, используется имя свойства или атрибут DisplayName.
         /// </summary>
         public string? DisplayName { get; set; }
@@ -86,11 +81,6 @@ namespace Common.Controls.Models
         public bool HideLabel { get; set; }
 
         /// <summary>
-        /// Определяет, как поле размещается в строке.
-        /// </summary>
-        public FieldLayout Layout { get; set; } = FieldLayout.Vertical;
-
-        /// <summary>
         /// Идентификатор группы для объединения полей в одну строку.
         /// Поля с одинаковым RowGroup помещаются в одну строку.
         /// Значение -1 означает отсутствие группировки.
@@ -104,22 +94,6 @@ namespace Common.Controls.Models
     }
 
     /// <summary>
-    /// Варианты размещения поля в строке.
-    /// </summary>
-    public enum FieldLayout
-    {
-        /// <summary>
-        /// Поле занимает отдельную строку.
-        /// </summary>
-        Vertical,
-
-        /// <summary>
-        /// Поле размещается в одной строке с предыдущим полем.
-        /// </summary>
-        Horizontal
-    }
-
-    /// <summary>
     /// Конфигурация формы <see cref="DataFormControl"/>.
     /// </summary>
     public class DataFormConfig
@@ -129,6 +103,12 @@ namespace Common.Controls.Models
         /// Ключ — имя категории, значение — <c>true</c>, если категория сворачиваема.
         /// </summary>
         public Dictionary<string, bool> CategoryCollapsible { get; set; } = new();
+
+        /// <summary>
+        /// Начальное состояние развёрнутости категорий.
+        /// Ключ — имя категории, значение — <c>true</c>, если категория развёрнута по умолчанию.
+        /// </summary>
+        public Dictionary<string, bool> CategoryExpanded { get; set; } = new();
 
         /// <summary>
         /// Конфигурации отдельных полей по имени свойства.

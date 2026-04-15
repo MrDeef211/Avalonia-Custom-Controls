@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Common.Controls.Models;
@@ -25,24 +26,11 @@ public class DataFormControl : BaseEditorControl, IDisposable
 
     public DataFormControl()
     {
-        this.WhenAnyValue(x => x.Sections)
-        .Subscribe(sections =>
-        {
-            _fieldSubscriptions.Clear();
-            var fields = sections?.SelectMany(s => s.Fields) ?? Enumerable.Empty<FormFieldModel>();
-            foreach (var field in fields)
-            {
-                var sub = field.WhenAnyValue(
-                    f => f.IsTouched,
-                    f => f.ConvertedValue,
-                    f => f.OriginalValue,
-                    (touched, converted, original) => touched && !Equals(converted, original))
-                    .Subscribe(_ => UpdateHasChanges())
-                    .DisposeWith(_fieldSubscriptions);
-            }
-            UpdateHasChanges();
-        })
-        .DisposeWith(_disposables);
+
+        var canExecute = this.WhenAnyValue(x => x.HasChanges);
+
+        CommitChangesCommand = ReactiveCommand.Create(() => CommitChanges(), canExecute);
+        CancelChangesCommand = ReactiveCommand.Create(() => CancelChanges(), canExecute);
     }
 
     public ObservableCollection<FormSectionModel> Sections { get; } = new();
@@ -160,7 +148,38 @@ public class DataFormControl : BaseEditorControl, IDisposable
         set => SetValue(SaveCommandProperty, value);
     }
 
+    public static readonly StyledProperty<ICommand?> CancelCommandProperty =
+        AvaloniaProperty.Register<DataFormControl, ICommand?>(nameof(CancelCommand));
+
+    /// <summary>
+    /// Команда, выполняемая после успешной отмены изменений.
+    /// </summary>
+    /// <remarks>
+    /// Параметр обьект
+    /// </remarks>
+    public ICommand? CancelCommand
+    {
+        get => GetValue(CancelCommandProperty);
+        set => SetValue(CancelCommandProperty, value);
+    }
+
+    public static readonly StyledProperty<ButtonPanelPlacement> ButtonPanelPlacementProperty =
+        AvaloniaProperty.Register<DataFormControl, ButtonPanelPlacement>(nameof(ButtonPanelPlacement), ButtonPanelPlacement.None);
+
+    /// <summary>
+    /// Расположение кнопок "сохранить" и "отмена"
+    /// </summary>
+    public ButtonPanelPlacement ButtonPanelPlacement
+    {
+        get => GetValue(ButtonPanelPlacementProperty);
+        set => SetValue(ButtonPanelPlacementProperty, value);
+    }
+
     #endregion
+
+
+    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> CommitChangesCommand { get; }
+    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> CancelChangesCommand { get; }
 
     protected override void OnSelectedObjectChanged(object? oldValue, object? newValue)
     {
@@ -224,7 +243,10 @@ public class DataFormControl : BaseEditorControl, IDisposable
         {
             var section = new FormSectionModel(group.Key);
             var firstConfig = group.First().Config;
-            section.IsExpanded = firstConfig?.IsCategoryExpanded ?? true;
+            if (FormConfig?.CategoryExpanded.TryGetValue(group.Key, out var expanded) == true)
+                section.IsExpanded = expanded;
+            else
+                section.IsExpanded = firstConfig?.IsCategoryExpanded ?? true;
             if (FormConfig?.CategoryCollapsible.TryGetValue(group.Key, out var canCollapse) == true)
                 section.CanCollapse = canCollapse;
 
@@ -237,6 +259,19 @@ public class DataFormControl : BaseEditorControl, IDisposable
             Sections.Add(section);
             BuildRows(section);
         }
+
+        _fieldSubscriptions.Clear();
+        foreach (var field in Sections.SelectMany(s => s.Fields))
+        {
+            var sub = field.WhenAnyValue(
+                f => f.IsTouched,
+                f => f.ConvertedValue,
+                f => f.OriginalValue,
+                (touched, converted, original) => touched && !Equals(converted, original))
+                .Subscribe(_ => UpdateHasChanges())
+                .DisposeWith(_fieldSubscriptions);
+        }
+        UpdateHasChanges();
     }
 
     private void BuildRows(FormSectionModel section)
@@ -249,20 +284,16 @@ public class DataFormControl : BaseEditorControl, IDisposable
             {
                 foreach (var field in group)
                 {
-                    var row = new FormRowModel();
-                    row.RowGroup = -1;
+                    var row = new FormRowModel { RowGroup = -1 };
                     row.Fields.Add(field);
-                    row.Orientation = Avalonia.Layout.Orientation.Vertical;
                     section.Rows.Add(row);
                 }
             }
             else
             {
-                var row = new FormRowModel();
-                row.RowGroup = group.Key;
+                var row = new FormRowModel { RowGroup = group.Key };
                 foreach (var field in group)
                     row.Fields.Add(field);
-                row.Orientation = row.Fields.Count > 1 ? Avalonia.Layout.Orientation.Horizontal : Avalonia.Layout.Orientation.Vertical;
                 section.Rows.Add(row);
             }
         }
@@ -294,6 +325,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
         {
             field.ResetToOriginal();
         }
+        CancelCommand?.Execute(SelectedObject);
     }
 
     private static string NormalizeCategoryName(string category)
@@ -313,4 +345,18 @@ public class DataFormControl : BaseEditorControl, IDisposable
             }
         }
     }
+}
+
+public enum ButtonPanelPlacement
+{
+    /// <summary>Кнопки не отображаются</summary>
+    None,
+    /// <summary>Кнопки сверху, вне прокручиваемой области</summary>
+    Top,
+    /// <summary>Кнопки снизу, вне прокручиваемой области</summary>
+    Bottom,
+    /// <summary>Кнопки сверху, внутри прокручиваемой области (перед полями)</summary>
+    InsideTop,
+    /// <summary>Кнопки снизу, внутри прокручиваемой области (после полей)</summary>
+    InsideBottom
 }

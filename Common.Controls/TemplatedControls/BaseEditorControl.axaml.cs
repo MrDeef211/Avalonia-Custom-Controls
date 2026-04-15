@@ -63,18 +63,6 @@ public abstract class BaseEditorControl : TemplatedControl
 
     #endregion
 
-    #region Комманды и события
-
-    private ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit>? _commitChangesCommand;
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> CommitChangesCommand =>
-        _commitChangesCommand ??= ReactiveCommand.Create(CommitChanges);
-
-    private ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit>? _cancelChangesCommand;
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> CancelChangesCommand =>
-        _cancelChangesCommand ??= ReactiveCommand.Create(CancelChanges);
-
-    #endregion
-
     #region Абстрактные методы
 
     /// <summary>
