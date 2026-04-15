@@ -472,9 +472,27 @@ public class PieChart : TemplatedControl
         var formatted = new FormattedText(labelText, CultureInfo.CurrentCulture,
             FlowDirection.LeftToRight, typeface, 12, Brushes.Black);
 
-        double shift = isHighlighted ? outerR * 0.05 : 0;
+        const double pushFactor = 0.05;
+        double shift = isHighlighted ? outerR * pushFactor : 0;
         double midRad = (sector.StartAngle + sector.SweepAngle / 2) * Math.PI / 180;
-        Point offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
+
+        Point offset;
+        switch (HighlightType)
+        {
+            case HighlightType.Decrease:
+                offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
+                break;
+            case HighlightType.Reduce:
+                if ((1 - InnerRadius) / 2 < pushFactor * 2)
+                {
+                    shift = isHighlighted ? outerR * (1 - InnerRadius) / 4 : 0;
+                }
+                offset = new Point(Math.Cos(midRad) * -shift, Math.Sin(midRad) * -shift);
+                break;
+            default:
+                offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
+                break;
+        }
 
         formatted.TextAlignment = TextAlignment.Left;
 
@@ -557,18 +575,15 @@ public class PieChart : TemplatedControl
 
             case HighlightType.Reduce:
                 // пропорциональное уменьшение
-                // параметры и сами преобразования были выбраны методом подбора на основе субьективной оценки результатов эксперементов
-                // Min, Max и первый if (тот который для вычисления отступа) нужны для обработки граничных ситуаций
-                // второй if (тот который для внутреннего радиуса) нужен, в основном, для улучшения внешнего вида при средних углах
-                if (originalInnerR / originalOuterR  < 1 - pushFactor && originalInnerR / originalOuterR > 0.1)
-                    offset = new Point(Math.Cos(midRad) * shift * 0.3, Math.Sin(midRad) * shift * 0.3);
-                else if (originalInnerR / originalOuterR <= 0.1)
-                    offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
+                if ((1 - InnerRadius) / 2 < pushFactor * 2)
+                    shift = originalOuterR * (1 - InnerRadius) / 4;
 
-                newOuterR = Math.Max(originalOuterR * (1 - pushFactor), (originalOuterR + originalInnerR) / 2);
+                offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
+                double ScalOffset = Math.Sqrt(offset.X * offset.X + offset.Y * offset.Y);
+                newOuterR = Math.Max(originalOuterR * (1 - pushFactor) - ScalOffset, (originalOuterR + originalInnerR) / 2);
                 double angleDelta = originalSweepDeg * reduceAngleFactor;
 
-                if (originalInnerR / originalOuterR < 0.1 || originalInnerR / originalOuterR > 0.75)
+                if (InnerRadius < 0.1 || InnerRadius > 0.75)
                     newInnerR = Math.Min(originalInnerR * (1 + pushFactor * 0.3), (originalOuterR + 2 * originalInnerR) / 3);
                 else
                     newInnerR = Math.Min(originalInnerR + originalOuterR * pushFactor * 0.5, (originalOuterR + 2 * originalInnerR) / 3);
