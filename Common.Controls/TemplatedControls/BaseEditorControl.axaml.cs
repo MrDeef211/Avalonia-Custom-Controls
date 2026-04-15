@@ -4,6 +4,8 @@ using Avalonia.Data;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
@@ -155,6 +157,43 @@ public abstract class BaseEditorControl : TemplatedControl
     /// Защищённый метод для установки ошибки валидации.
     /// </summary>
     protected void SetError(string error) => Error = error;
+
+    #endregion
+
+    #region Вспомогательные методы
+
+    /// <summary>
+    /// Возвращает отфильтрованный список публичных свойств экземпляра,
+    /// исключая служебные свойства ReactiveUI.
+    /// </summary>
+    protected IEnumerable<PropertyInfo> GetPublicProperties(object target)
+    {
+        if (target == null) return Enumerable.Empty<PropertyInfo>();
+
+        return target.GetType()
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.CanRead)
+            .Where(p => !IsReactiveInternalProperty(p));
+    }
+
+    /// <summary>
+    /// Определяет, должно ли свойство быть только для чтения в UI.
+    /// Учитывает глобальный IsReadOnly, наличие публичного сеттера.
+    /// </summary>
+    protected bool IsPropertyReadOnly(PropertyInfo property)
+    {
+        if (IsReadOnly) return true;
+        if (!property.CanWrite) return true;
+        return property.SetMethod?.IsPublic != true;
+    }
+
+    /// <summary>
+    /// Нормализует имя категории (удаляет пробелы, приводит к единому регистру).
+    /// </summary>
+    protected static string NormalizeCategoryName(string? category)
+    {
+        return string.IsNullOrWhiteSpace(category) ? "Общие" : category.Trim();
+    }
 
     #endregion
 }

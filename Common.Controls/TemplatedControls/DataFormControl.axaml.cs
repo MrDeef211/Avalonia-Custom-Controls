@@ -201,11 +201,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
 
         if (target == null) return;
 
-        var properties = target.GetType()
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.CanRead)
-            .Where(p => !IsReactiveInternalProperty(p))
-            .ToList();
+        var properties = GetPublicProperties(target).ToList();
 
         var configuredProperties = new List<(PropertyInfo Property, DataFormFieldConfig? Config)>();
         foreach (var prop in properties)
@@ -254,7 +250,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
             var sortedFields = group.OrderBy(g => g.Order).ToList();
             foreach (var item in sortedFields)
             {
-                bool readOnly = IsReadOnly || !item.Property.CanWrite || item.Property.SetMethod?.IsPublic != true;
+                bool readOnly = IsPropertyReadOnly(item.Property);
                 var fieldModel = new FormFieldModel(item.Property, target, readOnly, item.Config);
                 section.Fields.Add(fieldModel);
             }
@@ -328,11 +324,6 @@ public class DataFormControl : BaseEditorControl, IDisposable
             field.ResetToOriginal();
         }
         CancelCommand?.Execute(SelectedObject);
-    }
-
-    private static string NormalizeCategoryName(string category)
-    {
-        return category?.Trim() ?? "Общие";
     }
 
     public void Dispose()
