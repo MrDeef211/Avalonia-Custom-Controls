@@ -86,7 +86,7 @@ namespace Demonstrations.Desktop.Models
         public DateTime BirthDate
         {
             get => _birthDate;
-            set => this.RaiseAndSetIfChanged(ref _birthDate, value);
+            private set => this.RaiseAndSetIfChanged(ref _birthDate, value);
         }
 
         [Category("Основные")]
@@ -142,7 +142,7 @@ namespace Demonstrations.Desktop.Models
         public DateTime HireDate
         {
             get => _hireDate;
-            set => this.RaiseAndSetIfChanged(ref _hireDate, value);
+            private set => this.RaiseAndSetIfChanged(ref _hireDate, value);
         }
 
         [Category("Работа")]
@@ -189,7 +189,7 @@ namespace Demonstrations.Desktop.Models
         public string InternalNotes
         {
             get => _internalNotes;
-            set => this.RaiseAndSetIfChanged(ref _internalNotes, value);
+            private set => this.RaiseAndSetIfChanged(ref _internalNotes, value);
         }
 
         [Browsable(false)]

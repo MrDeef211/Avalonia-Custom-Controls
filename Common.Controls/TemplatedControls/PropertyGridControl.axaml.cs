@@ -127,7 +127,8 @@ public class PropertyGridControl : BaseEditorControl
 
         var properties = target.GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.CanRead && p.CanWrite);
+            .Where(p => p.CanRead)
+            .Where(p => !IsReactiveInternalProperty(p));
 
         var grouped = properties
             .Select(p => new
@@ -143,7 +144,8 @@ public class PropertyGridControl : BaseEditorControl
             var categoryModel = new CategoryModel(group.Key);
             foreach (var item in group)
             {
-                var propVm = new PropertyItemModel(item.Property, target, IsReadOnly);
+                bool readOnly = IsReadOnly || !item.Property.CanWrite || item.Property.SetMethod?.IsPublic != true;
+                var propVm = new PropertyItemModel(item.Property, target, readOnly);
 
                 propVm.WhenAnyValue(x => x.Value)
                     .Subscribe(Observer.Create<object?>(_ => OnPropertyValueChanged(propVm)))

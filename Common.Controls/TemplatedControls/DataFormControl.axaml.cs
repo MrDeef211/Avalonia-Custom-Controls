@@ -203,7 +203,8 @@ public class DataFormControl : BaseEditorControl, IDisposable
 
         var properties = target.GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.CanRead && p.CanWrite)
+            .Where(p => p.CanRead)
+            .Where(p => !IsReactiveInternalProperty(p))
             .ToList();
 
         var configuredProperties = new List<(PropertyInfo Property, DataFormFieldConfig? Config)>();
@@ -253,7 +254,8 @@ public class DataFormControl : BaseEditorControl, IDisposable
             var sortedFields = group.OrderBy(g => g.Order).ToList();
             foreach (var item in sortedFields)
             {
-                var fieldModel = new FormFieldModel(item.Property, target, IsReadOnly, item.Config);
+                bool readOnly = IsReadOnly || !item.Property.CanWrite || item.Property.SetMethod?.IsPublic != true;
+                var fieldModel = new FormFieldModel(item.Property, target, readOnly, item.Config);
                 section.Fields.Add(fieldModel);
             }
             Sections.Add(section);

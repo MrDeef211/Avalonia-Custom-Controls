@@ -106,6 +106,5 @@ namespace Common.Controls.Selectors
         }
 
         public bool Match(object? data) => data is PropertyItemModel;
-    }
-    
+    }    
 }

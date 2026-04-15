@@ -8,6 +8,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Subjects;
+using System.Reflection;
 
 namespace Common.Controls;
 
@@ -92,6 +93,16 @@ public abstract class BaseEditorControl : TemplatedControl
     protected virtual void OnSelectedObjectChanged(object? oldValue, object? newValue)
     {
 
+    }
+
+    protected virtual bool IsReactiveInternalProperty(PropertyInfo prop)
+    {
+        if (prop.DeclaringType == typeof(ReactiveObject) ||
+            prop.DeclaringType == typeof(IReactiveObject))
+            return true;
+
+        string name = prop.Name;
+        return name == "Changing" || name == "Changed" || name == "ThrownExceptions";
     }
 
     #endregion
