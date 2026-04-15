@@ -51,6 +51,7 @@ namespace Demonstrations.Desktop.ViewModels
             FormConfig.SetCategoryOrder("Образование", 4);
             FormConfig.CategoryCollapsible["Работа"] = true;
             FormConfig.CategoryCollapsible["Образование"] = true;
+            FormConfig.CategoryExpanded["Образование"] = false;
 
             SaveCommand = ReactiveCommand.Create<object?>(OnSave);
         }

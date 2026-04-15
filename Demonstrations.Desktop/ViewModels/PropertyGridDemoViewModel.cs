@@ -21,8 +21,8 @@ namespace Demonstrations.Desktop.ViewModels
             MakeReadOnlyCommand = ReactiveCommand.Create(() => { IsReadOnly = !IsReadOnly; });
         }
 
-        private DemoObject _selectedObject;
-        public DemoObject SelectedObject
+        private RichDemoObject _selectedObject;
+        public RichDemoObject SelectedObject
         {
             get => _selectedObject;
             set => this.RaiseAndSetIfChanged(ref _selectedObject, value);
@@ -55,7 +55,7 @@ namespace Demonstrations.Desktop.ViewModels
 
         private void NewObject()
         {
-            SelectedObject = new DemoObject();
+            SelectedObject = new RichDemoObject();
         }
     }
 }
