@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Demonstrations.Desktop.Models
@@ -52,7 +53,7 @@ namespace Demonstrations.Desktop.Models
 
         private EmployeeRole _role = EmployeeRole.Developer;
         private WorkShift _shift = WorkShift.Day;
-        private double _salary = 75000.50;
+        private double _salary = 75000;
         private bool _isFullTime = true;
         private DateTime _hireDate = DateTime.Now.AddYears(-3);
         private DateTime? _terminationDate = null;
@@ -65,6 +66,7 @@ namespace Demonstrations.Desktop.Models
         private string _internalNotes = "Это поле скрыто в DataForm";
         private double _bonusPercentage = 15.5;
 
+        [Required(ErrorMessage = "Обязательное поле")]
         [Category("Основные")]
         [DisplayName("Полное имя")]
         public string FullName
@@ -89,6 +91,7 @@ namespace Demonstrations.Desktop.Models
             private set => this.RaiseAndSetIfChanged(ref _birthDate, value);
         }
 
+        [RegularExpression("^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})?$")]
         [Category("Основные")]
         [DisplayName("Email")]
         public string Email
@@ -97,6 +100,7 @@ namespace Demonstrations.Desktop.Models
             set => this.RaiseAndSetIfChanged(ref _email, value);
         }
 
+        [RegularExpression("^((\\+7|8)?[\\s\\-]?\\(?\\d{3}\\)?[\\s\\-]?\\d{3}[\\s\\-]?\\d{2}[\\s\\-]?\\d{2})?$")]
         [Category("Основные")]
         [DisplayName("Телефон")]
         public string Phone
@@ -105,6 +109,7 @@ namespace Demonstrations.Desktop.Models
             set => this.RaiseAndSetIfChanged(ref _phone, value);
         }
 
+        [Required(ErrorMessage = "Обязательное поле")]
         [Category("Работа")]
         [DisplayName("Должность")]
         public EmployeeRole Role
@@ -192,6 +197,7 @@ namespace Demonstrations.Desktop.Models
             private set => this.RaiseAndSetIfChanged(ref _internalNotes, value);
         }
 
+        [Range(1, 100, ErrorMessage = "Значение должно быть от 1 до 100")]
         [Browsable(false)]
         public double BonusPercentage
         {

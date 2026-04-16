@@ -26,6 +26,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
 
     public DataFormControl()
     {
+        EnsureSubscriptions();
 
         var canExecute = this.WhenAnyValue(x => x.HasChanges);
 
@@ -187,7 +188,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
         GenerateEditors(newValue);
     }
 
-    protected override void GenerateEditors(object? target)
+    protected internal override void GenerateEditors(object? target)
     {
         _fieldSubscriptions.Clear();
         foreach (var section in Sections)
@@ -304,7 +305,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
         SetHasChanges(hasChanges);
     }
 
-    protected override void CommitChanges()
+    protected internal override void CommitChanges()
     {
         foreach (var field in Sections.SelectMany(s => s.Fields))
         {
@@ -314,10 +315,11 @@ public class DataFormControl : BaseEditorControl, IDisposable
             field.PropertyInfo.SetValue(field.Target, field.ConvertedValue);
             field.UpdateOriginal();
         }
+        UpdateHasChanges();
         SaveCommand?.Execute(SelectedObject);
     }
 
-    protected override void CancelChanges()
+    protected internal override void CancelChanges()
     {
         foreach (var field in Sections.SelectMany(s => s.Fields))
         {

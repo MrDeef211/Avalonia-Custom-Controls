@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -15,6 +16,7 @@ namespace Controls.Models
         private string _validationError = string.Empty;
         private IEnumerable<EnumItem>? _enumDisplayItems;
         private EnumItem? _selectedEnumItem;
+        private readonly bool _isRequired;
 
         public PropertyItemModel(PropertyInfo propertyInfo, object target, bool isReadOnly)
         {
@@ -23,6 +25,7 @@ namespace Controls.Models
             PropertyName = propertyInfo.Name;
             _value = propertyInfo.GetValue(target);
             _isReadOnly = isReadOnly;
+            _isRequired = propertyInfo.GetCustomAttribute<RequiredAttribute>() != null;
             PropertyType = propertyInfo.PropertyType;
 
             IsBool = PropertyType == typeof(bool);
@@ -86,6 +89,7 @@ namespace Controls.Models
             get => _value;
             set
             {
+                ValidateValue(value);
                 this.RaiseAndSetIfChanged(ref _value, value);
                 this.RaisePropertyChanged(nameof(DateValue));
                 if (IsEnum && EnumDisplayItems != null)
@@ -162,6 +166,50 @@ namespace Controls.Models
             var field = enumValue.GetType().GetField(enumValue.ToString());
             var descAttr = field?.GetCustomAttribute<DescriptionAttribute>();
             return descAttr?.Description ?? enumValue.ToString();
+        }
+
+        private void ValidateValue(object? value)
+        {
+            var targetType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
+            object? convertedValue = null;
+
+            if (value != null)
+            {
+                try
+                {
+                    convertedValue = Convert.ChangeType(value, targetType);
+                }
+                catch (Exception ex)
+                {
+                    ValidationError = $"Ошибка преобразования: {ex.Message}";
+                    return;
+                }
+            }
+
+            if (!_isRequired && (value == null || (value is string str && string.IsNullOrEmpty(str))))
+            {
+                ValidationError = string.Empty;
+                return;
+            }
+
+            if (value == null && PropertyType.IsValueType && Nullable.GetUnderlyingType(PropertyType) == null)
+            {
+                ValidationError = "Значение не может быть null";
+                return;
+            }
+
+            var validationContext = new ValidationContext(Target ?? new object())
+            {
+                MemberName = PropertyName
+            };
+            var results = new List<ValidationResult>();
+            if (!Validator.TryValidateProperty(convertedValue, validationContext, results))
+            {
+                ValidationError = results[0].ErrorMessage ?? "Некорректное значение";
+                return;
+            }
+
+            ValidationError = string.Empty;
         }
     }
 }

@@ -120,7 +120,12 @@ public class PropertyGridControl : BaseEditorControl
 
     #endregion
 
-    protected override void GenerateEditors(object? target)
+    public PropertyGridControl()
+    {
+        EnsureSubscriptions();
+    }
+
+    protected internal override void GenerateEditors(object? target)
     {
         Categories.Clear();
         if (target == null) return;
@@ -155,8 +160,13 @@ public class PropertyGridControl : BaseEditorControl
 
     private void OnPropertyValueChanged(PropertyItemModel propertyModel)
     {
-        propertyModel.ValidationError = string.Empty;
-        SetError(string.Empty);
+        SetError(propertyModel.ValidationError);
+
+        if (!string.IsNullOrEmpty(propertyModel.ValidationError))
+        {
+            SetHasChanges(true);
+            return;
+        }
 
         var currentValue = propertyModel.PropertyInfo.GetValue(propertyModel.Target);
 
@@ -186,8 +196,6 @@ public class PropertyGridControl : BaseEditorControl
         }
         catch (Exception ex)
         {
-            propertyModel.ValidationError = $"Ошибка: {ex.Message}";
-            SetError(propertyModel.ValidationError);
             return;
         }
 
@@ -198,12 +206,12 @@ public class PropertyGridControl : BaseEditorControl
         SetHasChanges(true);
     }
 
-    protected override void CommitChanges()
+    protected internal override void CommitChanges()
     {
         SetHasChanges(false);
     }
 
-    protected override void CancelChanges()
+    protected internal override void CancelChanges()
     {
         GenerateEditors(SelectedObject);
         SetHasChanges(false);

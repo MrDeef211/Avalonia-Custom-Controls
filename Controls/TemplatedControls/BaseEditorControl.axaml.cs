@@ -71,17 +71,17 @@ public abstract class BaseEditorControl : TemplatedControl
     /// <summary>
     /// Применить изменения к редактируемому объекту.
     /// </summary>
-    protected abstract void CommitChanges();
+    protected internal abstract void CommitChanges();
 
     /// <summary>
     /// Отменить изменения, восстановить исходное состояние.
     /// </summary>
-    protected abstract void CancelChanges();
+    protected internal abstract void CancelChanges();
 
     /// <summary>
     /// Генерация полей / свойств на основе переданного объекта.
     /// </summary>
-    protected abstract void GenerateEditors(object? target);
+    protected internal abstract void GenerateEditors(object? target);
 
     #endregion
 
@@ -193,6 +193,11 @@ public abstract class BaseEditorControl : TemplatedControl
     protected static string NormalizeCategoryName(string? category)
     {
         return string.IsNullOrWhiteSpace(category) ? "Общие" : category.Trim();
+    }
+
+    protected void EnsureSubscriptions()
+    {
+        _subscriptions ??= new CompositeDisposable();
     }
 
     #endregion

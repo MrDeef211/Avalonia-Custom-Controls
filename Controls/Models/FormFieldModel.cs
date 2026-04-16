@@ -19,6 +19,7 @@ namespace Controls.Models
         private string _validationError = string.Empty;
         private bool _isTouched;
         private int _rowGroup = -1;
+        private readonly bool _isRequired;
         private IEnumerable<EnumItem>? _enumDisplayItems;
 
         public FormFieldModel(PropertyInfo propertyInfo, object target, bool isReadOnly, DataFormFieldConfig? fieldConfig = null)
@@ -31,15 +32,8 @@ namespace Controls.Models
             _value = propertyInfo.GetValue(target);
             OriginalValue = _value;
             _isReadOnly = isReadOnly;
+            _isRequired = propertyInfo.GetCustomAttribute<RequiredAttribute>() != null;
             PropertyType = propertyInfo.PropertyType;
-
-            if (PropertyType.IsEnum)
-            {
-                var values = Enum.GetValues(PropertyType).Cast<object>();
-                EnumDisplayItems = values
-                    .Select(v => new EnumItem(v, GetEnumDisplayName(v)))
-                    .ToList();
-            }
 
             if (PropertyType.IsEnum)
             {
@@ -198,6 +192,7 @@ namespace Controls.Models
         public void UpdateOriginal()
         {
             OriginalValue = Value;
+            IsTouched = false;
         }
 
         private void UpdateConvertedValueAndValidation()
@@ -218,6 +213,10 @@ namespace Controls.Models
         {
             try
             {
+                var validationError = Validate(input);
+                if (!string.IsNullOrEmpty(validationError))
+                    return (null, validationError);
+
                 if (input == null)
                 {
                     if (PropertyType.IsValueType && Nullable.GetUnderlyingType(PropertyType) == null)
@@ -230,12 +229,10 @@ namespace Controls.Models
 
                 if (inputType == targetType)
                 {
-                    var validationError = Validate(input);
-                    return (input, validationError);
+                    return (input, string.Empty);
                 }
 
                 object converted;
-
                 if (targetType == typeof(DateTime))
                 {
                     converted = ConvertToDateTime(input);
@@ -249,8 +246,7 @@ namespace Controls.Models
                     converted = Convert.ChangeType(input, targetType);
                 }
 
-                var error = Validate(converted);
-                return (converted, error);
+                return (converted, string.Empty);
             }
             catch (Exception ex)
             {
@@ -271,20 +267,13 @@ namespace Controls.Models
 
         private string Validate(object? value)
         {
-            var validationContext = new ValidationContext(Target ?? new object())
+            if (!_isRequired && (value == null || (value is string str && string.IsNullOrEmpty(str))))
             {
-                MemberName = PropertyName
-            };
-            var results = new List<ValidationResult>();
-            if (!Validator.TryValidateProperty(value, validationContext, results))
-            {
-                return results[0].ErrorMessage ?? "Некорректное значение";
+                return string.Empty;
             }
 
-            if (ValidationConfig != null)
+            if (ValidationConfig != null && value != null)
             {
-                if (value == null) return string.Empty;
-
                 if (IsNumeric && double.TryParse(value.ToString(), out var num))
                 {
                     if (ValidationConfig.Min.HasValue && num < ValidationConfig.Min.Value)
@@ -292,13 +281,30 @@ namespace Controls.Models
                     if (ValidationConfig.Max.HasValue && num > ValidationConfig.Max.Value)
                         return ValidationConfig.CustomErrorMessage ?? $"Значение не может быть больше {ValidationConfig.Max.Value}";
                 }
-                else if (value is string str)
+                else if (value is string s)
                 {
-                    if (ValidationConfig.MaxLength.HasValue && str.Length > ValidationConfig.MaxLength.Value)
+                    if (ValidationConfig.MaxLength.HasValue && s.Length > ValidationConfig.MaxLength.Value)
                         return ValidationConfig.CustomErrorMessage ?? $"Максимальная длина {ValidationConfig.MaxLength.Value} символов";
-                    if (!string.IsNullOrEmpty(ValidationConfig.RegexPattern) && !Regex.IsMatch(str, ValidationConfig.RegexPattern))
+                    if (!string.IsNullOrEmpty(ValidationConfig.RegexPattern) && !Regex.IsMatch(s, ValidationConfig.RegexPattern))
                         return ValidationConfig.CustomErrorMessage ?? "Некорректный формат";
                 }
+            }
+
+            if (value == null && PropertyType.IsValueType && Nullable.GetUnderlyingType(PropertyType) == null)
+            {
+                return "Значение не может быть null";
+            }
+
+            var validationContext = new ValidationContext(Target ?? new object())
+            {
+                MemberName = PropertyName
+            };
+            var results = new List<ValidationResult>();
+            if (!Validator.TryValidateProperty(value, validationContext, results))
+            {
+                if (ValidationConfig?.CustomErrorMessage != null)
+                    return ValidationConfig.CustomErrorMessage;
+                return results[0].ErrorMessage ?? "Некорректное значение";
             }
 
             return string.Empty;
