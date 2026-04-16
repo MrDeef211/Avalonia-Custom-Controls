@@ -113,6 +113,8 @@ namespace Controls.Models
 
         public bool IsEditable => !IsReadOnly;
 
+        public string? ToolTipText => Description != PropertyName ? Description : null;
+
         public string ValidationError
         {
             get => _validationError;

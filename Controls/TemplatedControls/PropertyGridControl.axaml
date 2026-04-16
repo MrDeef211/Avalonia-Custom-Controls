@@ -7,6 +7,7 @@
                     x:CompileBindings="False">
 
     <selectors:PropertyEditorTemplateSelector x:Key="PropertyEditorTemplateSelector" />
+    <converters:NotEqualConverter x:Key="NotEqualConverter" />
 
     <ControlTheme x:Key="{x:Type controls:PropertyGridControl}" TargetType="controls:PropertyGridControl">
         <Setter Property="Template">
@@ -39,7 +40,7 @@
                                                                FontWeight="{Binding PropertyNameFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
                                                                Foreground="{Binding PropertyNameForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
                                                                Margin="0,0,16,0" 
-                                                               ToolTip.Tip="{Binding Description}"/>
+                                                               ToolTip.Tip="{Binding ToolTipText}"/>
                                                     
                                                     <ContentControl Grid.Column="1"
                                                                     Content="{Binding}"
@@ -49,7 +50,8 @@
                                                                Text="⚠️" 
                                                                Foreground="{Binding ErrorIconForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
                                                                IsVisible="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
-                                                               Margin="8,0,0,0" />
+                                                               Margin="8,0,0,0"  
+                                                               ToolTip.Tip="{Binding ValidationError}" ToolTip.IsOpen="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

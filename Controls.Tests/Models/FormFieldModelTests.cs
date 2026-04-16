@@ -172,5 +172,18 @@ namespace Controls.Tests.Models
             var expectedOffset = TimeZoneInfo.Local.GetUtcOffset(target.Created);
             model.DateValue.Should().Be(new DateTimeOffset(2025, 3, 15, 0, 0, 0, expectedOffset));
         }
+
+        [Fact]
+        public void Validate_Should_Accept_Int_Value_For_Int_Property()
+        {
+            var target = new DataFormTestObject { Age = 0 };
+            var prop = typeof(DataFormTestObject).GetProperty(nameof(DataFormTestObject.Age));
+            var model = new FormFieldModel(prop, target, false);
+
+            model.Value = 30;
+
+            model.ValidationError.Should().BeEmpty();
+            model.ConvertedValue.Should().Be(30);
+        }
     }
 }

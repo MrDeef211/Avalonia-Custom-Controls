@@ -213,40 +213,35 @@ namespace Controls.Models
         {
             try
             {
-                var validationError = Validate(input);
-                if (!string.IsNullOrEmpty(validationError))
-                    return (null, validationError);
-
-                if (input == null)
-                {
-                    if (PropertyType.IsValueType && Nullable.GetUnderlyingType(PropertyType) == null)
-                        throw new InvalidOperationException("Значение не может быть null для типа значения");
+                if (!_isRequired && (input == null || (input is string str && string.IsNullOrEmpty(str))))
                     return (null, string.Empty);
+
+                object? converted = null;
+                if (input != null)
+                {
+                    var targetType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
+                    var inputType = input.GetType();
+
+                    if (inputType == targetType)
+                    {
+                        converted = input;
+                    }
+                    else if (targetType == typeof(DateTime))
+                    {
+                        converted = ConvertToDateTime(input);
+                    }
+                    else if (targetType == typeof(DateTime?))
+                    {
+                        converted = input == null ? null : ConvertToDateTime(input);
+                    }
+                    else
+                    {
+                        converted = Convert.ChangeType(input, targetType);
+                    }
                 }
 
-                var targetType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
-                var inputType = input.GetType();
-
-                if (inputType == targetType)
-                {
-                    return (input, string.Empty);
-                }
-
-                object converted;
-                if (targetType == typeof(DateTime))
-                {
-                    converted = ConvertToDateTime(input);
-                }
-                else if (targetType == typeof(DateTime?))
-                {
-                    converted = input == null ? null : ConvertToDateTime(input);
-                }
-                else
-                {
-                    converted = Convert.ChangeType(input, targetType);
-                }
-
-                return (converted, string.Empty);
+                var validationError = Validate(converted);
+                return (converted, validationError);
             }
             catch (Exception ex)
             {
@@ -267,10 +262,8 @@ namespace Controls.Models
 
         private string Validate(object? value)
         {
-            if (!_isRequired && (value == null || (value is string str && string.IsNullOrEmpty(str))))
-            {
-                return string.Empty;
-            }
+            if (value == null && _isRequired && PropertyType.IsValueType && Nullable.GetUnderlyingType(PropertyType) == null)
+                return "Значение не может быть null";
 
             if (ValidationConfig != null && value != null)
             {
@@ -290,21 +283,19 @@ namespace Controls.Models
                 }
             }
 
-            if (value == null && PropertyType.IsValueType && Nullable.GetUnderlyingType(PropertyType) == null)
+            if (value != null || _isRequired)
             {
-                return "Значение не может быть null";
-            }
-
-            var validationContext = new ValidationContext(Target ?? new object())
-            {
-                MemberName = PropertyName
-            };
-            var results = new List<ValidationResult>();
-            if (!Validator.TryValidateProperty(value, validationContext, results))
-            {
-                if (ValidationConfig?.CustomErrorMessage != null)
-                    return ValidationConfig.CustomErrorMessage;
-                return results[0].ErrorMessage ?? "Некорректное значение";
+                var validationContext = new ValidationContext(Target ?? new object())
+                {
+                    MemberName = PropertyName
+                };
+                var results = new List<ValidationResult>();
+                if (!Validator.TryValidateProperty(value, validationContext, results))
+                {
+                    if (ValidationConfig?.CustomErrorMessage != null)
+                        return ValidationConfig.CustomErrorMessage;
+                    return results[0].ErrorMessage ?? "Некорректное значение";
+                }
             }
 
             return string.Empty;

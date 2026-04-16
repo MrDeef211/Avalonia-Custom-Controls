@@ -9,7 +9,7 @@
     <selectors:EditorTemplateSelector x:Key="EditorTemplateSelector" />
     <converters:BoolToGlyphConverter x:Key="BoolToGlyphConverter" />
     <converters:BoolToCursorConverter x:Key="BoolToCursorConverter" />
-    <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+    <converters:NotEqualConverter x:Key="NotEqualConverter" />
 
     <ControlTheme x:Key="{x:Type controls:DataFormControl}" TargetType="controls:DataFormControl">
         <Setter Property="Template">
@@ -152,7 +152,8 @@
                                                                                        Text="⚠️"
                                                                                        Foreground="Red"
                                                                                        IsVisible="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
-                                                                                       Margin="8,0,0,0" />
+                                                                                       Margin="8,0,0,0" 
+                                                                                       ToolTip.Tip="{Binding ValidationError}" ToolTip.IsOpen="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"/>
                                                                         </Grid>
                                                                     </ScrollViewer>
                                                                 </DataTemplate>

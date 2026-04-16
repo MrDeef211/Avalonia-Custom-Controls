@@ -202,5 +202,19 @@ namespace Controls.Tests.Models
             model.Value = null;
             model.Value.Should().BeNull();
         }
+
+        [Fact]
+        public void ValidateValue_Should_Accept_Int_Value_For_Int_Property()
+        {
+            var target = new ValidationTestObject { Number = 0 };
+            var prop = typeof(ValidationTestObject).GetProperty(nameof(ValidationTestObject.Number));
+            var model = new PropertyItemModel(prop, target, false);
+
+            model.Value = 50;
+
+            model.ValidationError.Should().BeEmpty();
+
+            model.Value.Should().Be(50);
+        }
     }
 }
