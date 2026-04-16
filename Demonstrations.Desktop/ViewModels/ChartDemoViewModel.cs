@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
-using Common.Controls;
-using Common.Controls.Models;
+using Controls;
+using Controls.Models;
 using Demonstrations.Desktop.Models;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;

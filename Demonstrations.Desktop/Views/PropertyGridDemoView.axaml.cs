@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Common.Controls;
 using Demonstrations.Desktop.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Avalonia;

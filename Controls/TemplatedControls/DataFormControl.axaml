@@ -1,0 +1,192 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Controls"
+                    xmlns:models="using:Controls.Models"
+                    xmlns:converters="using:Controls.Converters"
+                    xmlns:selectors="using:Controls.Selectors"
+                    x:CompileBindings="False">
+
+    <selectors:EditorTemplateSelector x:Key="EditorTemplateSelector" />
+    <converters:BoolToGlyphConverter x:Key="BoolToGlyphConverter" />
+    <converters:BoolToCursorConverter x:Key="BoolToCursorConverter" />
+    <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+
+    <ControlTheme x:Key="{x:Type controls:DataFormControl}" TargetType="controls:DataFormControl">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Spacing="8"
+                                Margin="0,0,0,8"
+                                IsVisible="{TemplateBinding ButtonPanelPlacement,
+                                    Converter={StaticResource EnumToBoolConverter},
+                                    ConverterParameter={x:Static controls:ButtonPanelPlacement.Top}}">
+                        <Button Content="Сохранить"
+                                Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsEnabled="{TemplateBinding HasChanges}" />
+                        <Button Content="Отмена"
+                                Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsEnabled="{TemplateBinding HasChanges}" />
+                    </StackPanel>
+
+                    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+                      <DockPanel>
+                        <StackPanel DockPanel.Dock="Top"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Spacing="8"
+                                    Margin="0,0,0,8"
+                                    IsVisible="{TemplateBinding ButtonPanelPlacement,
+                                        Converter={StaticResource EnumToBoolConverter},
+                                        ConverterParameter={x:Static controls:ButtonPanelPlacement.InsideTop}}">
+                            <Button Content="Сохранить"
+                                    Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                    IsEnabled="{TemplateBinding HasChanges}" />
+                            <Button Content="Отмена"
+                                    Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                    IsEnabled="{TemplateBinding HasChanges}" />
+                        </StackPanel>
+
+                        <StackPanel DockPanel.Dock="Bottom"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Spacing="8"
+                                    Margin="0,8,0,0"
+                                    IsVisible="{TemplateBinding ButtonPanelPlacement,
+                                        Converter={StaticResource EnumToBoolConverter},
+                                        ConverterParameter={x:Static controls:ButtonPanelPlacement.InsideBottom}}">
+                            <Button Content="Сохранить"
+                                    Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                    IsEnabled="{TemplateBinding HasChanges}" />
+                            <Button Content="Отмена"
+                                    Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                    IsEnabled="{TemplateBinding HasChanges}" />
+                        </StackPanel>
+
+                        <ItemsControl ItemsSource="{Binding Sections, RelativeSource={RelativeSource TemplatedParent}}"
+                                      HorizontalAlignment="Stretch">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="models:FormSectionModel">
+                                    <StackPanel Margin="0,0,0,12">
+
+                                        <Button Command="{Binding ToggleCommand}"
+                                                IsEnabled="{Binding CanCollapse}"
+                                                Cursor="{Binding CanCollapse, Converter={StaticResource BoolToCursorConverter}}"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Padding="8,4"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Left">
+                                            <Button.Styles>
+                                                <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                                    <Setter Property="Background" Value="Transparent" />
+                                                </Style>
+                                                <Style Selector="Button:disabled /template/ ContentPresenter">
+                                                    <Setter Property="Background" Value="Transparent" />
+                                                </Style>
+                                                <Style Selector="Button:disabled">
+                                                    <Setter Property="Background" Value="Transparent" />
+                                                    <Setter Property="Opacity" Value="1" />
+                                                </Style>
+                                            </Button.Styles>
+                                            <DockPanel>
+                                                <TextBlock Text="{Binding IsExpanded, Converter={StaticResource BoolToGlyphConverter}}"
+                                                           FontSize="12"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,8,0"
+                                                           DockPanel.Dock="Left"
+                                                           IsVisible="{Binding CanCollapse}" />
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontSize="{Binding CategoryHeaderFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                           FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                           Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                           VerticalAlignment="Center" />
+                                            </DockPanel>
+                                        </Button>
+
+                                        <ItemsControl ItemsSource="{Binding Rows}" IsVisible="{Binding IsExpanded}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="models:FormRowModel">
+                                                        <ItemsControl ItemsSource="{Binding Fields}" Margin="0,0,0,0">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <UniformGrid Columns="{Binding Fields.Count}" Rows="1" />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate DataType="models:FormFieldModel">
+                                                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                                                  VerticalScrollBarVisibility="Disabled"
+                                                                                  HorizontalAlignment="Stretch">
+                                                                        <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}">
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="{Binding LabelColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}" />
+                                                                                <ColumnDefinition Width="*" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                            </Grid.ColumnDefinitions>
+
+                                                                            <TextBlock Grid.Column="0"
+                                                                                       Text="{Binding DisplayName}"
+                                                                                       VerticalAlignment="Center"
+                                                                                       FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                                                       FontWeight="{Binding LabelFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                                                       Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                                                       Margin="0,0,16,0"
+                                                                                       IsVisible="{Binding ShowLabel}" />
+
+                                                                            <ContentControl Grid.Column="{Binding EditorColumn}"
+                                                                                            Grid.ColumnSpan="{Binding EditorColumnSpan}"
+                                                                                            Content="{Binding}"
+                                                                                            ContentTemplate="{StaticResource EditorTemplateSelector}"
+                                                                                            HorizontalAlignment="Stretch" />
+
+                                                                            <TextBlock Grid.Column="2"
+                                                                                       Text="⚠️"
+                                                                                       Foreground="Red"
+                                                                                       IsVisible="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
+                                                                                       Margin="8,0,0,0" />
+                                                                        </Grid>
+                                                                    </ScrollViewer>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                        <Rectangle Height="1" Fill="LightGray" Margin="0,8,0,0" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DockPanel>
+                    </ScrollViewer>
+
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Spacing="8"
+                                Margin="0,8,0,0"
+                                IsVisible="{TemplateBinding ButtonPanelPlacement,
+                                    Converter={StaticResource EnumToBoolConverter},
+                                    ConverterParameter={x:Static controls:ButtonPanelPlacement.Bottom}}">
+                        <Button Content="Сохранить"
+                                Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsEnabled="{TemplateBinding HasChanges}" />
+                        <Button Content="Отмена"
+                                Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsEnabled="{TemplateBinding HasChanges}" />
+                    </StackPanel>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

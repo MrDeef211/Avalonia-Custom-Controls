@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Controls.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Common.Controls.Models
+namespace Demonstrations.Desktop.Models
 {
     public class ChartGenerator
     {

@@ -1,4 +1,4 @@
-﻿using Common.Controls.Models;
+﻿using Controls.Models;
 using Demonstrations.Desktop.Models;
 using ReactiveUI;
 using System;

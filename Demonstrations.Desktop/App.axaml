@@ -12,14 +12,14 @@
     <Application.Resources>
     <ResourceDictionary>
         <ResourceDictionary.MergedDictionaries>
-            <ResourceInclude Source="avares://Common.Controls/Themes/CommonControls.axaml" />
+            <ResourceInclude Source="avares://Controls/Themes/Controls.axaml" />
         </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
 </Application.Resources>
   
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="avares://Common.Controls/Themes/CommonControls.Styles.axaml" />
+        <StyleInclude Source="avares://Controls/Themes/Controls.Styles.axaml" />
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
     </Application.Styles>
 </Application>

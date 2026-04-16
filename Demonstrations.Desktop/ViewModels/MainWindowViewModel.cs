@@ -2,8 +2,8 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Converters;
 using Avalonia.Media.TextFormatting;
-using Common.Controls;
-using Common.Controls.Models;
+using Controls;
+using Controls.Models;
 using ReactiveUI;
 using ReactiveUI.Validation;
 using ReactiveUI.Validation.Extensions;

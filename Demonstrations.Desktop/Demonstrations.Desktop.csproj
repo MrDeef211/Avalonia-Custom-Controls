@@ -29,6 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common.Controls\Common.Controls.csproj" />
+    <ProjectReference Include="..\Controls\Controls.csproj" />
   </ItemGroup>
 </Project>

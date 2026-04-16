@@ -1,5 +1,5 @@
 ﻿using Avalonia.Media;
-using Common.Controls.Models;
+using Controls.Models;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;

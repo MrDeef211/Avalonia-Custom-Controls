@@ -1,0 +1,60 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Controls"
+                    xmlns:conv="using:Avalonia.Data.Converters">
+
+    <ControlTheme x:Key="{x:Type controls:RangeSlider}" TargetType="controls:RangeSlider">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="LowerTextBox"
+                             Grid.Column="0"
+                             IsVisible="{TemplateBinding ShowTextBoxes}"
+                             Width="{TemplateBinding TextBoxWidth}"
+                             Height="30"
+                             Margin="0,0,5,0"
+                             Text="{Binding LowerText, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             IsReadOnly="{TemplateBinding IsLowerThumbEnabled, Converter={x:Static conv:BoolConverters.Not}}"
+                             VerticalAlignment="Center" />
+
+                    <Canvas x:Name="PART_TrackCanvas"
+                            Grid.Column="1"
+                            Background="Transparent"
+                            ClipToBounds="False"
+                            Height="30"
+                            Margin="5,0,5,0"
+                            VerticalAlignment="Center">
+                    <Border x:Name="PART_LowerThumb"
+                            Cursor="SizeWestEast"
+                            Width="4"
+                            Height="24"
+                            Background="{TemplateBinding LowerThumbBrush}"
+                            CornerRadius="2" />
+                    <Border x:Name="PART_UpperThumb"
+                            Cursor="SizeWestEast"
+                            Width="4"
+                            Height="24"
+                            Background="{TemplateBinding UpperThumbBrush}"
+                            CornerRadius="2" />
+                    </Canvas>
+
+                    <TextBox x:Name="UpperTextBox"
+                             Grid.Column="2"
+                             IsVisible="{TemplateBinding ShowTextBoxes}"
+                             Width="{TemplateBinding TextBoxWidth}"
+                             Height="30"
+                             Margin="5,0,0,0"
+                             Text="{Binding UpperText, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             IsReadOnly="{TemplateBinding IsUpperThumbEnabled, Converter={x:Static conv:BoolConverters.Not}}"
+                             VerticalAlignment="Center" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

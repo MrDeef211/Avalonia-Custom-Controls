@@ -1,6 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:controls="using:Common.Controls"
+             xmlns:controls="using:Controls"
              xmlns:vm="using:Demonstrations.Desktop.ViewModels"
              x:Class="Demonstrations.Desktop.Views.DataFormDemoView"
              x:DataType="vm:DataFormDemoViewModel">

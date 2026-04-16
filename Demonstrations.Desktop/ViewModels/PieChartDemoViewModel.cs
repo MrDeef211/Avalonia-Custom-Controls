@@ -1,8 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Common.Controls;
-using Common.Controls.Models;
+using Controls;
+using Controls.Models;
 using Demonstrations.Desktop.Models;
 using ReactiveUI;
 using System;
