@@ -32,6 +32,14 @@ public class DataFormControl : BaseEditorControl, IDisposable
 
         CommitChangesCommand = ReactiveCommand.Create(() => CommitChanges(), canExecute);
         CancelChangesCommand = ReactiveCommand.Create(() => CancelChanges(), canExecute);
+
+        this.WhenAnyValue(x => x.FormConfig)
+            .Subscribe(_ =>
+            {
+                if (SelectedObject != null)
+                    GenerateEditors(SelectedObject);
+            })
+            .DisposeWith(_disposables);
     }
 
     public ObservableCollection<FormSectionModel> Sections { get; } = new();
@@ -50,13 +58,13 @@ public class DataFormControl : BaseEditorControl, IDisposable
         set => SetValue(FormConfigProperty, value);
     }
 
-    public static readonly StyledProperty<double> LabelColumnWidthProperty =
-        AvaloniaProperty.Register<DataFormControl, double>(nameof(LabelColumnWidth), 120.0);
+    public static readonly StyledProperty<GridLength> LabelColumnWidthProperty =
+        AvaloniaProperty.Register<DataFormControl, GridLength>(nameof(LabelColumnWidth), new GridLength(120));
 
     /// <summary>
     /// Ширина колонки имён свойств
     /// </summary>
-    public double LabelColumnWidth
+    public GridLength LabelColumnWidth
     {
         get => GetValue(LabelColumnWidthProperty);
         set => SetValue(LabelColumnWidthProperty, value);
