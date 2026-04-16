@@ -31,7 +31,7 @@ namespace Controls.Tests.Controls
             {
                 FormConfig = new DataFormConfig
                 {
-                    CategoryOrders =
+                    _categoryOrders =
             {
                 ["Дополнительно"] = 1,
                 ["Основные"] = 2,
@@ -55,7 +55,7 @@ namespace Controls.Tests.Controls
             {
                 FormConfig = new DataFormConfig
                 {
-                    Fields =
+                    _fields =
                     {
                         ["Name"] = new DataFormFieldConfig { IsBrowsable = false }
                     }
@@ -76,7 +76,7 @@ namespace Controls.Tests.Controls
             {
                 FormConfig = new DataFormConfig
                 {
-                    Fields =
+                    _fields =
                     {
                         ["Name"] = new DataFormFieldConfig { RowGroup = 1 },
                         ["Age"] = new DataFormFieldConfig { RowGroup = 1 }
@@ -100,7 +100,7 @@ namespace Controls.Tests.Controls
             {
                 FormConfig = new DataFormConfig
                 {
-                    CategoryExpanded = { ["Основные"] = false, ["Дополнительно"] = true }
+                    _categoryExpanded = { ["Основные"] = false, ["Дополнительно"] = true }
                 }
             };
             var obj = new DataFormTestObject();
@@ -118,7 +118,7 @@ namespace Controls.Tests.Controls
             {
                 FormConfig = new DataFormConfig
                 {
-                    CategoryCollapsible = { ["Основные"] = true, ["Дополнительно"] = false }
+                    _categoryCollapsible = { ["Основные"] = true, ["Дополнительно"] = false }
                 }
             };
             var obj = new DataFormTestObject();
@@ -263,7 +263,7 @@ namespace Controls.Tests.Controls
             {
                 FormConfig = new DataFormConfig
                 {
-                    Fields =
+                    _fields =
             {
                 ["Age"] = new DataFormFieldConfig
                 {

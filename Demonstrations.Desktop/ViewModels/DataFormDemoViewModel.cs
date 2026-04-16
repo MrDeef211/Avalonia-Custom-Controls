@@ -22,25 +22,25 @@ namespace Demonstrations.Desktop.ViewModels
             Title = "DataForm - Форма данных";
             NewObject();
 
-            FormConfig.Fields.Add("FullName", new DataFormFieldConfig
+            FormConfig.SetFieldRule("FullName", new DataFormFieldConfig
             {
                 DisplayName = "Полное имя",
                 Category = "Личные данные",
                 Order = 1,
                 Validation = new DataFormFieldValidation { MaxLength = 50 }
             });
-            FormConfig.Fields.Add("Age", new DataFormFieldConfig
+            FormConfig.SetFieldRule("Age", new DataFormFieldConfig
             {
                 DisplayName = "Возраст",
                 Category = "Личные данные",
                 Order = 2,
                 Validation = new DataFormFieldValidation { Min = 0, Max = 120 }
             });
-            FormConfig.Fields.Add("Education", new DataFormFieldConfig
+            FormConfig.SetFieldRule("Education", new DataFormFieldConfig
             {
                 RowGroup = 1,
             });
-            FormConfig.Fields.Add("University", new DataFormFieldConfig
+            FormConfig.SetFieldRule("University", new DataFormFieldConfig
             {
                 HideLabel = true,
                 RowGroup = 1,
@@ -49,9 +49,9 @@ namespace Demonstrations.Desktop.ViewModels
             FormConfig.SetCategoryOrder("Основные", 2);
             FormConfig.SetCategoryOrder("Работа", 3);
             FormConfig.SetCategoryOrder("Образование", 4);
-            FormConfig.CategoryCollapsible["Работа"] = true;
-            FormConfig.CategoryCollapsible["Образование"] = true;
-            FormConfig.CategoryExpanded["Образование"] = false;
+            FormConfig.SetCategoryCollapsible("Работа", true);
+            FormConfig.SetCategoryCollapsible("Образование", true, true);
+
 
             SaveCommand = ReactiveCommand.Create<object?>(OnSave);
         }

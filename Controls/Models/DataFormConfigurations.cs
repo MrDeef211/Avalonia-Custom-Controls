@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using System.Text;
 
 namespace Controls.Models
@@ -98,28 +99,95 @@ namespace Controls.Models
     /// </summary>
     public class DataFormConfig
     {
+
+        protected internal readonly Dictionary<string, bool> _categoryCollapsible = new();
+        protected internal readonly Dictionary<string, bool> _categoryExpanded = new();
+        protected internal readonly Dictionary<string, DataFormFieldConfig> _fields = new();
+        protected internal readonly Dictionary<string, int> _categoryOrders = new();
+
         /// <summary>
         /// Определяет, могут ли категории сворачиваться пользователем.
         /// Ключ — имя категории, значение — <c>true</c>, если категория сворачиваема.
         /// </summary>
-        public Dictionary<string, bool> CategoryCollapsible { get; set; } = new();
+        public IReadOnlyDictionary<string, bool> CategoryCollapsible => _categoryCollapsible;
 
         /// <summary>
         /// Начальное состояние развёрнутости категорий.
         /// Ключ — имя категории, значение — <c>true</c>, если категория развёрнута по умолчанию.
         /// </summary>
-        public Dictionary<string, bool> CategoryExpanded { get; set; } = new();
+        public IReadOnlyDictionary<string, bool> CategoryExpanded => _categoryExpanded;
 
         /// <summary>
         /// Конфигурации отдельных полей по имени свойства.
         /// </summary>
-        public Dictionary<string, DataFormFieldConfig> Fields { get; set; } = new();
+        public IReadOnlyDictionary<string, DataFormFieldConfig> Fields => _fields;
 
         /// <summary>
         /// Порядок отображения категорий.
         /// Ключ — имя категории, значение — порядковый номер (меньше — раньше).
         /// </summary>
-        public Dictionary<string, int> CategoryOrders { get; set; } = new();
+        public IReadOnlyDictionary<string, int> CategoryOrders => _categoryOrders;
+
+        /// <summary>
+        /// Добавляет конфигурации отдельных полей по имени свойства.
+        /// </summary>
+        /// <remarks>
+        /// Добавляет новые правила к старым
+        /// </remarks>
+        /// <param name="fieldName">Имя поля.</param>
+        /// <param name="config">Правила.</param>
+        public void AddFieldRule(string fieldName, DataFormFieldConfig config)
+        {
+            var normalized = fieldName?.Trim() ?? throw new ArgumentNullException(nameof(fieldName));
+            if (!Fields.ContainsKey(normalized))
+                _fields.TryAdd(normalized, config);
+            else
+                _fields[normalized] = MergeConfig(Fields[normalized], config);
+        }
+
+        /// <summary>
+        /// Добавляет правила валидации отдельных полей по имени свойства.
+        /// </summary>
+        /// <remarks>
+        /// Добавляет новые правила к старым
+        /// </remarks>
+        /// <param name="fieldName">Имя поля.</param>
+        /// <param name="validation">Правила.</param>
+        public void AddFieldValidation(string fieldName, DataFormFieldValidation validation) => AddFieldRule(fieldName, new DataFormFieldConfig { Validation = validation });
+
+        /// <summary>
+        /// Устанавливает конфигурации отдельных полей по имени свойства.
+        /// </summary>
+        /// <remarks>
+        /// Заменяет старое правило новым
+        /// </remarks>
+        /// <param name="fieldName">Имя поля.</param>
+        /// <param name="config">Правило.</param>
+        public void SetFieldRule(string fieldName, DataFormFieldConfig config)
+        {
+            var normalized = fieldName?.Trim() ?? throw new ArgumentNullException(nameof(fieldName));
+            if (!Fields.ContainsKey(normalized))
+                _fields.TryAdd(normalized, config);
+            else
+                _fields[normalized] = config;
+        }
+
+        /// <summary>
+        /// Устанавливает правила валидации отдельных полей по имени свойства.
+        /// </summary>
+        /// <remarks>
+        /// Заменяет старое правило новым
+        /// </remarks>
+        /// <param name="fieldName">Имя поля.</param>
+        /// <param name="config">Правило.</param>
+        public void SetFieldValidation(string fieldName, DataFormFieldValidation validation)
+        {
+            var normalized = fieldName?.Trim() ?? throw new ArgumentNullException(nameof(fieldName));
+            if (!Fields.ContainsKey(normalized))
+                _fields.TryAdd(normalized, new DataFormFieldConfig { Validation = validation });
+            else
+                _fields[normalized].Validation = validation;
+        }
 
         /// <summary>
         /// Устанавливает порядок отображения категории.
@@ -129,7 +197,59 @@ namespace Controls.Models
         public void SetCategoryOrder(string categoryName, int order)
         {
             var normalized = categoryName?.Trim() ?? throw new ArgumentNullException(nameof(categoryName));
-            CategoryOrders[normalized] = order;
+            _categoryOrders[normalized] = order;
+        }
+
+        /// <summary>
+        /// Устанавливает возможность схлопывания категории.
+        /// </summary>
+        /// <param name="categoryName">Имя категории.</param>
+        /// <param name="collapsible">Возможность схлопывания.</param>
+        /// <param name="defaultСollapsed">Схлонуто по умолчанию.</param>
+        public void SetCategoryCollapsible(string categoryName, bool collapsible, bool defaultСollapsed)
+        {
+            var normalized = categoryName?.Trim() ?? throw new ArgumentNullException(nameof(categoryName));
+            _categoryCollapsible[normalized] = collapsible;
+            if (collapsible)
+                _categoryExpanded[normalized] = !defaultСollapsed;
+        }
+
+        /// <summary>
+        /// Устанавливает возможность схлопывания категории.
+        /// </summary>
+        /// <param name="categoryName">Имя категории.</param>
+        /// <param name="collapsible">Возможность схлопывания.</param>
+        public void SetCategoryCollapsible(string categoryName, bool collapsible) => SetCategoryCollapsible(categoryName, collapsible, false);
+
+        private DataFormFieldConfig MergeConfig(DataFormFieldConfig first, DataFormFieldConfig second)
+        {
+            if (first == null || second == null)
+                return first ?? second;
+
+            var fV = first.Validation;
+            var sV = second.Validation;
+
+            return new DataFormFieldConfig
+            {
+                DisplayName = second.DisplayName ?? first.DisplayName,
+                Category = second.Category ?? first.Category,
+                IsReadOnly = second.IsReadOnly ?? first.IsReadOnly,
+                IsBrowsable = second.IsBrowsable != default ? second.IsBrowsable : first.IsBrowsable,
+                IsCategoryExpanded = second.IsCategoryExpanded ? first.IsCategoryExpanded : second.IsCategoryExpanded,
+                Order = second.Order != 0 ? second.Order : first.Order,
+                CategoryOrder = second.CategoryOrder ?? first.CategoryOrder,
+                HideLabel = second.HideLabel ? second.HideLabel : first.HideLabel,
+                RowGroup = second.RowGroup != -1 ? second.RowGroup : first.RowGroup,
+
+                Validation = new DataFormFieldValidation
+                {
+                    Min = sV?.Min ?? fV?.Min,
+                    Max = sV?.Max ?? fV?.Max,
+                    MaxLength = sV?.MaxLength ?? fV?.MaxLength,
+                    RegexPattern = sV?.RegexPattern ?? fV?.RegexPattern,
+                    CustomErrorMessage = sV?.CustomErrorMessage ?? fV?.CustomErrorMessage
+                }
+            };            
         }
     }
 }
