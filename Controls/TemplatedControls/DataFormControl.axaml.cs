@@ -299,8 +299,13 @@ public class DataFormControl : BaseEditorControl, IDisposable
             else
             {
                 var row = new FormRowModel { RowGroup = group.Key };
-                foreach (var field in group)
+                for (int i = 0; i < group.Count(); i++)
+                {
+                    var field = group.ElementAt(i);
+                    field.Index = i;
                     row.Fields.Add(field);
+                }
+
                 section.Rows.Add(row);
             }
         }

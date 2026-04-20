@@ -251,8 +251,7 @@ namespace Demonstrations.Desktop.ViewModels
             config.SetFieldRule("Phone", new DataFormFieldConfig
             {
                 Order = 2,
-                RowGroup = 1,
-                HideLabel = true
+                RowGroup = 1
             });
 
             config.SetCategoryOrder("Основные данные", 1);

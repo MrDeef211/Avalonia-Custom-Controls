@@ -21,6 +21,7 @@ namespace Controls.Models
         private int _rowGroup = -1;
         private readonly bool _isRequired;
         private IEnumerable<EnumItem>? _enumDisplayItems;
+        private int _index = 0;
 
         public FormFieldModel(PropertyInfo propertyInfo, object target, bool isReadOnly, DataFormFieldConfig? fieldConfig = null)
         {
@@ -115,6 +116,12 @@ namespace Controls.Models
             private set => this.RaiseAndSetIfChanged(ref _isTouched, value);
         }
 
+        public int Index
+        {
+            get => _index;
+            set => this.RaiseAndSetIfChanged(ref _index, value);
+        }
+
         public DateTimeOffset? DateValue
         {
             get
@@ -148,6 +155,7 @@ namespace Controls.Models
         public bool IsBool => PropertyType == typeof(bool);
         public bool ShowLabel => !HideLabel;
         public bool HideLabel { get; private set; }
+        public bool ShowLabelInRow => ShowLabel && Index != 0;
 
         public int EditorColumn => ShowLabel ? 1 : 0;
         public int EditorColumnSpan => ShowLabel ? 1 : 2;
