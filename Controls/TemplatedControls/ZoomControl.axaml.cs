@@ -136,6 +136,104 @@ public class ZoomControl : ContentControl
 
     #endregion
 
+    #region Назначения клавиш
+
+    // Клавиши панорамирования
+    public static readonly StyledProperty<Key> PanUpKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(PanUpKey), Key.W);
+    public static readonly StyledProperty<Key> PanDownKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(PanDownKey), Key.S);
+    public static readonly StyledProperty<Key> PanLeftKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(PanLeftKey), Key.A);
+    public static readonly StyledProperty<Key> PanRightKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(PanRightKey), Key.D);
+
+    // Альтернативные клавиши (стрелки) — можно отключить, установив Key.None
+    public static readonly StyledProperty<Key> PanUpAltKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(PanUpAltKey), Key.Up);
+    public static readonly StyledProperty<Key> PanDownAltKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(PanDownAltKey), Key.Down);
+    public static readonly StyledProperty<Key> PanLeftAltKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(PanLeftAltKey), Key.Left);
+    public static readonly StyledProperty<Key> PanRightAltKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(PanRightAltKey), Key.Right);
+
+    // Клавиши масштабирования
+    public static readonly StyledProperty<Key> ZoomInKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(ZoomInKey), Key.Add);
+    public static readonly StyledProperty<Key> ZoomOutKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(ZoomOutKey), Key.Subtract);
+
+    // Сброс масштаба
+    public static readonly StyledProperty<Key> ResetZoomKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(ResetZoomKey), Key.D0);
+    public static readonly StyledProperty<KeyModifiers> ResetZoomModifiersProperty =
+        AvaloniaProperty.Register<ZoomControl, KeyModifiers>(nameof(ResetZoomModifiers), KeyModifiers.Control);
+
+    // Вписать в экран
+    public static readonly StyledProperty<Key> FitToScreenKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(FitToScreenKey), Key.Home);
+    public static readonly StyledProperty<KeyModifiers> FitToScreenModifiersProperty =
+        AvaloniaProperty.Register<ZoomControl, KeyModifiers>(nameof(FitToScreenModifiers), KeyModifiers.None);
+
+    // История (Undo/Redo)
+    public static readonly StyledProperty<Key> UndoKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(UndoKey), Key.Z);
+    public static readonly StyledProperty<KeyModifiers> UndoModifiersProperty =
+        AvaloniaProperty.Register<ZoomControl, KeyModifiers>(nameof(UndoModifiers), KeyModifiers.Control);
+    public static readonly StyledProperty<Key> RedoKeyProperty =
+        AvaloniaProperty.Register<ZoomControl, Key>(nameof(RedoKey), Key.Y);
+    public static readonly StyledProperty<KeyModifiers> RedoModifiersProperty =
+        AvaloniaProperty.Register<ZoomControl, KeyModifiers>(nameof(RedoModifiers), KeyModifiers.Control);
+
+    // Включение клавиатурного управления
+    public static readonly StyledProperty<bool> EnableKeyboardNavigationProperty =
+        AvaloniaProperty.Register<ZoomControl, bool>(nameof(EnableKeyboardNavigation), true);
+
+
+    public Key PanUpKey { get => GetValue(PanUpKeyProperty); set => SetValue(PanUpKeyProperty, value); }
+    public Key PanDownKey { get => GetValue(PanDownKeyProperty); set => SetValue(PanDownKeyProperty, value); }
+    public Key PanLeftKey { get => GetValue(PanLeftKeyProperty); set => SetValue(PanLeftKeyProperty, value); }
+    public Key PanRightKey { get => GetValue(PanRightKeyProperty); set => SetValue(PanRightKeyProperty, value); }
+    public Key PanUpAltKey { get => GetValue(PanUpAltKeyProperty); set => SetValue(PanUpAltKeyProperty, value); }
+    public Key PanDownAltKey { get => GetValue(PanDownAltKeyProperty); set => SetValue(PanDownAltKeyProperty, value); }
+    public Key PanLeftAltKey { get => GetValue(PanLeftAltKeyProperty); set => SetValue(PanLeftAltKeyProperty, value); }
+    public Key PanRightAltKey { get => GetValue(PanRightAltKeyProperty); set => SetValue(PanRightAltKeyProperty, value); }
+    public Key ZoomInKey { get => GetValue(ZoomInKeyProperty); set => SetValue(ZoomInKeyProperty, value); }
+    public Key ZoomOutKey { get => GetValue(ZoomOutKeyProperty); set => SetValue(ZoomOutKeyProperty, value); }
+    /// <summary>
+    /// Клавиша сброса зума
+    /// </summary>
+    public Key ResetZoomKey { get => GetValue(ResetZoomKeyProperty); set => SetValue(ResetZoomKeyProperty, value); }
+    /// <summary>
+    /// Клавиша модификатор сброса зума
+    /// </summary>
+    public KeyModifiers ResetZoomModifiers { get => GetValue(ResetZoomModifiersProperty); set => SetValue(ResetZoomModifiersProperty, value); }
+    /// <summary>
+    /// Клавиша вписывания в экран
+    /// </summary>
+    public Key FitToScreenKey { get => GetValue(FitToScreenKeyProperty); set => SetValue(FitToScreenKeyProperty, value); }
+    /// <summary>
+    /// Клавиша модификатор вписывания в экран
+    /// </summary>
+    public KeyModifiers FitToScreenModifiers { get => GetValue(FitToScreenModifiersProperty); set => SetValue(FitToScreenModifiersProperty, value); }
+    /// <summary>
+    /// Клавиша отмены
+    /// </summary>
+    public Key UndoKey { get => GetValue(UndoKeyProperty); set => SetValue(UndoKeyProperty, value); }
+    public KeyModifiers UndoModifiers { get => GetValue(UndoModifiersProperty); set => SetValue(UndoModifiersProperty, value); }
+    /// <summary>
+    /// Клавиша возврата отмены
+    /// </summary>
+    public Key RedoKey { get => GetValue(RedoKeyProperty); set => SetValue(RedoKeyProperty, value); }
+    public KeyModifiers RedoModifiers { get => GetValue(RedoModifiersProperty); set => SetValue(RedoModifiersProperty, value); }
+    /// <summary>
+    /// Включить навигацию через клавиатуру
+    /// </summary>
+    public bool EnableKeyboardNavigation { get => GetValue(EnableKeyboardNavigationProperty); set => SetValue(EnableKeyboardNavigationProperty, value); }
+
+    #endregion
+
     #region Команды
 
     private ReactiveCommand<Unit, Unit>? _resetZoomCommand;
@@ -203,13 +301,14 @@ public class ZoomControl : ContentControl
 
     private void OnAnimationTick(object? sender, EventArgs e)
     {
+        if (!EnableKeyboardNavigation) return;
         double dx = 0, dy = 0;
         double step = 10.0;
 
-        if (_pressedKeys.Contains(Key.W) || _pressedKeys.Contains(Key.Up)) dy += step;
-        if (_pressedKeys.Contains(Key.S) || _pressedKeys.Contains(Key.Down)) dy -= step;
-        if (_pressedKeys.Contains(Key.A) || _pressedKeys.Contains(Key.Left)) dx += step;
-        if (_pressedKeys.Contains(Key.D) || _pressedKeys.Contains(Key.Right)) dx -= step;
+        if (_pressedKeys.Contains(PanUpKey) || _pressedKeys.Contains(PanUpAltKey)) dy += step;
+        if (_pressedKeys.Contains(PanDownKey) || _pressedKeys.Contains(PanDownAltKey)) dy -= step;
+        if (_pressedKeys.Contains(PanLeftKey) || _pressedKeys.Contains(PanLeftAltKey)) dx += step;
+        if (_pressedKeys.Contains(PanRightKey) || _pressedKeys.Contains(PanRightAltKey)) dx -= step;
 
         if (dx != 0 || dy != 0)
         {
@@ -316,33 +415,35 @@ public class ZoomControl : ContentControl
 
     private void ProcessStaticKeys(KeyEventArgs e)
     {
+        if (!EnableKeyboardNavigation) return;
+
         var center = new Point(Bounds.Width / 2, Bounds.Height / 2);
-        if (e.Key == Key.Add || e.Key == Key.OemPlus)
+        if (e.Key == ZoomInKey || e.Key == Key.OemPlus)
         {
             ZoomAtPoint(center, 1);
             e.Handled = true;
         }
-        else if (e.Key == Key.Subtract || e.Key == Key.OemMinus)
+        else if (e.Key == ZoomOutKey || e.Key == Key.OemMinus)
         {
             ZoomAtPoint(center, -1);
             e.Handled = true;
         }
-        else if (e.Key == Key.D0 && e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        else if (e.Key == ResetZoomKey && e.KeyModifiers == ResetZoomModifiers)
         {
             ResetZoom();
             e.Handled = true;
         }
-        else if (e.Key == Key.Home)
+        else if (e.Key == FitToScreenKey && e.KeyModifiers == FitToScreenModifiers)
         {
             FitToScreen();
             e.Handled = true;
         }
-        else if (e.Key == Key.Z && e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        else if (e.Key == UndoKey && e.KeyModifiers == UndoModifiers)
         {
             Undo();
             e.Handled = true;
         }
-        else if (e.Key == Key.Y && e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        else if (e.Key == RedoKey && e.KeyModifiers == RedoModifiers)
         {
             Redo();
             e.Handled = true;
@@ -453,8 +554,38 @@ public class ZoomControl : ContentControl
         JumpToMatrix(Matrix.Identity);
     }
 
-    // Пока одинаковые
-    private void FitToScreen() => ResetZoom();
+    /// <summary>
+    /// Подогнать содержимое под размеры контрола с сохранением пропорций.
+    /// </summary>
+    private void FitToScreen()
+    {
+        if (_presenter?.Child == null) return;
+
+        var content = _presenter.Child;
+        if (content.Bounds.Width <= 0 || content.Bounds.Height <= 0)
+        {
+            content.Measure(Size.Infinity);
+            content.Arrange(new Rect(content.DesiredSize));
+        }
+        double contentWidth = content.Bounds.Width;
+        double contentHeight = content.Bounds.Height;
+        double availableWidth = Bounds.Width;
+        double availableHeight = Bounds.Height;
+
+        if (contentWidth <= 0 || contentHeight <= 0 || availableWidth <= 0 || availableHeight <= 0)
+            return;
+
+        double scaleX = availableWidth / contentWidth;
+        double scaleY = availableHeight / contentHeight;
+        double scale = Math.Min(scaleX, scaleY);
+        scale = Math.Clamp(scale, MinScale, MaxScale);
+
+        double offsetX = (availableWidth - contentWidth * scale) / 2;
+        double offsetY = (availableHeight - contentHeight * scale) / 2;
+
+        PushState();
+        JumpToMatrix(new Matrix(scale, 0, 0, scale, offsetX, offsetY));
+    }
 
     #endregion
 
@@ -499,7 +630,8 @@ public class ZoomControl : ContentControl
     }
 
     private bool IsMovementKeyPressed() =>
-    _pressedKeys.Any(k => k is Key.W or Key.A or Key.S or Key.D or Key.Up or Key.Down or Key.Left or Key.Right);
+        _pressedKeys.Any(k => k == PanUpKey || k == PanDownKey || k == PanLeftKey || k == PanRightKey ||
+                              k == PanUpAltKey || k == PanDownAltKey || k == PanLeftAltKey || k == PanRightAltKey);
 
     #endregion
 }
