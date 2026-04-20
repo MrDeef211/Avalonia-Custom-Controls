@@ -19,7 +19,8 @@
                             <DataTemplate DataType="models:CategoryModel">
                                 <Expander Header="{Binding Name}" IsExpanded="True" Margin="0,2"
                                           FontSize="{Binding CategoryHeaderFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
-                                          FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}">
+                                          FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
+                                          Classes="PropertyGridExpander">
                                     <ItemsControl ItemsSource="{Binding Properties}" Margin="20,0,0,0">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="models:PropertyItemModel">
@@ -40,7 +41,8 @@
                                                                FontWeight="{Binding PropertyNameFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
                                                                Foreground="{Binding PropertyNameForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
                                                                Margin="0,0,16,0" 
-                                                               ToolTip.Tip="{Binding ToolTipText}"/>
+                                                               ToolTip.Tip="{Binding ToolTipText}"
+                                                               Classes="PropertyGridFieldLabel"/>
                                                     
                                                     <ContentControl Grid.Column="1"
                                                                     Content="{Binding}"
@@ -51,7 +53,9 @@
                                                                Foreground="{Binding ErrorIconForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
                                                                IsVisible="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
                                                                Margin="8,0,0,0"  
-                                                               ToolTip.Tip="{Binding ValidationError}" ToolTip.IsOpen="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"/>
+                                                               ToolTip.Tip="{Binding ValidationError}" 
+                                                               ToolTip.IsOpen="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
+                                                               Classes="PropertyGridErrorIcon"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

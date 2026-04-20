@@ -14,6 +14,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBox x:Name="LowerTextBox"
+                             Classes="RangeSliderTextBox"
                              Grid.Column="0"
                              IsVisible="{TemplateBinding ShowTextBoxes}"
                              Width="{TemplateBinding TextBoxWidth}"
@@ -24,6 +25,7 @@
                              VerticalAlignment="Center" />
 
                     <Canvas x:Name="PART_TrackCanvas"
+                            Classes="RangeSliderTrack"
                             Grid.Column="1"
                             Background="Transparent"
                             ClipToBounds="False"
@@ -31,12 +33,14 @@
                             Margin="5,0,5,0"
                             VerticalAlignment="Center">
                     <Border x:Name="PART_LowerThumb"
+                            Classes="RangeSliderThumb RangeSliderLowerThumb"
                             Cursor="SizeWestEast"
                             Width="4"
                             Height="24"
                             Background="{TemplateBinding LowerThumbBrush}"
                             CornerRadius="2" />
                     <Border x:Name="PART_UpperThumb"
+                            Classes="RangeSliderThumb RangeSliderUpperThumb"
                             Cursor="SizeWestEast"
                             Width="4"
                             Height="24"
@@ -45,6 +49,7 @@
                     </Canvas>
 
                     <TextBox x:Name="UpperTextBox"
+                             Classes="RangeSliderTextBox"
                              Grid.Column="2"
                              IsVisible="{TemplateBinding ShowTextBoxes}"
                              Width="{TemplateBinding TextBoxWidth}"

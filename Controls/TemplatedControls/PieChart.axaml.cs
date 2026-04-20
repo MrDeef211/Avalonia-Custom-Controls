@@ -64,6 +64,18 @@ public class PieChart : TemplatedControl
     public static readonly StyledProperty<ImageScaling> ImageScalingProperty =
         AvaloniaProperty.Register<PieChart, ImageScaling>(nameof(ImageScaling), ImageScaling.Fill);
 
+    public static readonly StyledProperty<double> LabelFontSizeProperty =
+        AvaloniaProperty.Register<PieChart, double>(nameof(LabelFontSize), 12.0);
+
+    public static readonly StyledProperty<FontFamily> LabelFontFamilyProperty =
+        AvaloniaProperty.Register<PieChart, FontFamily>(nameof(LabelFontFamily), FontFamily.Default);
+
+    public static readonly StyledProperty<FontWeight> LabelFontWeightProperty =
+        AvaloniaProperty.Register<PieChart, FontWeight>(nameof(LabelFontWeight), FontWeight.Normal);
+
+    public static readonly StyledProperty<FontStyle> LabelFontStyleProperty =
+        AvaloniaProperty.Register<PieChart, FontStyle>(nameof(LabelFontStyle), FontStyle.Normal);
+
     #endregion
 
     static PieChart()
@@ -80,7 +92,11 @@ public class PieChart : TemplatedControl
             HoleColorProperty,
             CenterImageProperty,
             ImageZoomProperty,
-            ImageScalingProperty);
+            ImageScalingProperty,
+            LabelFontSizeProperty,
+            LabelFontFamilyProperty,
+            LabelFontWeightProperty,
+            LabelFontStyleProperty);
     }
 
     #region Свойства
@@ -232,6 +248,42 @@ public class PieChart : TemplatedControl
     {
         get => GetValue(ImageScalingProperty);
         set => SetValue(ImageScalingProperty, value);
+    }
+
+    /// <summary>
+    /// Размер шрифта подписей   
+    /// </summary>
+    public double LabelFontSize
+    {
+        get => GetValue(LabelFontSizeProperty);
+        set => SetValue(LabelFontSizeProperty, value);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public FontFamily LabelFontFamily
+    {
+        get => GetValue(LabelFontFamilyProperty);
+        set => SetValue(LabelFontFamilyProperty, value);
+    }
+
+    /// <summary>
+    /// Тип шрифта подписей   
+    /// </summary>
+    public FontWeight LabelFontWeight
+    {
+        get => GetValue(LabelFontWeightProperty);
+        set => SetValue(LabelFontWeightProperty, value);
+    }
+
+    /// <summary>
+    /// Стиль шрифта подписей   
+    /// </summary>
+    public FontStyle LabelFontStyle
+    {
+        get => GetValue(LabelFontStyleProperty);
+        set => SetValue(LabelFontStyleProperty, value);
     }
 
     #endregion
@@ -468,9 +520,9 @@ public class PieChart : TemplatedControl
             ? $"{sector.Name} ({sector.Percentage:F1}%)"
             : sector.Name;
 
-        var typeface = new Typeface("Arial");
+        var typeface = new Typeface(LabelFontFamily, LabelFontStyle, LabelFontWeight);
         var formatted = new FormattedText(labelText, CultureInfo.CurrentCulture,
-            FlowDirection.LeftToRight, typeface, 12, Brushes.Black);
+            FlowDirection.LeftToRight, typeface, LabelFontSize, Brushes.Black);
 
         const double pushFactor = 0.05;
         double shift = isHighlighted ? outerR * pushFactor : 0;

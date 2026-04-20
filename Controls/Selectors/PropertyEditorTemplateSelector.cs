@@ -21,6 +21,7 @@ namespace Controls.Selectors
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Avalonia.Thickness(0)
                 };
+                checkBox.Classes.Add("PropertyGridEditor");
                 checkBox.Bind(CheckBox.IsCheckedProperty, new Binding("Value") { Mode = BindingMode.TwoWay });
                 checkBox.Bind(CheckBox.IsEnabledProperty, new Binding("IsEditable"));
                 checkBox.Bind(ToolTip.TipProperty, new Binding("Description"));
@@ -38,6 +39,7 @@ namespace Controls.Selectors
                     Padding = new Avalonia.Thickness(4, 2),
                     VerticalAlignment = VerticalAlignment.Center
                 };
+                combo.Classes.Add("PropertyGridEditor");
                 combo.ItemsSource = model.EnumDisplayItems;
                 combo.DisplayMemberBinding = new Binding("DisplayName");
                 combo.Bind(ComboBox.SelectedItemProperty, new Binding("SelectedEnumItem") { Mode = BindingMode.TwoWay });
@@ -57,6 +59,7 @@ namespace Controls.Selectors
                     Padding = new Avalonia.Thickness(4, 2),
                     VerticalAlignment = VerticalAlignment.Center
                 };
+                numeric.Classes.Add("PropertyGridEditor");
                 numeric.Bind(NumericUpDown.ValueProperty, new Binding("Value") { Mode = BindingMode.TwoWay });
                 numeric.Bind(NumericUpDown.IsEnabledProperty, new Binding("IsEditable"));
                 numeric.Bind(ToolTip.TipProperty, new Binding("Description"));
@@ -84,6 +87,7 @@ namespace Controls.Selectors
                     Padding = new Avalonia.Thickness(4, 2),
                     VerticalAlignment = VerticalAlignment.Center
                 };
+                picker.Classes.Add("PropertyGridEditor");
                 picker.Bind(DatePicker.SelectedDateProperty, new Binding("DateValue") { Mode = BindingMode.TwoWay });
                 picker.Bind(DatePicker.IsEnabledProperty, new Binding("IsEditable"));
                 picker.Bind(ToolTip.TipProperty, new Binding("Description"));
@@ -99,6 +103,7 @@ namespace Controls.Selectors
                 Padding = new Avalonia.Thickness(4, 2),
                 VerticalAlignment = VerticalAlignment.Center
             };
+            textBox.Classes.Add("PropertyGridEditor");
             textBox.Bind(TextBox.TextProperty, new Binding("Value") { Mode = BindingMode.TwoWay });
             textBox.Bind(TextBox.IsEnabledProperty, new Binding("IsEditable"));
             textBox.Bind(ToolTip.TipProperty, new Binding("Description"));
@@ -106,5 +111,5 @@ namespace Controls.Selectors
         }
 
         public bool Match(object? data) => data is PropertyItemModel;
-    }    
+    }
 }

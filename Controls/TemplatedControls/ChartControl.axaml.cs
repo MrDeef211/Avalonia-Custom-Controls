@@ -12,6 +12,7 @@ using Controls.TemplatedControls;
 using DynamicData.Aggregation;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -116,6 +117,24 @@ public class ChartControl : TemplatedControl
     public static readonly StyledProperty<KeyModifiers> InteractiveModifierProperty =
         AvaloniaProperty.Register<ChartControl, KeyModifiers>(nameof(InteractiveModifier), KeyModifiers.None);
 
+    public static readonly StyledProperty<double> AxisLabelFontSizeProperty =
+    AvaloniaProperty.Register<ChartControl, double>(nameof(AxisLabelFontSize), 10.0);
+
+    public static readonly StyledProperty<FontFamily> AxisLabelFontFamilyProperty =
+        AvaloniaProperty.Register<ChartControl, FontFamily>(nameof(AxisLabelFontFamily), FontFamily.Default);
+
+    public static readonly StyledProperty<FontWeight> AxisLabelFontWeightProperty =
+        AvaloniaProperty.Register<ChartControl, FontWeight>(nameof(AxisLabelFontWeight), FontWeight.Normal);
+
+    public static readonly StyledProperty<FontStyle> AxisLabelFontStyleProperty =
+        AvaloniaProperty.Register<ChartControl, FontStyle>(nameof(AxisLabelFontStyle), FontStyle.Normal);
+
+    public static readonly StyledProperty<double> PointLabelFontSizeProperty =
+        AvaloniaProperty.Register<ChartControl, double>(nameof(PointLabelFontSize), 10.0);
+
+    public static readonly StyledProperty<double> TooltipFontSizeProperty =
+        AvaloniaProperty.Register<ChartControl, double>(nameof(TooltipFontSize), 12.0);
+
     #endregion 
 
     static ChartControl()
@@ -138,7 +157,14 @@ public class ChartControl : TemplatedControl
             LabelModeXProperty,
             LabelModeYProperty,
             ShowPointsLabelsProperty,
-            InteractiveProperty);
+            InteractiveProperty,
+            AxisLabelFontSizeProperty,
+            AxisLabelFontFamilyProperty,
+            AxisLabelFontWeightProperty,
+            AxisLabelFontStyleProperty,
+            PointLabelFontSizeProperty,
+            TooltipFontSizeProperty);
+
     }
 
     public ChartControl()
@@ -347,6 +373,60 @@ public class ChartControl : TemplatedControl
     {
         get => GetValue(InteractiveModifierProperty);
         set => SetValue(InteractiveModifierProperty, value);
+    }
+
+    /// <summary>
+    /// Размер шрифта подписей осей
+    /// </summary>
+    public double AxisLabelFontSize
+    {
+        get => GetValue(AxisLabelFontSizeProperty);
+        set => SetValue(AxisLabelFontSizeProperty, value);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public FontFamily AxisLabelFontFamily
+    {
+        get => GetValue(AxisLabelFontFamilyProperty);
+        set => SetValue(AxisLabelFontFamilyProperty, value);
+    }
+
+    /// <summary>
+    /// Тип шрифта подписей осей
+    /// </summary>
+    public FontWeight AxisLabelFontWeight
+    {
+        get => GetValue(AxisLabelFontWeightProperty);
+        set => SetValue(AxisLabelFontWeightProperty, value);
+    }
+
+    /// <summary>
+    /// Стиль шрифта подписей осей
+    /// </summary>
+    public FontStyle AxisLabelFontStyle
+    {
+        get => GetValue(AxisLabelFontStyleProperty);
+        set => SetValue(AxisLabelFontStyleProperty, value);
+    }
+
+    /// <summary>
+    /// Размер шрифта подписей на точках
+    /// </summary>
+    public double PointLabelFontSize
+    {
+        get => GetValue(PointLabelFontSizeProperty);
+        set => SetValue(PointLabelFontSizeProperty, value);
+    }
+
+    /// <summary>
+    /// Размер шрифта подсказок
+    /// </summary>
+    public double TooltipFontSize
+    {
+        get => GetValue(TooltipFontSizeProperty);
+        set => SetValue(TooltipFontSizeProperty, value);
     }
 
     #endregion
@@ -690,7 +770,7 @@ public class ChartControl : TemplatedControl
             context.DrawLine(_axisPen, new Point(_axisX - 3, p.Y), new Point(_axisX + 3, p.Y));
 
             // Подпись
-            DrawText(context, FormatNumber(val), new Point(_axisX - 20, p.Y), 0, TextAlignment.Right);
+            DrawText(context, FormatNumber(val), new Point(_axisX - 20, p.Y), 0, TextAlignment.Right, fontSize: AxisLabelFontSize);
         }
     }
 
@@ -712,7 +792,7 @@ public class ChartControl : TemplatedControl
                 TextAngle = SortedData.Count >= 100 ? -60 : TextAngle;
 
                 DrawText(context, FormatNumber(point.Value), new Point(nPoint.X, nPoint.Y - 15),
-                    TextAngle, TextAlignment.Center, PointsLabelsColor);
+                    TextAngle, TextAlignment.Center, PointsLabelsColor, fontSize: PointLabelFontSize);
             }
         }
     }
@@ -753,7 +833,7 @@ public class ChartControl : TemplatedControl
                 System.Globalization.CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight,
                 Typeface.Default,
-                12,
+                TooltipFontSize,
                 Brushes.Black);
 
             var rect = new Rect(p.X + 10, p.Y - 40, ft.Width + 10, ft.Height + 6);
@@ -767,23 +847,27 @@ public class ChartControl : TemplatedControl
     /// Отрисовка текста с возможностью поворота и выравнивания.
     /// </summary>
     private void DrawText(DrawingContext context, string text, Point pos, double angle = 0,
-        TextAlignment align = TextAlignment.Center, IBrush? brush = null)
+        TextAlignment align = TextAlignment.Center, IBrush? brush = null,
+        double? fontSize = null, FontFamily? fontFamily = null, FontWeight? fontWeight = null, FontStyle? fontStyle = null)
     {
+        var typeface = new Typeface(
+            fontFamily ?? AxisLabelFontFamily,
+            fontStyle ?? AxisLabelFontStyle,
+            fontWeight ?? AxisLabelFontWeight);
+
         var ft = new FormattedText(
             text,
-            System.Globalization.CultureInfo.InvariantCulture,
+            CultureInfo.InvariantCulture,
             FlowDirection.LeftToRight,
-            Typeface.Default,
-            10,
+            typeface,
+            fontSize ?? AxisLabelFontSize,
             brush ?? AxisColor);
 
         ft.TextAlignment = align;
 
         var transform = Matrix.CreateTranslation(pos.X, pos.Y);
         if (angle != 0)
-        {
             transform = Matrix.CreateRotation(Math.PI * angle / 180) * transform;
-        }
 
         using (context.PushTransform(transform))
         {

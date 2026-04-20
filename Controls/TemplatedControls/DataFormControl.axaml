@@ -34,6 +34,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Grid.Column="0"
+                                               Classes="DataFormFieldLabel"
                                                Text="{Binding DisplayName}"
                                                VerticalAlignment="Center"
                                                FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
@@ -49,6 +50,7 @@
                                                     HorizontalAlignment="Stretch" />
 
                                     <TextBlock Grid.Column="2"
+                                               Classes="DataFormErrorIcon"
                                                Text="⚠️"
                                                Foreground="Red"
                                                IsVisible="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
@@ -72,6 +74,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0"
+                               Classes="DataFormFieldLabel"
                                Text="{Binding Fields[0].DisplayName}"
                                VerticalAlignment="Center"
                                FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
@@ -99,6 +102,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Grid.Column="0"
+                                               Classes="DataFormFieldLabel"
                                                Text="{Binding DisplayName}"
                                                VerticalAlignment="Center"
                                                FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
@@ -113,6 +117,7 @@
                                                         HorizontalAlignment="Stretch" />
 
                                         <TextBlock Grid.Column="2"
+                                                   Classes="DataFormErrorIcon"
                                                    Text="⚠️"
                                                    Foreground="Red"
                                                    IsVisible="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
@@ -144,8 +149,8 @@
                                 IsVisible="{TemplateBinding ButtonPanelPlacement,
                                     Converter={StaticResource EnumToBoolConverter},
                                     ConverterParameter={x:Static controls:ButtonPanelPlacement.Top}}">
-                        <Button Content="Сохранить" Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
-                        <Button Content="Отмена" Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
+                        <Button Classes="DataFormSaveButton" Content="Сохранить" Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
+                        <Button Classes="DataFormCancelButton" Content="Отмена" Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
                     </StackPanel>
 
                     <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
@@ -156,8 +161,8 @@
                                         IsVisible="{TemplateBinding ButtonPanelPlacement,
                                             Converter={StaticResource EnumToBoolConverter},
                                             ConverterParameter={x:Static controls:ButtonPanelPlacement.InsideTop}}">
-                                <Button Content="Сохранить" Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
-                                <Button Content="Отмена" Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
+                                <Button Classes="DataFormSaveButton" Content="Сохранить" Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
+                                <Button Classes="DataFormCancelButton" Content="Отмена" Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
                             </StackPanel>
 
                             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center"
@@ -165,8 +170,8 @@
                                         IsVisible="{TemplateBinding ButtonPanelPlacement,
                                             Converter={StaticResource EnumToBoolConverter},
                                             ConverterParameter={x:Static controls:ButtonPanelPlacement.InsideBottom}}">
-                                <Button Content="Сохранить" Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
-                                <Button Content="Отмена" Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
+                                <Button Classes="DataFormSaveButton" Content="Сохранить" Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
+                                <Button Classes="DataFormCancelButton" Content="Отмена" Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
                             </StackPanel>
 
                             <ItemsControl ItemsSource="{Binding Sections, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Stretch">
@@ -174,7 +179,8 @@
                                     <DataTemplate DataType="models:FormSectionModel">
                                         <StackPanel Margin="0,0,0,12">
 
-                                            <Button Command="{Binding ToggleCommand}"
+                                            <Button Classes="DataFormSectionHeader"
+                                                    Command="{Binding ToggleCommand}"
                                                     IsEnabled="{Binding CanCollapse}"
                                                     Cursor="{Binding CanCollapse, Converter={StaticResource BoolToCursorConverter}}"
                                                     Background="Transparent" BorderThickness="0" Padding="8,4"
@@ -213,7 +219,7 @@
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
 
-                                            <Rectangle Height="1" Fill="LightGray" Margin="0,8,0,0" />
+                                            <Rectangle Classes="DataFormSectionSeparator" Height="1" Fill="LightGray" Margin="0,8,0,0" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -226,8 +232,8 @@
                                 IsVisible="{TemplateBinding ButtonPanelPlacement,
                                     Converter={StaticResource EnumToBoolConverter},
                                     ConverterParameter={x:Static controls:ButtonPanelPlacement.Bottom}}">
-                        <Button Content="Сохранить" Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
-                        <Button Content="Отмена" Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
+                        <Button Classes="DataFormSaveButton" Content="Сохранить" Command="{Binding CommitChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
+                        <Button Classes="DataFormCancelButton" Content="Отмена" Command="{Binding CancelChangesCommand, RelativeSource={RelativeSource TemplatedParent}}" IsEnabled="{TemplateBinding HasChanges}" />
                     </StackPanel>
                 </Grid>
             </ControlTemplate>

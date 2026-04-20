@@ -41,6 +41,7 @@ namespace Controls.Selectors
                     combo.Bind(ComboBox.SelectedItemProperty, new Binding("SelectedEnumItem") { Mode = BindingMode.TwoWay });
                     combo.Bind(ComboBox.IsEnabledProperty, new Binding("IsEditable"));
                     editor = combo;
+                    editor.Classes.Add("DataFormEditor");
                 }
                 else if (model.IsNumeric)
                 {
@@ -64,6 +65,7 @@ namespace Controls.Selectors
                         numeric.Increment = 0.1m;
                     }
                     editor = numeric;
+                    editor.Classes.Add("DataFormEditor");
                 }
                 else if (model.IsDateTime)
                 {
@@ -77,6 +79,7 @@ namespace Controls.Selectors
                     picker.Bind(DatePicker.SelectedDateProperty, new Binding("DateValue") { Mode = BindingMode.TwoWay });
                     picker.Bind(DatePicker.IsEnabledProperty, new Binding("IsEditable"));
                     editor = picker;
+                    editor.Classes.Add("DataFormEditor");
                 }
                 else
                 {
@@ -90,6 +93,7 @@ namespace Controls.Selectors
                     textBox.Bind(TextBox.TextProperty, new Binding("Value") { Mode = BindingMode.TwoWay });
                     textBox.Bind(TextBox.IsEnabledProperty, new Binding("IsEditable"));
                     editor = textBox;
+                    editor.Classes.Add("DataFormEditor");
                 }
 
                 return new ScrollViewer
@@ -97,11 +101,12 @@ namespace Controls.Selectors
                     Content = editor,
                     HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
                     VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                    HorizontalAlignment = HorizontalAlignment.Stretch
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Classes = { "DataFormEditorScroll" }
                 };
             }
 
-            return new TextBox(); // fallback
+            return new TextBox(); 
         }
 
         public bool Match(object? data) => data is FormFieldModel;
