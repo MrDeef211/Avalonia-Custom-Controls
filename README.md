@@ -357,7 +357,7 @@ public class Person
 | `PropertyNameFontWeight`	| `FontWeight`	| `SemiBold`	| Жирность шрифта имени свойства. | 
 | `PropertyNameForeground`	| `IBrush?`	| `Black`	| Цвет текста имени свойства. | 
 | `ErrorIconForeground`	| `IBrush?`	| `Red`	| Цвет иконки ошибки. | 
-| `CategoryHeaderFontSize`	| double`	| `14`	| Размер шрифта заголовка категории. | 
+| `CategoryHeaderFontSize`	| `double`	| `14`	| Размер шрифта заголовка категории. | 
 | `CategoryHeaderFontWeight`	| `FontWeight`	| `Bold`	| Жирность шрифта заголовка категории. | 
 
 ## Стилизация через классы
@@ -470,6 +470,7 @@ MyChart.Content = data;
 | `ChartThickness`	| `double`	| `2`	| Толщина линии. | 
 | `Fill`	| `bool`	| `false`	| Заливка области под графиком цветом `ChartColor`. | 
 | `HighlightPoints`	| `bool`	| `true`	| Отображать ли точки на линии. | 
+| `TiltThreshold` | `double` | `24` | Порог наклона текста в пикселях |
 
 ### Сетка и оси
 
@@ -621,6 +622,7 @@ MyPieChart.SectorColors = new List<IBrush>
 | :--- | :--- | :--- | :--- |
 | `HighlightSector`	| `bool`	| `true`	| Включить выделение сектора под курсором. | 
 | `HighlightType`	| `HighlightType`	| `Push`	| Эффект выделения (см. таблицу ниже). | 
+| `SizeShift`	| `double`	| `0.05`	| Смещение размера при выделении в относительных единицах. | 
 
 **Эффекты выделения (`HighlightType`)**
 
