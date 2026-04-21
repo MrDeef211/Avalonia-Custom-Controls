@@ -729,12 +729,18 @@ public class RangeSlider : TemplatedControl
 
 public enum FillMode
 {
-    // не заполнять
+    /// <summary>
+    /// не заполнять
+    /// </summary>
     None,
 
-    // заполнить участок между ползунками
+    /// <summary>
+    /// заполнить участок между ползунками
+    /// </summary>
     Between,
 
-    // заполнить участки слева от Lower и справа от Upper
+    /// <summary>
+    /// заполнить участки слева от Lower и справа от Upper
+    /// </summary>
     Outside
 }

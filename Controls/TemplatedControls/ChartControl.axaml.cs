@@ -1124,29 +1124,46 @@ public class ChartControl : TemplatedControl
 
 public enum ChartStyle
 {
-    // Точки
+    /// <summary>
+    /// Точки
+    /// </summary>
     Simple,
 
-    // Линии
+    /// <summary>
+    /// Линии
+    /// </summary>
     Line,
 
-    // Ступенчатый
+    /// <summary>
+    /// Ступенчатый
+    /// </summary>
     Step,
 
-    // Кривые
+    /// <summary>
+    /// Кривые
+    /// </summary>
     Spline,
 }
 
 public enum AxisLabelMode
-{   // Нет
+{
+    /// <summary>
+    /// Нет
+    /// </summary>
     None,
 
-    // По сетке
+    /// <summary>
+    /// По сетке
+    /// </summary>
     Grid,
 
-    // По точкам
+    /// <summary>
+    /// По точкам
+    /// </summary>
     Points,
 
-    // Авто
+    /// <summary>
+    /// Авто
+    /// </summary>
     Auto
 }
