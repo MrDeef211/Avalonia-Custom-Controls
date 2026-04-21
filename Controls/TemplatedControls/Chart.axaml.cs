@@ -57,7 +57,7 @@ public class Chart : TemplatedControl
     public static readonly StyledProperty<ChartDataBase> ContentProperty =
         AvaloniaProperty.Register<Chart, ChartDataBase>(nameof(Content), new());
 
-    public static readonly StyledProperty<ChartDataBase> SortedDataProperty =
+    public static readonly StyledProperty<ChartDataBase> FilteredDataProperty =
         AvaloniaProperty.Register<Chart, ChartDataBase>(nameof(FilteredData), new(), defaultBindingMode: BindingMode.OneWayToSource);
 
     public static readonly StyledProperty<double> MinimumProperty =
@@ -144,7 +144,7 @@ public class Chart : TemplatedControl
     {
         AffectsRender<Chart>(
             ContentProperty,
-            SortedDataProperty,
+            FilteredDataProperty,
             MinimumProperty,
             MaximumProperty,
             ChartStyleProperty, 
@@ -198,8 +198,8 @@ public class Chart : TemplatedControl
     /// </summary>
     public ChartDataBase FilteredData
     {
-        get => GetValue(SortedDataProperty);
-        set => SetValue(SortedDataProperty, value);
+        get => GetValue(FilteredDataProperty);
+        set => SetValue(FilteredDataProperty, value);
     }
 
     /// <summary>
