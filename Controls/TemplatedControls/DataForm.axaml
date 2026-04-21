@@ -26,9 +26,9 @@
                             <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                           VerticalScrollBarVisibility="Disabled"
                                           HorizontalAlignment="Stretch">
-                                <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}">
+                                <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="{Binding LabelColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}" />
+                                        <ColumnDefinition Width="{Binding LabelColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
@@ -37,9 +37,9 @@
                                                Classes="DataFormFieldLabel"
                                                Text="{Binding DisplayName}"
                                                VerticalAlignment="Center"
-                                               FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                               FontWeight="{Binding LabelFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                               Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                               FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
+                                               FontWeight="{Binding LabelFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
+                                               Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
                                                Margin="0,0,16,0"
                                                IsVisible="{Binding ShowLabel}" />
 
@@ -69,7 +69,7 @@
             <DataTemplate DataType="models:FormRowModel">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding LabelColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}" />
+                        <ColumnDefinition Width="{Binding LabelColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
@@ -77,9 +77,9 @@
                                Classes="DataFormFieldLabel"
                                Text="{Binding Fields[0].DisplayName}"
                                VerticalAlignment="Center"
-                               FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                               FontWeight="{Binding LabelFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                               Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                               FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
+                               FontWeight="{Binding LabelFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
+                               Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
                                Margin="0,0,16,0"
                                IsVisible="{Binding Fields[0].ShowLabel}" />
 
@@ -94,7 +94,7 @@
                                 <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                               VerticalScrollBarVisibility="Disabled"
                                               HorizontalAlignment="Stretch">
-                                    <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}">
+                                    <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
@@ -105,9 +105,9 @@
                                                Classes="DataFormFieldLabel"
                                                Text="{Binding DisplayName}"
                                                VerticalAlignment="Center"
-                                               FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                               FontWeight="{Binding LabelFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                               Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                               FontSize="{Binding LabelFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
+                                               FontWeight="{Binding LabelFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
+                                               Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
                                                Margin="0,0,16,0"
                                                IsVisible="{Binding ShowLabelInRow}" />
 
@@ -134,7 +134,7 @@
         </selectors:RowTemplateSelector.MultiFieldTemplate>
     </selectors:RowTemplateSelector>
 
-    <ControlTheme x:Key="{x:Type controls:DataFormControl}" TargetType="controls:DataFormControl">
+    <ControlTheme x:Key="{x:Type controls:DataForm}" TargetType="controls:DataForm">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid>
@@ -203,9 +203,9 @@
                                                                Margin="0,0,8,0" DockPanel.Dock="Left"
                                                                IsVisible="{Binding CanCollapse}" />
                                                     <TextBlock Text="{Binding Name}"
-                                                               FontSize="{Binding CategoryHeaderFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                                               FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                                               Foreground="{Binding CategoryHeaderForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                               FontSize="{Binding CategoryHeaderFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
+                                                               FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
+                                                               Foreground="{Binding CategoryHeaderForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataForm}}"
                                                                VerticalAlignment="Center" />
                                                 </DockPanel>
                                             </Button>

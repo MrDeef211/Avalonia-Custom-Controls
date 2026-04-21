@@ -19,7 +19,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Controls;
 
-public class ChartControl : TemplatedControl
+public class Chart : TemplatedControl
 {
 
     // Поля для координат области рисования
@@ -55,94 +55,94 @@ public class ChartControl : TemplatedControl
     #region Styled Property
 
     public static readonly StyledProperty<ChartDataBase> ContentProperty =
-        AvaloniaProperty.Register<ChartControl, ChartDataBase>(nameof(Content), new());
+        AvaloniaProperty.Register<Chart, ChartDataBase>(nameof(Content), new());
 
     public static readonly StyledProperty<ChartDataBase> SortedDataProperty =
-        AvaloniaProperty.Register<ChartControl, ChartDataBase>(nameof(SortedData), new(), defaultBindingMode: BindingMode.OneWayToSource);
+        AvaloniaProperty.Register<Chart, ChartDataBase>(nameof(FilteredData), new(), defaultBindingMode: BindingMode.OneWayToSource);
 
     public static readonly StyledProperty<double> MinimumProperty =
-        AvaloniaProperty.Register<ChartControl, double>(nameof(Minimum), defaultBindingMode: BindingMode.OneWayToSource);
+        AvaloniaProperty.Register<Chart, double>(nameof(Minimum), defaultBindingMode: BindingMode.OneWayToSource);
 
     public static readonly StyledProperty<double> MaximumProperty =
-        AvaloniaProperty.Register<ChartControl, double>(nameof(Maximum), defaultBindingMode: BindingMode.OneWayToSource);
+        AvaloniaProperty.Register<Chart, double>(nameof(Maximum), defaultBindingMode: BindingMode.OneWayToSource);
 
     public static readonly StyledProperty<ChartStyle> ChartStyleProperty =
-        AvaloniaProperty.Register<ChartControl, ChartStyle>(nameof(ChartStyle), ChartStyle.Simple);
+        AvaloniaProperty.Register<Chart, ChartStyle>(nameof(ChartStyle), ChartStyle.Simple);
 
     public static readonly StyledProperty<IBrush> ChartColorProperty =
-        AvaloniaProperty.Register<ChartControl, IBrush>(nameof(ChartColor), Brushes.DodgerBlue);
+        AvaloniaProperty.Register<Chart, IBrush>(nameof(ChartColor), Brushes.DodgerBlue);
 
     public static readonly StyledProperty<double> ChartThicknessProperty =
-        AvaloniaProperty.Register<ChartControl, double>(nameof(ChartThickness), 2);
+        AvaloniaProperty.Register<Chart, double>(nameof(ChartThickness), 2);
 
     public static readonly StyledProperty<bool> FillProperty =
-        AvaloniaProperty.Register<ChartControl, bool>(nameof(Fill), false);
+        AvaloniaProperty.Register<Chart, bool>(nameof(Fill), false);
 
     public static readonly StyledProperty<bool> HighlightPointsProperty =
-        AvaloniaProperty.Register<ChartControl, bool>(nameof(HighlightPoints), true);
+        AvaloniaProperty.Register<Chart, bool>(nameof(HighlightPoints), true);
 
     public static readonly StyledProperty<bool> GridProperty =
-        AvaloniaProperty.Register<ChartControl, bool>(nameof(Grid), true);
+        AvaloniaProperty.Register<Chart, bool>(nameof(Grid), true);
 
     public static readonly StyledProperty<IBrush> GridColorProperty =
-        AvaloniaProperty.Register<ChartControl, IBrush>(nameof(GridColor), Brushes.LightGray);
+        AvaloniaProperty.Register<Chart, IBrush>(nameof(GridColor), Brushes.LightGray);
 
     public static readonly StyledProperty<GridLength> GridSizeXProperty =
-        AvaloniaProperty.Register<ChartControl, GridLength>(nameof(GridSizeX), GridLength.Auto);
+        AvaloniaProperty.Register<Chart, GridLength>(nameof(GridSizeX), GridLength.Auto);
 
     public static readonly StyledProperty<GridLength> GridSizeYProperty =
-        AvaloniaProperty.Register<ChartControl, GridLength>(nameof(GridSizeY), GridLength.Auto);
+        AvaloniaProperty.Register<Chart, GridLength>(nameof(GridSizeY), GridLength.Auto);
 
     public static readonly StyledProperty<bool> AxisProperty =
-        AvaloniaProperty.Register<ChartControl, bool>(nameof(Axis), true);
+        AvaloniaProperty.Register<Chart, bool>(nameof(Axis), true);
 
     public static readonly StyledProperty<IBrush> AxisColorProperty =
-        AvaloniaProperty.Register<ChartControl, IBrush>(nameof(AxisColor), Brushes.Green);
+        AvaloniaProperty.Register<Chart, IBrush>(nameof(AxisColor), Brushes.Green);
 
     public static readonly StyledProperty<AxisLabelMode> LabelModeXProperty =
-        AvaloniaProperty.Register<ChartControl, AxisLabelMode>(nameof(LabelModeX), AxisLabelMode.Grid);
+        AvaloniaProperty.Register<Chart, AxisLabelMode>(nameof(LabelModeX), AxisLabelMode.Grid);
 
     public static readonly StyledProperty<AxisLabelMode> LabelModeYProperty =
-        AvaloniaProperty.Register<ChartControl, AxisLabelMode>(nameof(LabelModeY), AxisLabelMode.Grid);
+        AvaloniaProperty.Register<Chart, AxisLabelMode>(nameof(LabelModeY), AxisLabelMode.Grid);
 
     public static readonly StyledProperty<bool> ShowPointsLabelsProperty =
-        AvaloniaProperty.Register<ChartControl, bool>(nameof(ShowPointsLabels), false);
+        AvaloniaProperty.Register<Chart, bool>(nameof(ShowPointsLabels), false);
 
     public static readonly StyledProperty<IBrush> PointsLabelsColorProperty =
-        AvaloniaProperty.Register<ChartControl, IBrush>(nameof(PointsLabelsColor), Brushes.Black);
+        AvaloniaProperty.Register<Chart, IBrush>(nameof(PointsLabelsColor), Brushes.Black);
 
     public static readonly StyledProperty<bool> InteractiveProperty =
-        AvaloniaProperty.Register<ChartControl, bool>(nameof(Interactive), false);
+        AvaloniaProperty.Register<Chart, bool>(nameof(Interactive), false);
 
     public static readonly StyledProperty<KeyModifiers> InteractiveModifierProperty =
-        AvaloniaProperty.Register<ChartControl, KeyModifiers>(nameof(InteractiveModifier), KeyModifiers.None);
+        AvaloniaProperty.Register<Chart, KeyModifiers>(nameof(InteractiveModifier), KeyModifiers.None);
 
     public static readonly StyledProperty<double> AxisLabelFontSizeProperty =
-    AvaloniaProperty.Register<ChartControl, double>(nameof(AxisLabelFontSize), 10.0);
+    AvaloniaProperty.Register<Chart, double>(nameof(AxisLabelFontSize), 10.0);
 
     public static readonly StyledProperty<FontFamily> AxisLabelFontFamilyProperty =
-        AvaloniaProperty.Register<ChartControl, FontFamily>(nameof(AxisLabelFontFamily), FontFamily.Default);
+        AvaloniaProperty.Register<Chart, FontFamily>(nameof(AxisLabelFontFamily), FontFamily.Default);
 
     public static readonly StyledProperty<FontWeight> AxisLabelFontWeightProperty =
-        AvaloniaProperty.Register<ChartControl, FontWeight>(nameof(AxisLabelFontWeight), FontWeight.Normal);
+        AvaloniaProperty.Register<Chart, FontWeight>(nameof(AxisLabelFontWeight), FontWeight.Normal);
 
     public static readonly StyledProperty<FontStyle> AxisLabelFontStyleProperty =
-        AvaloniaProperty.Register<ChartControl, FontStyle>(nameof(AxisLabelFontStyle), FontStyle.Normal);
+        AvaloniaProperty.Register<Chart, FontStyle>(nameof(AxisLabelFontStyle), FontStyle.Normal);
 
     public static readonly StyledProperty<double> PointLabelFontSizeProperty =
-        AvaloniaProperty.Register<ChartControl, double>(nameof(PointLabelFontSize), 10.0);
+        AvaloniaProperty.Register<Chart, double>(nameof(PointLabelFontSize), 10.0);
 
     public static readonly StyledProperty<double> TooltipFontSizeProperty =
-        AvaloniaProperty.Register<ChartControl, double>(nameof(TooltipFontSize), 12.0);
+        AvaloniaProperty.Register<Chart, double>(nameof(TooltipFontSize), 12.0);
 
     public static readonly StyledProperty<double> TiltThresholdProperty =
-        AvaloniaProperty.Register<ChartControl, double>(nameof(TiltThreshold), 24.0);
+        AvaloniaProperty.Register<Chart, double>(nameof(TiltThreshold), 24.0);
 
     #endregion 
 
-    static ChartControl()
+    static Chart()
     {
-        AffectsRender<ChartControl>(
+        AffectsRender<Chart>(
             ContentProperty,
             SortedDataProperty,
             MinimumProperty,
@@ -171,7 +171,7 @@ public class ChartControl : TemplatedControl
 
     }
 
-    public ChartControl()
+    public Chart()
     {
         _gridPen = new Pen(GridColor, 0.5);
         _axisPen = new Pen(AxisColor, 1);
@@ -196,7 +196,7 @@ public class ChartControl : TemplatedControl
     /// <summary>
     /// Список точек используемых для построения в данный момент. Используется для расчётов
     /// </summary>
-    public ChartDataBase SortedData
+    public ChartDataBase FilteredData
     {
         get => GetValue(SortedDataProperty);
         set => SetValue(SortedDataProperty, value);
@@ -583,7 +583,7 @@ public class ChartControl : TemplatedControl
     public override void Render(DrawingContext context)
     {
         base.Render(context);
-        if (SortedData == null || SortedData.Chart.Count < 2) return;
+        if (FilteredData == null || FilteredData.Chart.Count < 2) return;
 
         if (Bounds.Width <= Padding.Left + Padding.Right ||
             Bounds.Height <= Padding.Top + Padding.Bottom)
@@ -801,7 +801,7 @@ public class ChartControl : TemplatedControl
             if (ShowPointsLabels)
             {
                 double TextAngle = 0;
-                TextAngle = CountToSpace(SortedData.Count) < TiltThreshold * 2 ? (CountToSpace(SortedData.Count) < TiltThreshold ? -60 : -45) : 0;
+                TextAngle = CountToSpace(FilteredData.Count) < TiltThreshold * 2 ? (CountToSpace(FilteredData.Count) < TiltThreshold ? -60 : -45) : 0;
 
                 DrawText(context, FormatNumber(point.Value), new Point(nPoint.X, nPoint.Y - 15),
                     TextAngle, TextAlignment.Center, PointsLabelsColor, fontSize: PointLabelFontSize);
@@ -972,9 +972,9 @@ public class ChartControl : TemplatedControl
         if (Content == null || Content.Count < 2)
             return;
 
-        SortedData = new(Content.Chart);
+        FilteredData = new(Content.Chart);
 
-        _sortedVisiblePoints = SortedData.Chart.OrderBy(p => p.Key).ToList();
+        _sortedVisiblePoints = FilteredData.Chart.OrderBy(p => p.Key).ToList();
         _sortedContentPoints = Content.Chart.OrderBy(p => p.Key).ToList();
 
         _minX = _sortedContentPoints[0].Key;
@@ -1010,7 +1010,7 @@ public class ChartControl : TemplatedControl
 
         _sortedVisiblePoints = _sortedContentPoints.GetRange(firstIdx, lastIdx - firstIdx + 1);
 
-        SortedData = new ChartDataBase(_sortedVisiblePoints.ToDictionary(p => p.Key, p => p.Value));
+        FilteredData = new ChartDataBase(_sortedVisiblePoints.ToDictionary(p => p.Key, p => p.Value));
 
         _minY = _sortedVisiblePoints.Min(p => p.Value);
         _maxY = _sortedVisiblePoints.Max(p => p.Value);
@@ -1057,7 +1057,7 @@ public class ChartControl : TemplatedControl
         dxUp = dxUp < 1 ? 1 : dxUp;
         dxDw = dxDw < 1 ? 1 : dxDw;
 
-        var sortedKeys = SortedData.Chart.Keys.OrderBy(k => k).ToList();
+        var sortedKeys = FilteredData.Chart.Keys.OrderBy(k => k).ToList();
 
         double aproxDelta = sortedKeys
             .Zip(sortedKeys.Skip(1), (current, next) => next - current)

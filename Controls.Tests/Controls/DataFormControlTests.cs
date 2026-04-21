@@ -10,12 +10,12 @@ using System.Text;
 
 namespace Controls.Tests.Controls
 {
-    public class DataFormControlTests
+    public class DataFormTests
     {
         [Fact]
         public void GenerateEditors_Should_Create_Sections_From_CategoryAttribute()
         {
-            var control = new DataFormControl();
+            var control = new DataForm();
             var obj = new DataFormTestObject();
 
             control.GenerateEditors(obj);
@@ -27,7 +27,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_Should_Apply_CategoryOrders()
         {
-            var control = new DataFormControl
+            var control = new DataForm
             {
                 FormConfig = new DataFormConfig
                 {
@@ -51,7 +51,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_Should_Hide_NonBrowsable_Fields()
         {
-            var control = new DataFormControl
+            var control = new DataForm
             {
                 FormConfig = new DataFormConfig
                 {
@@ -72,7 +72,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_Should_Group_By_RowGroup()
         {
-            var control = new DataFormControl
+            var control = new DataForm
             {
                 FormConfig = new DataFormConfig
                 {
@@ -96,7 +96,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_Should_Set_CategoryExpanded_From_Config()
         {
-            var control = new DataFormControl
+            var control = new DataForm
             {
                 FormConfig = new DataFormConfig
                 {
@@ -114,7 +114,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_Should_Set_CategoryCollapsible()
         {
-            var control = new DataFormControl
+            var control = new DataForm
             {
                 FormConfig = new DataFormConfig
                 {
@@ -132,7 +132,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void HasChanges_Should_Be_True_When_Field_Value_Changes()
         {
-            var control = new DataFormControl();
+            var control = new DataForm();
             var obj = new DataFormTestObject { Name = "Старое" };
             control.GenerateEditors(obj);
             control.HasChanges.Should().BeFalse();
@@ -146,7 +146,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void CommitChanges_Should_Apply_Changes_To_Target()
         {
-            var control = new DataFormControl();
+            var control = new DataForm();
             var obj = new DataFormTestObject { Name = "Старое" };
             control.GenerateEditors(obj);
 
@@ -162,7 +162,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void CancelChanges_Should_Reset_Fields_To_Original()
         {
-            var control = new DataFormControl();
+            var control = new DataForm();
             var obj = new DataFormTestObject { Name = "Исходное" };
             control.GenerateEditors(obj);
 
@@ -178,7 +178,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void CommitChanges_Should_Not_Apply_Invalid_Fields()
         {
-            var control = new DataFormControl();
+            var control = new DataForm();
             var obj = new DataFormTestObject { Age = 30 };
             control.GenerateEditors(obj);
 
@@ -194,7 +194,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void SaveCommand_Should_Execute_After_Commit()
         {
-            var control = new DataFormControl();
+            var control = new DataForm();
             var obj = new DataFormTestObject();
             control.GenerateEditors(obj);
             control.SelectedObject = obj;
@@ -212,7 +212,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void CancelCommand_Should_Execute_After_Cancel()
         {
-            var control = new DataFormControl();
+            var control = new DataForm();
             var obj = new DataFormTestObject();
             control.GenerateEditors(obj);
             control.SelectedObject = obj;
@@ -228,7 +228,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void ReadOnly_Properties_Should_Not_Be_Editable()
         {
-            var control = new DataFormControl();
+            var control = new DataForm();
             var obj = new DataFormTestObject();
 
             control.GenerateEditors(obj);
@@ -241,7 +241,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void Validation_Should_Apply_Required_Attribute_In_DataForm()
         {
-            var control = new DataFormControl();
+            var control = new DataForm();
             var obj = new DataFormTestObject();
             control.GenerateEditors(obj);
 
@@ -259,7 +259,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void Validation_Should_Use_CustomErrorMessage_From_Config()
         {
-            var control = new DataFormControl
+            var control = new DataForm
             {
                 FormConfig = new DataFormConfig
                 {

@@ -8,12 +8,12 @@ using Controls.Tests.Models;
 
 namespace Controls.Tests.Controls
 {
-    public class PropertyGridControlTests
+    public class PropertyGridTests
     {
         [Fact]
         public void GenerateEditors_Should_Create_Categories_From_CategoryAttribute()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new PropertyGridTestObject();
 
             control.GenerateEditors(obj);
@@ -25,7 +25,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_Should_Group_Properties_By_Category()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new PropertyGridTestObject();
 
             control.GenerateEditors(obj);
@@ -37,7 +37,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_Should_Set_ReadOnly_For_Properties_Without_Public_Setter()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new PropertyGridTestObject();
 
             control.GenerateEditors(obj);
@@ -53,7 +53,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_Should_Set_ReadOnly_For_Private_Set_Properties()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new PropertyGridTestObject();
 
             control.GenerateEditors(obj);
@@ -68,7 +68,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_Should_Set_ReadOnly_When_Control_IsReadOnly_True()
         {
-            var control = new PropertyGridControl { IsReadOnly = true };
+            var control = new PropertyGrid { IsReadOnly = true };
             var obj = new PropertyGridTestObject();
 
             control.GenerateEditors(obj);
@@ -82,7 +82,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void When_PropertyItemModel_Value_Changes_Should_Update_Target_Property()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new PropertyGridTestObject { Name = "Old" };
             control.GenerateEditors(obj);
 
@@ -98,7 +98,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void When_PropertyItemModel_Value_Invalid_Should_Set_ValidationError_And_Not_Update_Target()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new PropertyGridTestObject { Age = 10 };
             control.GenerateEditors(obj);
 
@@ -115,7 +115,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void When_Value_Changed_To_Same_Value_Should_Not_Set_HasChanges()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new PropertyGridTestObject { Name = "Same" };
             control.GenerateEditors(obj);
 
@@ -133,7 +133,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void When_Value_Changed_Should_Set_HasChanges_True()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new PropertyGridTestObject { Name = "Old" };
             control.GenerateEditors(obj);
 
@@ -149,7 +149,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void GenerateEditors_With_Null_Target_Should_Clear_Categories()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new PropertyGridTestObject();
             control.GenerateEditors(obj);
             control.Categories.Should().NotBeEmpty();
@@ -163,7 +163,7 @@ namespace Controls.Tests.Controls
         public void GenerateEditors_Should_Ignore_ReactiveUI_Internal_Properties()
         {
             var reactiveObj = new ReactiveTestObject();
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
 
             control.GenerateEditors(reactiveObj);
 
@@ -175,7 +175,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void Validation_Should_Apply_Range_Attribute_For_Number()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new ValidationTestObject();
             control.GenerateEditors(obj);
 
@@ -195,7 +195,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void Validation_Should_Apply_StringLength_Attribute()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new ValidationTestObject();
             control.GenerateEditors(obj);
 
@@ -213,7 +213,7 @@ namespace Controls.Tests.Controls
         [Fact]
         public void Validation_Should_Apply_Required_Attribute()
         {
-            var control = new PropertyGridControl();
+            var control = new PropertyGrid();
             var obj = new ValidationTestObject();
             control.GenerateEditors(obj);
 

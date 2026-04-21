@@ -17,12 +17,12 @@ namespace Demonstrations.Desktop.ViewModels
         {
             new ControlDescription
             {
-                Name = "ChartControl",
+                Name = "Chart",
                 Description = "Отображение графиков и диаграмм. Поддерживает различные стили (линии, столбцы, точки), заливку, сетку, подписи осей."
             },
             new ControlDescription
             {
-                Name = "PieChartControl",
+                Name = "PieChart",
                 Description = "Круговая диаграмма для отображения долей. Позволяет настраивать цвета."
             },
             new ControlDescription
@@ -32,12 +32,12 @@ namespace Demonstrations.Desktop.ViewModels
             },
             new ControlDescription
             {
-                Name = "PropertyGridControl",
+                Name = "PropertyGrid",
                 Description = "Редактор свойств объектов. Автоматически отображает все публичные свойства, группирует по категориям, поддерживает редактирование на лету."
             },
             new ControlDescription
             {
-                Name = "DataFormControl",
+                Name = "DataForm",
                 Description = "Форма для редактирования данных. Поля группируются по категориям, поддерживает буферизацию изменений, кнопки «Сохранить»/«Отмена», настраиваемую сетку и выборочное отображение свойств."
             },
             new ControlDescription

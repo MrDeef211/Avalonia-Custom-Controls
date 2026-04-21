@@ -19,12 +19,12 @@ using System.Windows.Input;
 
 namespace Controls;
 
-public class DataFormControl : BaseEditorControl, IDisposable
+public class DataForm : BaseEditorControl, IDisposable
 {
     private readonly CompositeDisposable _disposables = new();
     private readonly CompositeDisposable _fieldSubscriptions = new();
 
-    public DataFormControl()
+    public DataForm()
     {
         EnsureSubscriptions();
 
@@ -47,7 +47,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     #region Настраиваемые визуальные свойства
 
     public static readonly StyledProperty<DataFormConfig?> FormConfigProperty =
-        AvaloniaProperty.Register<DataFormControl, DataFormConfig?>(nameof(FormConfig));
+        AvaloniaProperty.Register<DataForm, DataFormConfig?>(nameof(FormConfig));
 
     /// <summary>
     /// Конфигурация формы
@@ -59,7 +59,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<GridLength> LabelColumnWidthProperty =
-        AvaloniaProperty.Register<DataFormControl, GridLength>(nameof(LabelColumnWidth), new GridLength(120));
+        AvaloniaProperty.Register<DataForm, GridLength>(nameof(LabelColumnWidth), new GridLength(120));
 
     /// <summary>
     /// Ширина колонки имён свойств
@@ -71,7 +71,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<Thickness> FieldMarginProperty =
-        AvaloniaProperty.Register<DataFormControl, Thickness>(nameof(FieldMargin), new Thickness(4));
+        AvaloniaProperty.Register<DataForm, Thickness>(nameof(FieldMargin), new Thickness(4));
 
     /// <summary>
     /// Отступы полей
@@ -83,7 +83,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<double> LabelFontSizeProperty =
-        AvaloniaProperty.Register<DataFormControl, double>(nameof(LabelFontSize), 12.0);
+        AvaloniaProperty.Register<DataForm, double>(nameof(LabelFontSize), 12.0);
 
     /// <summary>
     /// Размер шрифта колонки имён свойств.
@@ -95,7 +95,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<FontWeight> LabelFontWeightProperty =
-        AvaloniaProperty.Register<DataFormControl, FontWeight>(nameof(LabelFontWeight), FontWeight.SemiBold);
+        AvaloniaProperty.Register<DataForm, FontWeight>(nameof(LabelFontWeight), FontWeight.SemiBold);
 
     /// <summary>
     /// Тип шрифта колонки имён свойств.
@@ -107,7 +107,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<IBrush?> LabelForegroundProperty =
-        AvaloniaProperty.Register<DataFormControl, IBrush?>(nameof(LabelForeground), Brushes.Black);
+        AvaloniaProperty.Register<DataForm, IBrush?>(nameof(LabelForeground), Brushes.Black);
 
     /// <summary>
     /// Цвет шрифта колонки имён свойств
@@ -119,7 +119,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<double> CategoryHeaderFontSizeProperty =
-        AvaloniaProperty.Register<DataFormControl, double>(nameof(CategoryHeaderFontSize), 14.0);
+        AvaloniaProperty.Register<DataForm, double>(nameof(CategoryHeaderFontSize), 14.0);
 
     /// <summary>
     /// Размер шрифта заголовков
@@ -131,7 +131,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<FontWeight> CategoryHeaderFontWeightProperty =
-        AvaloniaProperty.Register<DataFormControl, FontWeight>(nameof(CategoryHeaderFontWeight), FontWeight.Bold);
+        AvaloniaProperty.Register<DataForm, FontWeight>(nameof(CategoryHeaderFontWeight), FontWeight.Bold);
 
     /// <summary>
     /// Тип шрифта заголовков
@@ -143,7 +143,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<IBrush?> CategoryHeaderForegroundProperty =
-        AvaloniaProperty.Register<DataFormControl, IBrush?>(nameof(CategoryHeaderForeground), Brushes.Black);
+        AvaloniaProperty.Register<DataForm, IBrush?>(nameof(CategoryHeaderForeground), Brushes.Black);
 
     /// <summary>
     /// Цвет шрифта заголовков
@@ -155,7 +155,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<ICommand?> SaveCommandProperty =
-        AvaloniaProperty.Register<DataFormControl, ICommand?>(nameof(SaveCommand));
+        AvaloniaProperty.Register<DataForm, ICommand?>(nameof(SaveCommand));
 
     /// <summary>
     /// Команда, выполняемая после успешного сохранения данных.
@@ -170,7 +170,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<ICommand?> CancelCommandProperty =
-        AvaloniaProperty.Register<DataFormControl, ICommand?>(nameof(CancelCommand));
+        AvaloniaProperty.Register<DataForm, ICommand?>(nameof(CancelCommand));
 
     /// <summary>
     /// Команда, выполняемая после успешной отмены изменений.
@@ -185,7 +185,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<ButtonPanelPlacement> ButtonPanelPlacementProperty =
-        AvaloniaProperty.Register<DataFormControl, ButtonPanelPlacement>(nameof(ButtonPanelPlacement), ButtonPanelPlacement.None);
+        AvaloniaProperty.Register<DataForm, ButtonPanelPlacement>(nameof(ButtonPanelPlacement), ButtonPanelPlacement.None);
 
     /// <summary>
     /// Расположение кнопок "сохранить" и "отмена"

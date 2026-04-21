@@ -63,10 +63,10 @@
                                    MinScale="1"
                                    MaxScale="20"
                                    RestrictPan="True">
-                <controls:ChartControl Content="{Binding FullChartData}"
+                <controls:Chart Content="{Binding FullChartData}"
                                        Minimum="{Binding LowerX, Mode=TwoWay}"
                                        Maximum="{Binding UpperX, Mode=TwoWay}"
-                                       SortedData="{Binding CurrentData}"
+                                       FilteredData="{Binding CurrentData}"
                                        ChartStyle="Spline"
                                        ChartColor="Red"
                                        ChartThickness="{Binding ChartThickness}"

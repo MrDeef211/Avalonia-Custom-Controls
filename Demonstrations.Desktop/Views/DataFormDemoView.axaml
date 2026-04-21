@@ -30,7 +30,7 @@
         </controls:Toolbar>
 
         <Border Padding="10" Background="White">
-            <controls:DataFormControl x:Name="DataForm"
+            <controls:DataForm x:Name="DataForm"
                                       FormConfig="{Binding CurrentFormConfig}"
                                       SelectedObject="{Binding SelectedObject}"
                                       HasChanges="{Binding HasChanges}"

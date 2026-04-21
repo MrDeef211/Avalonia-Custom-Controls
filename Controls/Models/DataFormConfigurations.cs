@@ -100,7 +100,7 @@ namespace Controls.Models
     }
 
     /// <summary>
-    /// Конфигурация формы <see cref="DataFormControl"/>.
+    /// Конфигурация формы <see cref="DataForm"/>.
     /// </summary>
     public class DataFormConfig
     {

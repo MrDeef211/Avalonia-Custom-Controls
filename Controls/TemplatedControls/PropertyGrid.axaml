@@ -9,7 +9,7 @@
     <selectors:PropertyEditorTemplateSelector x:Key="PropertyEditorTemplateSelector" />
     <converters:NotEqualConverter x:Key="NotEqualConverter" />
 
-    <ControlTheme x:Key="{x:Type controls:PropertyGridControl}" TargetType="controls:PropertyGridControl">
+    <ControlTheme x:Key="{x:Type controls:PropertyGrid}" TargetType="controls:PropertyGrid">
         <Setter Property="Template">
             <ControlTemplate>
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled">
@@ -18,15 +18,15 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="models:CategoryModel">
                                 <Expander Header="{Binding Name}" IsExpanded="True" Margin="0,2"
-                                          FontSize="{Binding CategoryHeaderFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
-                                          FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
+                                          FontSize="{Binding CategoryHeaderFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGrid}}"
+                                          FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGrid}}"
                                           Classes="PropertyGridExpander">
                                     <ItemsControl ItemsSource="{Binding Properties}" Margin="20,0,0,0">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="models:PropertyItemModel">
-                                                <Grid Margin="{Binding EditorMargin, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}">
+                                                <Grid Margin="{Binding EditorMargin, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGrid}}">
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="{Binding PropertyNameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}" 
+                                                        <ColumnDefinition Width="{Binding PropertyNameColumnWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGrid}}" 
                                                                           SharedSizeGroup="PropertyNameColumn"
                                                                           MinWidth="120" />
                                                         <ColumnDefinition Width="*" 
@@ -37,9 +37,9 @@
                                                     <TextBlock Grid.Column="0" 
                                                                Text="{Binding PropertyName}" 
                                                                VerticalAlignment="Center" 
-                                                               FontSize="{Binding PropertyNameFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
-                                                               FontWeight="{Binding PropertyNameFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
-                                                               Foreground="{Binding PropertyNameForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
+                                                               FontSize="{Binding PropertyNameFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGrid}}"
+                                                               FontWeight="{Binding PropertyNameFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGrid}}"
+                                                               Foreground="{Binding PropertyNameForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGrid}}"
                                                                Margin="0,0,16,0" 
                                                                ToolTip.Tip="{Binding ToolTipText}"
                                                                Classes="PropertyGridFieldLabel"/>
@@ -50,7 +50,7 @@
                                                                     HorizontalAlignment="Stretch" />
                                                     <TextBlock Grid.Column="2" 
                                                                Text="⚠️" 
-                                                               Foreground="{Binding ErrorIconForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGridControl}}"
+                                                               Foreground="{Binding ErrorIconForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:PropertyGrid}}"
                                                                IsVisible="{Binding ValidationError, Converter={x:Static converters:NotEmptyConverter.Instance}}"
                                                                Margin="8,0,0,0"  
                                                                ToolTip.Tip="{Binding ValidationError}" 

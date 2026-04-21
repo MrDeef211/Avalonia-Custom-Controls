@@ -38,4 +38,19 @@
   <ItemGroup>
 	  <InternalsVisibleTo Include="Controls.Tests" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="TemplatedControls\Chart.axaml.cs">
+      <DependentUpon>Chart.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="TemplatedControls\DataForm.axaml.cs">
+      <DependentUpon>DataForm.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="TemplatedControls\PropertyGrid.axaml.cs">
+      <DependentUpon>PropertyGrid.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="TemplatedControls\ZoomControl.axaml.cs">
+      <DependentUpon>ZoomControl.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

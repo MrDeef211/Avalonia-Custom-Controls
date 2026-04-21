@@ -17,14 +17,14 @@ using System.Reflection;
 
 namespace Controls;
 
-public class PropertyGridControl : BaseEditorControl
+public class PropertyGrid : BaseEditorControl
 {
     public ObservableCollection<CategoryModel> Categories { get; } = new();
 
     #region Настраиваемые визуальные свойства
 
     public static readonly StyledProperty<GridLength> PropertyNameColumnWidthProperty =
-        AvaloniaProperty.Register<PropertyGridControl, GridLength>(nameof(PropertyNameColumnWidth), GridLength.Auto);
+        AvaloniaProperty.Register<PropertyGrid, GridLength>(nameof(PropertyNameColumnWidth), GridLength.Auto);
 
     /// <summary>
     /// Ширина колонки имён свойств (по умолчанию Auto, но можно задать фиксированную)
@@ -37,7 +37,7 @@ public class PropertyGridControl : BaseEditorControl
 
     
     public static readonly StyledProperty<Thickness> EditorMarginProperty =
-        AvaloniaProperty.Register<PropertyGridControl, Thickness>(nameof(EditorMargin), new Thickness(4));
+        AvaloniaProperty.Register<PropertyGrid, Thickness>(nameof(EditorMargin), new Thickness(4));
 
 
     /// <summary>
@@ -50,7 +50,7 @@ public class PropertyGridControl : BaseEditorControl
     }
 
     public static readonly StyledProperty<double> PropertyNameFontSizeProperty =
-        AvaloniaProperty.Register<PropertyGridControl, double>(nameof(PropertyNameFontSize), 12.0);
+        AvaloniaProperty.Register<PropertyGrid, double>(nameof(PropertyNameFontSize), 12.0);
 
     /// <summary>
     /// Шрифт для имени свойства
@@ -62,7 +62,7 @@ public class PropertyGridControl : BaseEditorControl
     }
 
     public static readonly StyledProperty<FontWeight> PropertyNameFontWeightProperty =
-        AvaloniaProperty.Register<PropertyGridControl, FontWeight>(nameof(PropertyNameFontWeight), FontWeight.SemiBold);
+        AvaloniaProperty.Register<PropertyGrid, FontWeight>(nameof(PropertyNameFontWeight), FontWeight.SemiBold);
 
     /// <summary>
     /// Тип шрифта для имени свойства
@@ -74,7 +74,7 @@ public class PropertyGridControl : BaseEditorControl
     }
 
     public static readonly StyledProperty<IBrush?> PropertyNameForegroundProperty =
-        AvaloniaProperty.Register<PropertyGridControl, IBrush?>(nameof(PropertyNameForeground), Brushes.Black);
+        AvaloniaProperty.Register<PropertyGrid, IBrush?>(nameof(PropertyNameForeground), Brushes.Black);
 
     public IBrush? PropertyNameForeground
     {
@@ -83,7 +83,7 @@ public class PropertyGridControl : BaseEditorControl
     }
     
     public static readonly StyledProperty<IBrush?> ErrorIconForegroundProperty =
-        AvaloniaProperty.Register<PropertyGridControl, IBrush?>(nameof(ErrorIconForeground), Brushes.Red);
+        AvaloniaProperty.Register<PropertyGrid, IBrush?>(nameof(ErrorIconForeground), Brushes.Red);
 
     /// <summary>
     /// Цвет иконки ошибки
@@ -95,7 +95,7 @@ public class PropertyGridControl : BaseEditorControl
     }
     
     public static readonly StyledProperty<double> CategoryHeaderFontSizeProperty =
-        AvaloniaProperty.Register<PropertyGridControl, double>(nameof(CategoryHeaderFontSize), 14.0);
+        AvaloniaProperty.Register<PropertyGrid, double>(nameof(CategoryHeaderFontSize), 14.0);
 
     /// <summary>
     /// Шрифт для заголовков категорий
@@ -107,7 +107,7 @@ public class PropertyGridControl : BaseEditorControl
     }
 
     public static readonly StyledProperty<FontWeight> CategoryHeaderFontWeightProperty =
-        AvaloniaProperty.Register<PropertyGridControl, FontWeight>(nameof(CategoryHeaderFontWeight), FontWeight.Bold);
+        AvaloniaProperty.Register<PropertyGrid, FontWeight>(nameof(CategoryHeaderFontWeight), FontWeight.Bold);
 
     /// <summary>
     /// Тип шрифта для заголовков категорий
@@ -120,7 +120,7 @@ public class PropertyGridControl : BaseEditorControl
 
     #endregion
 
-    public PropertyGridControl()
+    public PropertyGrid()
     {
         EnsureSubscriptions();
     }
