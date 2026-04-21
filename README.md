@@ -357,7 +357,7 @@ public class Person
 | `PropertyNameFontWeight`	| `FontWeight`	| `SemiBold`	| Жирность шрифта имени свойства. | 
 | `PropertyNameForeground`	| `IBrush?`	| `Black`	| Цвет текста имени свойства. | 
 | `ErrorIconForeground`	| `IBrush?`	| `Red`	| Цвет иконки ошибки. | 
-| `CategoryHeaderFontSize`	| double`	| `14`	| Размер шрифта заголовка категории. | 
+| `CategoryHeaderFontSize`	| `double`	| `14`	| Размер шрифта заголовка категории. | 
 | `CategoryHeaderFontWeight`	| `FontWeight`	| `Bold`	| Жирность шрифта заголовка категории. | 
 
 ## Стилизация через классы
