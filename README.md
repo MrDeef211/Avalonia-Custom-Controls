@@ -26,9 +26,9 @@
 
 | Контрол |	Описание |
 | :--- | :--- |
-| `DataFormControl` | 	Форма редактирования объекта с автоматической генерацией полей, категориями и валидацией. |
-| `PropertyGridControl` | 	Редактор свойств объектов. Автоматически отображает все публичные свойства, группирует по категориям, поддерживает редактирование на лету. |
-| `ChartControl` | 	Линейный график с различными стилями отрисовки, сеткой, масштабированием и подсказками. |
+| `DataForm` | 	Форма редактирования объекта с автоматической генерацией полей, категориями и валидацией. |
+| `PropertyGrid` | 	Редактор свойств объектов. Автоматически отображает все публичные свойства, группирует по категориям, поддерживает редактирование на лету. |
+| `Chart` | 	Линейный график с различными стилями отрисовки, сеткой, масштабированием и подсказками. |
 | `PieChart` | 	Круговая диаграмма с возможностью выделения секторов, настройкой цветов и меток. |
 | `RangeSlider` | 	Ползунок выбора диапазона значений с двумя бегунками и текстовыми полями. |
 | `ZoomControl` | 	Контейнер с поддержкой масштабирования и панорамирования содержимого. |
@@ -51,13 +51,13 @@
 </Style>
 ```
 ---
-# DataFormControl
+# DataForm
 Автоматически строит форму редактирования для любого объекта. Поддерживает группировку по категориям, валидацию и команды.
 
 ## Базовое использование
 
 ```xml
-<controls:DataFormControl x:Name="MyForm"
+<controls:DataForm x:Name="MyForm"
                           SelectedObject="{Binding MyObject}"
                           FormConfig="{Binding MyConfig}"
                           HasChanges="{Binding HasChanges}"
@@ -165,7 +165,7 @@ config.SetFieldValidation("Email", new DataFormFieldValidation
 
 ## Настройка через свойства контрола
 
-`DataFormControl` потдерживает настройку через `StyledProperty` при установке в **axaml** файле.
+`DataForm` потдерживает настройку через `StyledProperty` при установке в **axaml** файле.
 
 ### Основная настройка
 
@@ -179,7 +179,7 @@ config.SetFieldValidation("Email", new DataFormFieldValidation
 
 ### Команды
 
-**Для привязки команд к событиям сохранения и отмены** `DataFormControl` потдерживает свойста комманд для привязки
+**Для привязки команд к событиям сохранения и отмены** `DataForm` потдерживает свойста комманд для привязки
 
 - `SaveCommand` – Команда, выполняемая после успешного сохранения данных. Параметр, сохранённый объект.
 
@@ -222,7 +222,7 @@ config.SetFieldValidation("Email", new DataFormFieldValidation
 | `CategoryHeaderFontWeight` | `FontWeight` | `FontWeight.Bold` | Тип шрифта заголовков |
 | `CategoryHeaderForeground` | `IBrush?` | `Brushes.Black` | Цвет шрифта заголовков |
 
-## Стилизация DataFormControl
+## Стилизация DataForm
 
 Потдерживается подробная настройка стилей элементов через стилевые классы.
 
@@ -269,14 +269,14 @@ config.SetFieldValidation("Email", new DataFormFieldValidation
 
 ---
 
-# PropertyGridControl
+# PropertyGrid
 
-`PropertyGridControl` — это редактор свойств объектов в стиле `PropertyGrid`. Он автоматически отображает все публичные свойства переданного объекта, группирует их по категориям и предоставляет удобный интерфейс для редактирования значений на лету.
+`PropertyGrid` — это редактор свойств объектов в стиле `PropertyGrid`. Он автоматически отображает все публичные свойства переданного объекта, группирует их по категориям и предоставляет удобный интерфейс для редактирования значений на лету.
 
 ## Базовое использование
 
 ```xml
-<controls:PropertyGridControl x:Name="PropertyGrid"
+<controls:PropertyGrid x:Name="PropertyGrid"
                               SelectedObject="{Binding MyObject}"
                               IsReadOnly="False" />
 ```
@@ -285,7 +285,7 @@ config.SetFieldValidation("Email", new DataFormFieldValidation
 
 ## Конфигурация через атрибуты
 
-`PropertyGridControl` в первую очередь опирается на атрибуты модели (при наличии). Никакой дополнительной конфигурации не требуется.
+`PropertyGrid` в первую очередь опирается на атрибуты модели (при наличии). Никакой дополнительной конфигурации не требуется.
 
 **Поддерживаемые атрибуты:**
 
@@ -323,7 +323,7 @@ public class Person
 
 ### Валидация
 
-`PropertyGridControl` использует атрибуты `DataAnnotations` для проверки вводимых значений.
+`PropertyGrid` использует атрибуты `DataAnnotations` для проверки вводимых значений.
 
 - Если свойство помечено `[Required]`, пустое значение (или null) вызовет ошибку.
 
@@ -333,7 +333,7 @@ public class Person
 
 ## Настройка через свойства контрола
 
-`PropertyGridControl` поддерживает настройку визуальных параметров через `StyledProperty` в **axaml.**
+`PropertyGrid` поддерживает настройку визуальных параметров через `StyledProperty` в **axaml.**
 
 ### Основные свойства
 
@@ -362,7 +362,7 @@ public class Person
 
 ## Стилизация через классы
 
-`PropertyGridControl` предоставляет стилевые классы для тонкой настройки внешнего вида без изменения шаблона.
+`PropertyGrid` предоставляет стилевые классы для тонкой настройки внешнего вида без изменения шаблона.
 
 | Класс	| Элемент	| Назначение | 
 | :--- | :--- | :--- |
@@ -410,16 +410,16 @@ public class Person
 
 ---
 
-# ChartControl
+# Chart
 
-`ChartControl` – это полностью настраиваемый линейный график, отрисовываемый через `DrawingContext`. Поддерживает несколько стилей линий, сетку, оси, подписи точек и интерактивное масштабирование/панорамирование.
+`Chart` – это полностью настраиваемый линейный график, отрисовываемый через `DrawingContext`. Поддерживает несколько стилей линий, сетку, оси, подписи точек и интерактивное масштабирование/панорамирование.
 
 ## Базовое использование
 
 Данные передаются через свойство `Content`, которое принимает объект `ChartDataBase` (словарь `double` → `double`). Контрол автоматически сортирует точки по ключу (`X`).
 
 ```xml
-<controls:ChartControl x:Name="MyChart"
+<controls:Chart x:Name="MyChart"
                        ChartStyle="Line"
                        ChartColor="DodgerBlue"
                        Fill="False"
@@ -534,7 +534,7 @@ MyChart.Content = data;
 Границы и фон задаются через стандартные свойства `BorderBrush`, `BorderThickness`, `Background`.
 
 ```xml
-<controls:ChartControl Background="#F9F9F9"
+<controls:Chart Background="#F9F9F9"
                        BorderBrush="Silver"
                        BorderThickness="1"
                        Padding="50,30,30,50" />
