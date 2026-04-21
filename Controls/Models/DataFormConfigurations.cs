@@ -57,6 +57,11 @@ namespace Controls.Models
         public bool? IsReadOnly { get; set; }
 
         /// <summary>
+        /// Указывает, обязательно ли поле.
+        /// </summary>
+        public bool? IsRequired { get; set; }   
+
+        /// <summary>
         /// Указывает, отображать ли поле в форме.
         /// </summary>
         public bool IsBrowsable { get; set; } = true;
@@ -132,7 +137,7 @@ namespace Controls.Models
         /// Добавляет конфигурации отдельных полей по имени свойства.
         /// </summary>
         /// <remarks>
-        /// Добавляет новые правила к старым
+        /// Добавляет новые правила к старым.
         /// </remarks>
         /// <param name="fieldName">Имя поля.</param>
         /// <param name="config">Правила.</param>
@@ -149,7 +154,7 @@ namespace Controls.Models
         /// Добавляет правила валидации отдельных полей по имени свойства.
         /// </summary>
         /// <remarks>
-        /// Добавляет новые правила к старым
+        /// Добавляет новые правила к старым.
         /// </remarks>
         /// <param name="fieldName">Имя поля.</param>
         /// <param name="validation">Правила.</param>
@@ -159,7 +164,7 @@ namespace Controls.Models
         /// Устанавливает конфигурации отдельных полей по имени свойства.
         /// </summary>
         /// <remarks>
-        /// Заменяет старое правило новым
+        /// Заменяет старое правило новым.
         /// </remarks>
         /// <param name="fieldName">Имя поля.</param>
         /// <param name="config">Правило.</param>
@@ -176,7 +181,7 @@ namespace Controls.Models
         /// Устанавливает правила валидации отдельных полей по имени свойства.
         /// </summary>
         /// <remarks>
-        /// Заменяет старое правило новым
+        /// Заменяет старое правило новым.
         /// </remarks>
         /// <param name="fieldName">Имя поля.</param>
         /// <param name="config">Правило.</param>

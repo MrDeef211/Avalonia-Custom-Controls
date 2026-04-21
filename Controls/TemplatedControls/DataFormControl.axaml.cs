@@ -86,7 +86,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
         AvaloniaProperty.Register<DataFormControl, double>(nameof(LabelFontSize), 12.0);
 
     /// <summary>
-    /// Размер шрифта колонки имён свойств
+    /// Размер шрифта колонки имён свойств.
     /// </summary>
     public double LabelFontSize
     {
@@ -98,7 +98,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
         AvaloniaProperty.Register<DataFormControl, FontWeight>(nameof(LabelFontWeight), FontWeight.SemiBold);
 
     /// <summary>
-    /// Тип шрифта колонки имён свойств
+    /// Тип шрифта колонки имён свойств.
     /// </summary>
     public FontWeight LabelFontWeight
     {
@@ -142,6 +142,18 @@ public class DataFormControl : BaseEditorControl, IDisposable
         set => SetValue(CategoryHeaderFontWeightProperty, value);
     }
 
+    public static readonly StyledProperty<IBrush?> CategoryHeaderForegroundProperty =
+        AvaloniaProperty.Register<DataFormControl, IBrush?>(nameof(CategoryHeaderForeground), Brushes.Black);
+
+    /// <summary>
+    /// Цвет шрифта заголовков
+    /// </summary>
+    public IBrush? CategoryHeaderForeground
+    {
+        get => GetValue(CategoryHeaderForegroundProperty);
+        set => SetValue(CategoryHeaderForegroundProperty, value);
+    }
+
     public static readonly StyledProperty<ICommand?> SaveCommandProperty =
         AvaloniaProperty.Register<DataFormControl, ICommand?>(nameof(SaveCommand));
 
@@ -149,7 +161,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     /// Команда, выполняемая после успешного сохранения данных.
     /// </summary>
     /// <remarks>
-    /// Параметр сохранённый объект
+    /// Параметр сохранённый объект.
     /// </remarks>
     public ICommand? SaveCommand
     {
@@ -164,7 +176,7 @@ public class DataFormControl : BaseEditorControl, IDisposable
     /// Команда, выполняемая после успешной отмены изменений.
     /// </summary>
     /// <remarks>
-    /// Параметр обьект
+    /// Параметр обьект.
     /// </remarks>
     public ICommand? CancelCommand
     {

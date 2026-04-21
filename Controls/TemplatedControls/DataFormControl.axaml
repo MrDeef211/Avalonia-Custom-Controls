@@ -205,7 +205,7 @@
                                                     <TextBlock Text="{Binding Name}"
                                                                FontSize="{Binding CategoryHeaderFontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
                                                                FontWeight="{Binding CategoryHeaderFontWeight, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
-                                                               Foreground="{Binding LabelForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
+                                                               Foreground="{Binding CategoryHeaderForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:DataFormControl}}"
                                                                VerticalAlignment="Center" />
                                                 </DockPanel>
                                             </Button>
