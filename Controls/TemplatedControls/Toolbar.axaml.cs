@@ -16,12 +16,18 @@ public class Toolbar : Avalonia.Controls.ItemsControl
     public static readonly StyledProperty<bool> WrapProperty =
         AvaloniaProperty.Register<Toolbar, bool>(nameof(Wrap), false);
 
+    /// <summary>
+    /// Ориентация Toolbar в пространстве (горизонтально или вертикально)
+    /// </summary>
     public Orientation Orientation
     {
         get => GetValue(OrientationProperty);
         set => SetValue(OrientationProperty, value);
     }
 
+    /// <summary>
+    /// Переносить компоненты на новую строку при нехватке места.
+    /// </summary>
     public bool Wrap
     {
         get => GetValue(WrapProperty);

@@ -190,7 +190,7 @@ public class ZoomControl : ContentControl
     public static readonly StyledProperty<bool> EnableKeyboardNavigationProperty =
         AvaloniaProperty.Register<ZoomControl, bool>(nameof(EnableKeyboardNavigation), true);
 
-
+    // Назначения клавиш
     public Key PanUpKey { get => GetValue(PanUpKeyProperty); set => SetValue(PanUpKeyProperty, value); }
     public Key PanDownKey { get => GetValue(PanDownKeyProperty); set => SetValue(PanDownKeyProperty, value); }
     public Key PanLeftKey { get => GetValue(PanLeftKeyProperty); set => SetValue(PanLeftKeyProperty, value); }
@@ -201,32 +201,47 @@ public class ZoomControl : ContentControl
     public Key PanRightAltKey { get => GetValue(PanRightAltKeyProperty); set => SetValue(PanRightAltKeyProperty, value); }
     public Key ZoomInKey { get => GetValue(ZoomInKeyProperty); set => SetValue(ZoomInKeyProperty, value); }
     public Key ZoomOutKey { get => GetValue(ZoomOutKeyProperty); set => SetValue(ZoomOutKeyProperty, value); }
+
     /// <summary>
     /// Клавиша сброса зума
     /// </summary>
     public Key ResetZoomKey { get => GetValue(ResetZoomKeyProperty); set => SetValue(ResetZoomKeyProperty, value); }
+
     /// <summary>
     /// Клавиша модификатор сброса зума
     /// </summary>
     public KeyModifiers ResetZoomModifiers { get => GetValue(ResetZoomModifiersProperty); set => SetValue(ResetZoomModifiersProperty, value); }
+
     /// <summary>
     /// Клавиша вписывания в экран
     /// </summary>
     public Key FitToScreenKey { get => GetValue(FitToScreenKeyProperty); set => SetValue(FitToScreenKeyProperty, value); }
+
     /// <summary>
     /// Клавиша модификатор вписывания в экран
     /// </summary>
     public KeyModifiers FitToScreenModifiers { get => GetValue(FitToScreenModifiersProperty); set => SetValue(FitToScreenModifiersProperty, value); }
+
     /// <summary>
     /// Клавиша отмены
     /// </summary>
     public Key UndoKey { get => GetValue(UndoKeyProperty); set => SetValue(UndoKeyProperty, value); }
+
+    /// <summary>
+    /// Модификатор клавиши отмены
+    /// </summary>
     public KeyModifiers UndoModifiers { get => GetValue(UndoModifiersProperty); set => SetValue(UndoModifiersProperty, value); }
+
     /// <summary>
     /// Клавиша возврата отмены
     /// </summary>
     public Key RedoKey { get => GetValue(RedoKeyProperty); set => SetValue(RedoKeyProperty, value); }
+
+    /// <summary>
+    /// Модификатор клавиши возврата отмены
+    /// </summary>
     public KeyModifiers RedoModifiers { get => GetValue(RedoModifiersProperty); set => SetValue(RedoModifiersProperty, value); }
+
     /// <summary>
     /// Включить навигацию через клавиатуру
     /// </summary>
