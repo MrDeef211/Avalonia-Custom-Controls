@@ -953,17 +953,36 @@ public class ViewModel : ReactiveObject
 ```
 По умолчанию элементы располагаются горизонтально с отступом 4 пикселя. Разделители (`Separator`) автоматически получают вертикальную черту.
 
+Два горизонтальных тулбара один над другим:
+
+```xml
+<StackPanel>
+    <controls:Toolbar Orientation="Horizontal">
+        <Button Content="Открыть" />
+        <Button Content="Сохранить" />
+    </controls:Toolbar>
+    <controls:Toolbar Orientation="Horizontal">
+        <Button Content="Вырезать" />
+        <Button Content="Копировать" />
+        <Button Content="Вставить" />
+    </controls:Toolbar>
+</StackPanel>
+```
+
 ---
 
 # Toolbar
 
 ## Свойства Toolbar
+
 | Свойство	| Тип	| По умолчанию	| Описание | 
 | :--- | :--- | :--- | :--- |
 | `ItemsPanel`	| `ItemsPanelTemplate`	| `tackPanel` (горизонтальный)	| Панель для размещения элементов. Можно заменить на WrapPanel для переноса. | 
 | `Background`	| `IBrush`	| `#F5F5F5`	| Фон панели. | 
 | `BorderBrush`	| `IBrush`	| `#F5F5F5`	| Цвет нижней границы (используется для отделения от содержимого). | 
 | `MinHeight`	| `double`	| `32`	| Минимальная высота тулбара. | 
+| `Wrap` | `bool` | `false` | Переносить обьекты на новую строку при нехватке места | 
+| `Orientation` | `Orientation` | `Orientation.Horizontal` | Ориентация `Toolbar` в пространстве (горизонтально или вертикально) | 
 
 ## Стилизация Toolbar
 По умолчанию кнопки и разделители внутри `Toolbar` уже стилизованы:
