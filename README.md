@@ -129,6 +129,7 @@ MyForm.FormConfig = config;
 | `DisplayName`	| `string?` | `null` | Подпись поля.	|
 | `Category`	| `string?` | `null` | Категория (секция).	|
 | `IsReadOnly`	| `bool?` | `null` | Только для чтения.	|
+| `IsRequired`	| `bool?` | `null` | Обязательное поле.	|
 | `IsBrowsable`	| `bool` | `true` | Показывать ли поле.	|
 | `Order`	| `int` | `0` | Порядок в категории.	|
 | `HideLabel`	| `bool` | `false` | Скрыть метку.	|
