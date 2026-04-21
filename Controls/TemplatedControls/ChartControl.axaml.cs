@@ -166,7 +166,8 @@ public class ChartControl : TemplatedControl
             AxisLabelFontWeightProperty,
             AxisLabelFontStyleProperty,
             PointLabelFontSizeProperty,
-            TooltipFontSizeProperty);
+            TooltipFontSizeProperty,
+            TiltThresholdProperty);
 
     }
 

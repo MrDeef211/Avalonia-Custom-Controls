@@ -76,6 +76,9 @@ public class PieChart : TemplatedControl
     public static readonly StyledProperty<FontStyle> LabelFontStyleProperty =
         AvaloniaProperty.Register<PieChart, FontStyle>(nameof(LabelFontStyle), FontStyle.Normal);
 
+    public static readonly StyledProperty<double> SizeShiftProperty =
+        AvaloniaProperty.Register<PieChart, double>(nameof(SizeShift), 0.05);
+
     #endregion
 
     static PieChart()
@@ -96,7 +99,8 @@ public class PieChart : TemplatedControl
             LabelFontSizeProperty,
             LabelFontFamilyProperty,
             LabelFontWeightProperty,
-            LabelFontStyleProperty);
+            LabelFontStyleProperty,
+            SizeShiftProperty);
     }
 
     #region Свойства
@@ -286,6 +290,20 @@ public class PieChart : TemplatedControl
         set => SetValue(LabelFontStyleProperty, value);
     }
 
+    public double SizeShift
+    {
+        get => GetValue(SizeShiftProperty);
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException("SizeShift дожен быть больше 0");
+            }
+
+            SetValue(SizeShiftProperty, value);
+        }
+    }
+
     #endregion
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -325,7 +343,9 @@ public class PieChart : TemplatedControl
         double outerR = size / 2;
         double innerR = (InnerRadius) * outerR;
 
-        if (distance > outerR * 1.05 || distance < innerR) return null;
+        double shift = HighlightType == HighlightType.Decrease || HighlightType == HighlightType.Reduce ? 0 : SizeShift;
+
+        if (distance > outerR * (1 + shift) || distance < innerR) return null;
 
         double angleRad = Math.Atan2(dy, dx);
         double angleDeg = (angleRad * 180 / Math.PI + 360.0) % 360.0;
@@ -334,7 +354,7 @@ public class PieChart : TemplatedControl
         {
             var sec = _sectors[i];
             // Нормализуем, если меньше нуля
-            // Нужно из за около костыльного сдвига угла на 90 градусов
+            // Нужно из-за около костыльного сдвига угла на 90 градусов
             double start = sec.StartAngle < 0 ? (sec.StartAngle + 360) % 360.0 : sec.StartAngle % 360.0;
             double end = (start + sec.SweepAngle) % 360.0;
             if (sec.SweepAngle > 0)
@@ -524,7 +544,7 @@ public class PieChart : TemplatedControl
         var formatted = new FormattedText(labelText, CultureInfo.CurrentCulture,
             FlowDirection.LeftToRight, typeface, LabelFontSize, Brushes.Black);
 
-        const double pushFactor = 0.05;
+        double pushFactor = SizeShift;
         double shift = isHighlighted ? outerR * pushFactor : 0;
         double midRad = (sector.StartAngle + sector.SweepAngle / 2) * Math.PI / 180;
 
@@ -589,8 +609,8 @@ public class PieChart : TemplatedControl
         if (!isHighlighted || !HighlightSector)
             return (new Point(0, 0), originalOuterR, originalInnerR, originalStartDeg, originalSweepDeg);
 
-        const double pushFactor = 0.05;      
-        const double reduceAngleFactor = 0.05; 
+        double pushFactor = SizeShift;      
+        double reduceAngleFactor = SizeShift; 
 
         double midRad = (originalStartDeg + originalSweepDeg / 2) * Math.PI / 180;
         double shift = originalOuterR * pushFactor;
@@ -615,9 +635,9 @@ public class PieChart : TemplatedControl
 
             case HighlightType.IncreaseOut:
                 // смещение + увеличение внешнего радиуса
-                newInnerR = originalInnerR * (1 + pushFactor * 0.7);
-                offset = new Point(Math.Cos(midRad) * shift * 0.3, Math.Sin(midRad) * shift * 0.3);
-                newOuterR = originalOuterR * (1 + pushFactor * 0.7);
+                newInnerR = originalInnerR * (1 + pushFactor * 0.5);
+                offset = new Point(Math.Cos(midRad) * shift * 0.5, Math.Sin(midRad) * shift * 0.5);
+                newOuterR = originalOuterR * (1 + pushFactor * 0.5);
                 break;
 
             case HighlightType.Decrease:
@@ -633,12 +653,13 @@ public class PieChart : TemplatedControl
                 offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
                 double ScalOffset = Math.Sqrt(offset.X * offset.X + offset.Y * offset.Y);
                 newOuterR = Math.Max(originalOuterR * (1 - pushFactor) - ScalOffset, (originalOuterR + originalInnerR) / 2);
-                double angleDelta = originalSweepDeg * reduceAngleFactor;
 
                 if (InnerRadius < 0.1 || InnerRadius > 0.75)
                     newInnerR = Math.Min(originalInnerR * (1 + pushFactor * 0.3), (originalOuterR + 2 * originalInnerR) / 3);
                 else
                     newInnerR = Math.Min(originalInnerR + originalOuterR * pushFactor * 0.5, (originalOuterR + 2 * originalInnerR) / 3);
+
+                double angleDelta = originalSweepDeg * reduceAngleFactor / 2;
 
                 newStartDeg = originalStartDeg + angleDelta;
                 newSweepDeg = originalSweepDeg - 2 * angleDelta;
