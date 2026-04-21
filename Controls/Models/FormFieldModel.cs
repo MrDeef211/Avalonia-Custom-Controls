@@ -19,7 +19,7 @@ namespace Controls.Models
         private string _validationError = string.Empty;
         private bool _isTouched;
         private int _rowGroup = -1;
-        private readonly bool _isRequired;
+        private bool _isRequired;
         private IEnumerable<EnumItem>? _enumDisplayItems;
         private int _index = 0;
 
@@ -94,6 +94,12 @@ namespace Controls.Models
                 this.RaiseAndSetIfChanged(ref _isReadOnly, value);
                 this.RaisePropertyChanged(nameof(IsEditable));
             }
+        }
+
+        public bool IsRequired
+        {
+            get => _isRequired;
+            set => this.RaiseAndSetIfChanged(ref _isRequired, value);
         }
 
         public int RowGroup
@@ -317,6 +323,8 @@ namespace Controls.Models
                     DisplayName = config.DisplayName;
                 if (config.IsReadOnly.HasValue)
                     IsReadOnly = config.IsReadOnly.Value;
+                if (config.IsRequired.HasValue)
+                    IsRequired = config.IsRequired.Value;
                 HideLabel = config.HideLabel;
                 RowGroup = config.RowGroup;
                 ValidationConfig = config.Validation;

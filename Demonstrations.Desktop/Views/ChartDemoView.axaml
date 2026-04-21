@@ -8,7 +8,8 @@
         <controls:Toolbar
             Background="#FFFFFF"
             BorderBrush="#FFFFFF"
-            DockPanel.Dock="Top">
+            DockPanel.Dock="Top"
+            Orientation="Horizontal">
 
             <Button Command="{Binding DrawCommand}">
                 <PathIcon Data="M100, 100L300, 100L200, 300Z"

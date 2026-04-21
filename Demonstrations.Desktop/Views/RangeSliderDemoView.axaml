@@ -5,23 +5,23 @@
              x:Class="Demonstrations.Desktop.Views.RangeSliderDemoView"
              x:DataType="vm:RangeSliderDemoViewModel">
     <DockPanel>
-        <controls:Toolbar DockPanel.Dock="Top" Background="White">
+        <controls:Toolbar DockPanel.Dock="Top" Background="White" Wrap="True">
 
             <TextBlock Text="Min:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <NumericUpDown Value="{Binding Minimum}" Minimum="-1000" Maximum="1000" Increment="1" Width="120"/>
+            <NumericUpDown Value="{Binding Minimum}" Minimum="-1000" Maximum="1000" Increment="1" Width="160"/>
             <TextBlock Text="Max:" VerticalAlignment="Center" Margin="10,0,2,0"/>
-            <NumericUpDown Value="{Binding Maximum}" Minimum="-1000" Maximum="1000" Increment="1" Width="120"/>
+            <NumericUpDown Value="{Binding Maximum}" Minimum="-1000" Maximum="1000" Increment="1" Width="160"/>
             
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
             <TextBlock Text="Step:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <NumericUpDown Value="{Binding Step}" Minimum="0.1" Maximum="100" Increment="0.5" Width="120"/>
+            <NumericUpDown Value="{Binding Step}" Minimum="0.1" Maximum="100" Increment="0.5" Width="160"/>
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
             <CheckBox Content="Show TextBoxes" IsChecked="{Binding ShowTextBoxes}" ToolTip.Tip="Показывать поля ввода"/>
             <TextBlock Text="Width:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <NumericUpDown Value="{Binding TextBoxWidth}" Minimum="30" Maximum="150" Increment="5" Width="120"/>
+            <NumericUpDown Value="{Binding TextBoxWidth}" Minimum="30" Maximum="150" Increment="5" Width="160"/>
 
             <Separator Width="1" Height="20" Background="Gray" Margin="5,0"/>
 
@@ -40,7 +40,7 @@
             <TextBlock Text="TickStep:" VerticalAlignment="Center" Margin="5,0,2,0"/>
             <TextBox Text="{Binding TickStepText}" Width="60" ToolTip.Tip="Auto / число* / число"/>
             <TextBlock Text="Length:" VerticalAlignment="Center" Margin="5,0,2,0"/>
-            <NumericUpDown Value="{Binding TickLength}" Minimum="0" Maximum="20" Increment="1" Width="120"/>
+            <NumericUpDown Value="{Binding TickLength}" Minimum="0" Maximum="20" Increment="1" Width="160"/>
         </controls:Toolbar>
 
         <StackPanel Margin="20" Spacing="20" Height="250">

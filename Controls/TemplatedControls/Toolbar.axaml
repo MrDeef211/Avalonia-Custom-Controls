@@ -2,47 +2,113 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:Controls">
 
-  <Styles.Resources>
-  <ControlTheme x:Key="{x:Type controls:Toolbar}" TargetType="controls:Toolbar">
-    <Setter Property="VerticalAlignment" Value="Top" />
-    <Setter Property="HorizontalAlignment" Value="Stretch" />
-    <Setter Property="Background" Value="#F5F5F5" />
-    <Setter Property="BorderBrush" Value="#F5F5F5" />
-    <Setter Property="MinHeight" Value="32" /> 
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Border Classes="ToolbarRoot"
-                Background="{TemplateBinding Background}" 
-                BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="0,0,0,1">
-          <ItemsPresenter Name="PART_ItemsPresenter" 
-                          ItemsPanel="{TemplateBinding ItemsPanel}" />
-        </Border>
-      </ControlTemplate>
-    </Setter>
-    <Setter Property="ItemsPanel">
-      <ItemsPanelTemplate>
-        <StackPanel Orientation="Horizontal" Spacing="4" Margin="4,0" />
-      </ItemsPanelTemplate>
-    </Setter>
-  </ControlTheme>
-  </Styles.Resources>
+    <Styles.Resources>
+        <ControlTheme x:Key="{x:Type controls:Toolbar}" TargetType="controls:Toolbar">
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="#F5F5F5" />
+            <Setter Property="BorderBrush" Value="#F5F5F5" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Classes="ToolbarRoot"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="0,0,0,1">
+                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                        ItemsPanel="{TemplateBinding ItemsPanel}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
 
-  <Style Selector="controls|Toolbar Button">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="Padding" Value="8,4" />
-  </Style>
+            <!-- Стили панелей для самого контрола -->
+            <Style Selector="^.horizontal:not(.wrap)">
+                <Setter Property="ItemsPanel">
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="4,0" />
+                    </ItemsPanelTemplate>
+                </Setter>
+            </Style>
+            <Style Selector="^.vertical:not(.wrap)">
+                <Setter Property="ItemsPanel">
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" Spacing="4" Margin="0,4" />
+                    </ItemsPanelTemplate>
+                </Setter>
+            </Style>
+            <Style Selector="^.horizontal.wrap">
+                <Setter Property="ItemsPanel">
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" LineSpacing="4" />
+                    </ItemsPanelTemplate>
+                </Setter>
+            </Style>
+            <Style Selector="^.vertical.wrap">
+                <Setter Property="ItemsPanel">
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Vertical" LineSpacing="4" />
+                    </ItemsPanelTemplate>
+                </Setter>
+            </Style>
+        </ControlTheme>
+    </Styles.Resources>
 
-  <Style Selector="controls|Toolbar Separator">
-    <Setter Property="Width" Value="1" />
-    <Setter Property="Height" Value="20" />
-    <Setter Property="Background" Value="#CCCCCC" />
-    <Setter Property="Margin" Value="6,0" />
-  </Style>
+    <!-- Дочерние стили вынесены из ControlTheme -->
+    <Style Selector="controls|Toolbar.horizontal Separator">
+        <Setter Property="Width" Value="1" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Background" Value="#CCCCCC" />
+        <Setter Property="Margin" Value="6,0" />
+    </Style>
+    <Style Selector="controls|Toolbar.vertical Separator">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Background" Value="#CCCCCC" />
+        <Setter Property="Margin" Value="0,6" />
+    </Style>
 
-  <Style Selector="controls|Toolbar Button:pointerover /template/ ContentPresenter">
-    <Setter Property="Background" Value="#E0E0E0" />
-  </Style>
+    <Style Selector="controls|Toolbar.horizontal TextBox, controls|Toolbar.horizontal ComboBox, controls|Toolbar.horizontal NumericUpDown">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Margin" Value="2,0" />
+    </Style>
+    <Style Selector="controls|Toolbar.horizontal CheckBox, controls|Toolbar.horizontal RadioButton">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="4,0" />
+    </Style>
+    <Style Selector="controls|Toolbar.horizontal TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="4,0" />
+    </Style>
+
+    <Style Selector="controls|Toolbar.vertical TextBox, controls|Toolbar.vertical ComboBox, controls|Toolbar.vertical NumericUpDown">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,2" />
+    </Style>
+    <Style Selector="controls|Toolbar.vertical CheckBox, controls|Toolbar.vertical RadioButton">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,4" />
+    </Style>
+    <Style Selector="controls|Toolbar.vertical TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,4" />
+    </Style>
+
+    <!-- Базовые стили кнопок и разделителей -->
+    <Style Selector="controls|Toolbar Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+    <Style Selector="controls|Toolbar Button:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#E0E0E0" />
+    </Style>
+    <Style Selector="controls|Toolbar Separator">
+        <Setter Property="Width" Value="1" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Background" Value="#CCCCCC" />
+        <Setter Property="Margin" Value="6,0" />
+    </Style>
+
 
 </Styles>
