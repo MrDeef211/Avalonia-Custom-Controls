@@ -4,16 +4,17 @@ using System.Collections.ObjectModel;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
+using ReactiveUI;
 
 namespace Controls.Models
 {
-    public class ChartDataBase
+    public class ChartDataBase : ReactiveObject
     {
         private ConcurrentDictionary<double, double> _chart;
         public Dictionary<double, double> Chart
         {
             get => new Dictionary<double, double>(_chart);
-            set => _chart = new ConcurrentDictionary<double, double>(value);
+            set => this.RaiseAndSetIfChanged(ref _chart, new ConcurrentDictionary<double, double>(value ?? throw new ArgumentNullException(nameof(value))));
         }
 
         public ChartDataBase(Dictionary<double, double> Chart) =>
@@ -28,8 +29,12 @@ namespace Controls.Models
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public void Add(double key, double value) =>
+        public void Add(double key, double value)
+        {
             _chart.TryAdd(key, value);
+            this.RaisePropertyChanged(nameof(Chart));
+            this.RaisePropertyChanged(nameof(Count));
+        }
 
         /// <summary>
         /// Добавление новой точки в конец (максимальный ключ плюс один)
@@ -38,8 +43,12 @@ namespace Controls.Models
         public void Add(double value) =>
             Add((_chart?.Keys.DefaultIfEmpty(-1).Max() ?? -1) + 1, value);
 
-        public void Remove(double key) =>
+        public void Remove(double key)
+        {
             _chart.TryRemove(key, out _);
+            this.RaisePropertyChanged(nameof(Chart));
+            this.RaisePropertyChanged(nameof(Count));
+        }
 
         public int Count => _chart.Count;
     }

@@ -30,6 +30,12 @@ namespace Demonstrations.Desktop.ViewModels
                     this.RaisePropertyChanged(nameof(ChartThickness));
                     this.RaisePropertyChanged(nameof(HighlightPoints));
                 });
+
+            this.WhenAnyValue(x => x._model.FullChartData)
+                .Subscribe(_ =>
+                {
+                    this.RaisePropertyChanged(nameof(FullChartData));
+                });
         }
 
         public ChartDataBase FullChartData => _model.FullChartData;

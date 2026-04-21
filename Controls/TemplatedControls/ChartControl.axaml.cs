@@ -135,6 +135,9 @@ public class ChartControl : TemplatedControl
     public static readonly StyledProperty<double> TooltipFontSizeProperty =
         AvaloniaProperty.Register<ChartControl, double>(nameof(TooltipFontSize), 12.0);
 
+    public static readonly StyledProperty<double> TiltThresholdProperty =
+        AvaloniaProperty.Register<ChartControl, double>(nameof(TiltThreshold), 24.0);
+
     #endregion 
 
     static ChartControl()
@@ -427,6 +430,15 @@ public class ChartControl : TemplatedControl
     {
         get => GetValue(TooltipFontSizeProperty);
         set => SetValue(TooltipFontSizeProperty, value);
+    }
+
+    /// <summary>
+    /// Порог наклона текста в пикселях
+    /// </summary>
+    public double TiltThreshold
+    {
+        get => GetValue(TiltThresholdProperty);
+        set => SetValue(TiltThresholdProperty, value);
     }
 
     #endregion
@@ -742,7 +754,7 @@ public class ChartControl : TemplatedControl
     List<KeyValuePair<double, double>> points, Func<double, double, Point> normalize)
     {
         // Засечки и подписи по X
-        double angleX = xLabels.Count > 10 ? (xLabels.Count > 40 ? 90 : 45) : 0;
+        double angleX = CountToSpace(xLabels.Count) < TiltThreshold * 2 ? (CountToSpace(xLabels.Count) < TiltThreshold ? 90 : 45) : 0;
         foreach (var val in xLabels)
         {
             var p = normalize(val, 0);
@@ -788,8 +800,7 @@ public class ChartControl : TemplatedControl
             if (ShowPointsLabels)
             {
                 double TextAngle = 0;
-                TextAngle = SortedData.Count >= 50 ? -45 : TextAngle;
-                TextAngle = SortedData.Count >= 100 ? -60 : TextAngle;
+                TextAngle = CountToSpace(SortedData.Count) < TiltThreshold * 2 ? (CountToSpace(SortedData.Count) < TiltThreshold ? -60 : -45) : 0;
 
                 DrawText(context, FormatNumber(point.Value), new Point(nPoint.X, nPoint.Y - 15),
                     TextAngle, TextAlignment.Center, PointsLabelsColor, fontSize: PointLabelFontSize);
@@ -961,6 +972,8 @@ public class ChartControl : TemplatedControl
             return;
 
         SortedData = new(Content.Chart);
+
+        _sortedVisiblePoints = SortedData.Chart.OrderBy(p => p.Key).ToList();
         _sortedContentPoints = Content.Chart.OrderBy(p => p.Key).ToList();
 
         _minX = _sortedContentPoints[0].Key;
@@ -970,6 +983,8 @@ public class ChartControl : TemplatedControl
 
         Minimum = _minX;
         Maximum = _maxX;
+
+        InvalidateVisual();
     }
 
     /// <summary>
@@ -998,6 +1013,8 @@ public class ChartControl : TemplatedControl
 
         _minY = _sortedVisiblePoints.Min(p => p.Value);
         _maxY = _sortedVisiblePoints.Max(p => p.Value);
+
+        InvalidateVisual();
     }
 
     /// <summary>
@@ -1095,6 +1112,12 @@ public class ChartControl : TemplatedControl
         double vy = _minY + ((Padding.Top + availableHeight - y) / availableHeight) * (_maxY - _minY);
 
         return new Point(vx, vy);
+    }
+
+    private double CountToSpace(int count)
+    {
+        double width = _right - _left;
+        return width / count;
     }
 }
 
