@@ -1,15 +1,16 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Controls;
 using Controls.Models;
+using ReactiveUI;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
-using ReactiveUI;
+using System.Linq;
+using System.Windows.Input;
 
 namespace Controls;
 
@@ -78,6 +79,9 @@ public class PieChart : TemplatedControl
 
     public static readonly StyledProperty<double> SizeShiftProperty =
         AvaloniaProperty.Register<PieChart, double>(nameof(SizeShift), 0.05);
+
+    public static readonly StyledProperty<ICommand?> ClickCommandProperty =
+        AvaloniaProperty.Register<PieChart, ICommand?>(nameof(ClickCommand));
 
     #endregion
 
@@ -304,6 +308,18 @@ public class PieChart : TemplatedControl
         }
     }
 
+    /// <summary>
+    /// Команда, выполняемая после клика на выделенный сектор
+    /// </summary>
+    /// <remarks>
+    /// Параметр обьект сектора из словаря <string, double>.
+    /// </remarks>
+    public ICommand? ClickCommand
+    {
+        get => GetValue(ClickCommandProperty);
+        set => SetValue(ClickCommandProperty, value);
+    }
+
     #endregion
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -327,6 +343,19 @@ public class PieChart : TemplatedControl
             _hoverSectorIndex = null;
             InvalidateVisual();
         }
+    }
+
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        var props = e.GetCurrentPoint(this).Properties;
+        bool isLeft = props.IsLeftButtonPressed;
+        if (HighlightSector && _hoverSectorIndex != null && isLeft)
+        {
+            var sector = _sectors[_hoverSectorIndex ?? 0];
+            ClickCommand.Execute((sector.Name, sector.Value));
+            e.Handled = true;
+        }
+        base.OnPointerPressed(e);
     }
 
     /// <summary>
