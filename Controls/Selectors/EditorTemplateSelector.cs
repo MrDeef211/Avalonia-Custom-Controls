@@ -49,12 +49,10 @@ namespace Controls.Selectors
                 {
                     var numeric = new NumericUpDown
                     {
-                        
+                        Height = 24,
+                        FontSize = 12,
+                        Padding = new Avalonia.Thickness(4, 2),
                     };
-                    if (Application.Current!.TryFindResource("NumericUpDownDataFormEditor", out var theme))
-                    {
-                        numeric.Theme = (ControlTheme)theme;
-                    }
                     numeric.Bind(NumericUpDown.ValueProperty, new Binding("Value") { Mode = BindingMode.TwoWay });
                     numeric.Bind(NumericUpDown.IsEnabledProperty, new Binding("IsEditable"));
 
