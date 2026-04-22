@@ -309,10 +309,10 @@ public class PieChart : TemplatedControl
     }
 
     /// <summary>
-    /// Команда, выполняемая после клика на выделенный сектор
+    /// Команда, выполняемая после клика на выделенный сектор.
     /// </summary>
     /// <remarks>
-    /// Параметр обьект сектора из словаря <string, double>.
+    /// Параметр данные сектора <string, double>.
     /// </remarks>
     public ICommand? ClickCommand
     {
@@ -349,10 +349,10 @@ public class PieChart : TemplatedControl
     {
         var props = e.GetCurrentPoint(this).Properties;
         bool isLeft = props.IsLeftButtonPressed;
-        if (HighlightSector && _hoverSectorIndex != null && isLeft)
+        if (HighlightSector && _hoverSectorIndex != null && isLeft && ClickCommand != null)
         {
             var sector = _sectors[_hoverSectorIndex ?? 0];
-            ClickCommand.Execute((sector.Name, sector.Value));
+            ClickCommand?.Execute((sector.Name, sector.Value));
             e.Handled = true;
         }
         base.OnPointerPressed(e);
