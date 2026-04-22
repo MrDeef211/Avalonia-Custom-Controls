@@ -552,7 +552,7 @@ public class PieChart : TemplatedControl
         switch (HighlightType)
         {
             case HighlightType.Decrease:
-                offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
+                offset = new Point(Math.Cos(midRad) * -shift, Math.Sin(midRad) * -shift);
                 break;
             case HighlightType.Reduce:
                 if ((1 - InnerRadius) / 2 < pushFactor * 2)

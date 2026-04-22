@@ -534,9 +534,9 @@ public class RangeSlider : TemplatedControl
         else if (newText == "")
         {
             // SetCurrentValue сообщает только если значение изменилось, а мне нужно гарантированно обновить текст на экране
-            SetCurrentValue(UpperValueProperty, Minimum);
-            _upperTextBox.Text = Minimum.ToString(CultureInfo.CurrentCulture);
-            _lastValidUpperText = Minimum.ToString(CultureInfo.CurrentCulture);
+            SetCurrentValue(UpperValueProperty, LowerValue + Step);
+            _upperTextBox.Text = UpperValue.ToString(CultureInfo.CurrentCulture);
+            _lastValidUpperText = UpperValue.ToString(CultureInfo.CurrentCulture);
         }
         else
         {
