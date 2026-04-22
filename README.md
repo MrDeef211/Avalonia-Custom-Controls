@@ -625,6 +625,7 @@ MyPieChart.SectorColors = new List<IBrush>
 | `HighlightSector`	| `bool`	| `true`	| Включить выделение сектора под курсором. | 
 | `HighlightType`	| `HighlightType`	| `Push`	| Эффект выделения (см. таблицу ниже). | 
 | `SizeShift`	| `double`	| `0.05`	| Смещение размера при выделении в относительных единицах. | 
+| `ClickCommand` | `ICommand?` | `null` | Команда, выполняемая после клика на выделенный сектор. Параметр данные сектора <string, double>. |
 
 **Эффекты выделения (`HighlightType`)**
 
