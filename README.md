@@ -237,6 +237,8 @@ config.SetFieldValidation("Email", new DataFormFieldValidation
 | `DataFormEditor` | Редактор поля (`TextBox`, `NumericUpDown` и т.д.) |
 | `DataFormErrorIcon` | Иконка ошибки (`TextBlock`) |
 
+Также для каждого редактора поля есть свой `DataFormEditor*название*`, например `DataFormEditorTextBox`
+
 Пример:
 
 ```xml
