@@ -24,6 +24,8 @@ namespace Controls.Selectors
                     };
                     checkBox.Bind(CheckBox.IsCheckedProperty, new Binding("Value") { Mode = BindingMode.TwoWay });
                     checkBox.Bind(CheckBox.IsEnabledProperty, new Binding("IsEditable"));
+                    checkBox.Classes.Add("DataFormEditor");
+                    checkBox.Classes.Add("DataFormEditorCheckBox");
                     return checkBox;
                 }
 
@@ -44,6 +46,7 @@ namespace Controls.Selectors
                     combo.Bind(ComboBox.IsEnabledProperty, new Binding("IsEditable"));
                     editor = combo;
                     editor.Classes.Add("DataFormEditor");
+                    editor.Classes.Add("DataFormEditorComboBox");
                 }
                 else if (model.IsNumeric)
                 {
@@ -67,6 +70,7 @@ namespace Controls.Selectors
                     }
                     editor = numeric;
                     editor.Classes.Add("DataFormEditor");
+                    editor.Classes.Add("DataFormEditorNumericUpDown");
                 }
                 else if (model.IsDateTime)
                 {
@@ -81,6 +85,7 @@ namespace Controls.Selectors
                     picker.Bind(DatePicker.IsEnabledProperty, new Binding("IsEditable"));
                     editor = picker;
                     editor.Classes.Add("DataFormEditor");
+                    editor.Classes.Add("DataFormEditorDatePicker");
                 }
                 else
                 {
@@ -95,6 +100,7 @@ namespace Controls.Selectors
                     textBox.Bind(TextBox.IsEnabledProperty, new Binding("IsEditable"));
                     editor = textBox;
                     editor.Classes.Add("DataFormEditor");
+                    editor.Classes.Add("DataFormEditorTextBox");
                 }
 
                 return new ScrollViewer
