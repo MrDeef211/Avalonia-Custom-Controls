@@ -46,7 +46,7 @@
                                   ZoomState="{Binding ZoomState}"
                                   Background="LightGray"
                                   MaxScale="50"
-                                  MinScale="0.1"
+                                  MinScale="0.5"
                                   RestrictPan="True">
                 <Panel>
                     <Image Source="{Binding CurrentImage}"

@@ -608,40 +608,80 @@ public class ZoomControl : ContentControl
 
     private Matrix ClampMatrix(Matrix matrix)
     {
-        double scale = matrix.M11;
-        double clampedScale = Math.Clamp(scale, MinScale, MaxScale);
+        double scale = matrix.M11; 
+        scale = Math.Clamp(scale, MinScale, MaxScale);
 
-        Matrix correctedMatrix = matrix;
-        if (Math.Abs(scale - clampedScale) > 0.0001)
-        {
-            correctedMatrix = new Matrix(
-                clampedScale, matrix.M12,
-                matrix.M21, clampedScale,
-                matrix.M31, matrix.M32);
-
-            scale = clampedScale;
-        }
-
-        if (!RestrictPan || _presenter?.Child == null) return correctedMatrix;
+        if (!RestrictPan || _presenter?.Child == null)
+            return new Matrix(scale, 0, 0, scale, matrix.M31, matrix.M32);
 
         var content = _presenter.Child;
 
-        double virtualAreaWidth = Bounds.Width / MinScale;
-        double virtualAreaHeight = Bounds.Height / MinScale;
+        double baseWidth = Bounds.Width;
+        double baseHeight = Bounds.Height;
+        double contentWidth = content.Bounds.Width;
+        double contentHeight = content.Bounds.Height;
 
-        double minX = Bounds.Width - content.Bounds.Width * scale - (virtualAreaWidth - Bounds.Width) / 2;
-        double maxX = (virtualAreaWidth - Bounds.Width) / 2;
-        double minY = Bounds.Height - content.Bounds.Height * scale - (virtualAreaHeight - Bounds.Height) / 2;
-        double maxY = (virtualAreaHeight - Bounds.Height) / 2;
+        double visibleWidthAtMinScale = baseWidth / MinScale;
+        double visibleHeightAtMinScale = baseHeight / MinScale;
 
-        if (minX > maxX) (minX, maxX) = (maxX, minX);
-        if (minY > maxY) (minY, maxY) = (maxY, minY);
+        double minXContent, maxXContent, minYContent, maxYContent;
 
-        return new Matrix(
-            correctedMatrix.M11, correctedMatrix.M12,
-            correctedMatrix.M21, correctedMatrix.M22,
-            Math.Clamp(correctedMatrix.M31, minX, maxX),
-            Math.Clamp(correctedMatrix.M32, minY, maxY));
+        if (contentWidth >= visibleWidthAtMinScale)
+        {
+            minXContent = 0;
+            maxXContent = contentWidth;
+        }
+        else
+        {
+            double offset = (visibleWidthAtMinScale - contentWidth) / 2;
+            minXContent = -offset;
+            maxXContent = contentWidth + offset;
+        }
+
+        if (contentHeight >= visibleHeightAtMinScale)
+        {
+            minYContent = 0;
+            maxYContent = contentHeight;
+        }
+        else
+        {
+            double offset = (visibleHeightAtMinScale - contentHeight) / 2;
+            minYContent = -offset;
+            maxYContent = contentHeight + offset;
+        }
+
+        double offsetX = matrix.M31;
+        double offsetY = matrix.M32;
+        double left = -offsetX / scale;
+        double right = (baseWidth - offsetX) / scale;
+        double top = -offsetY / scale;
+        double bottom = (baseHeight - offsetY) / scale;
+
+        if (right - left > maxXContent - minXContent)
+        {
+            offsetX = (baseWidth - contentWidth * scale) / 2;
+        }
+        else
+        {
+            if (left < minXContent)
+                offsetX = -minXContent * scale;
+            if (right > maxXContent)
+                offsetX = baseWidth - maxXContent * scale;
+        }
+
+        if (bottom - top > maxYContent - minYContent)
+        {
+            offsetY = (baseHeight - contentHeight * scale) / 2;
+        }
+        else
+        {
+            if (top < minYContent)
+                offsetY = -minYContent * scale;
+            if (bottom > maxYContent)
+                offsetY = baseHeight - maxYContent * scale;
+        }
+
+        return new Matrix(scale, 0, 0, scale, offsetX, offsetY);
     }
 
     private bool IsMovementKeyPressed() =>
