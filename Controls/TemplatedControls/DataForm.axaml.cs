@@ -83,7 +83,7 @@ public class DataForm : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<double> LabelFontSizeProperty =
-        AvaloniaProperty.Register<DataForm, double>(nameof(LabelFontSize), 12.0);
+        AvaloniaProperty.Register<DataForm, double>(nameof(LabelFontSize), 10.0);
 
     /// <summary>
     /// Размер шрифта колонки имён свойств.
@@ -119,7 +119,7 @@ public class DataForm : BaseEditorControl, IDisposable
     }
 
     public static readonly StyledProperty<double> CategoryHeaderFontSizeProperty =
-        AvaloniaProperty.Register<DataForm, double>(nameof(CategoryHeaderFontSize), 14.0);
+        AvaloniaProperty.Register<DataForm, double>(nameof(CategoryHeaderFontSize), 12.0);
 
     /// <summary>
     /// Размер шрифта заголовков

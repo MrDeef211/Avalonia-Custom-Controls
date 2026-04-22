@@ -1,8 +1,10 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Styling;
 using Controls.Models;
 
 namespace Controls.Selectors
@@ -17,8 +19,8 @@ namespace Controls.Selectors
                 {
                     var checkBox = new CheckBox
                     {
+                        Margin = new Avalonia.Thickness(0),
                         VerticalAlignment = VerticalAlignment.Center,
-                        Margin = new Avalonia.Thickness(0)
                     };
                     checkBox.Bind(CheckBox.IsCheckedProperty, new Binding("Value") { Mode = BindingMode.TwoWay });
                     checkBox.Bind(CheckBox.IsEnabledProperty, new Binding("IsEditable"));
@@ -34,7 +36,7 @@ namespace Controls.Selectors
                         Height = 24,
                         FontSize = 12,
                         Padding = new Avalonia.Thickness(4, 2),
-                        VerticalAlignment = VerticalAlignment.Center
+                        VerticalAlignment = VerticalAlignment.Center,
                     };
                     combo.ItemsSource = model.EnumDisplayItems;
                     combo.DisplayMemberBinding = new Binding("DisplayName");
@@ -47,11 +49,12 @@ namespace Controls.Selectors
                 {
                     var numeric = new NumericUpDown
                     {
-                        Height = 24,
-                        FontSize = 12,
-                        Padding = new Avalonia.Thickness(4, 2),
-                        VerticalAlignment = VerticalAlignment.Center
+                        
                     };
+                    if (Application.Current!.TryFindResource("NumericUpDownDataFormEditor", out var theme))
+                    {
+                        numeric.Theme = (ControlTheme)theme;
+                    }
                     numeric.Bind(NumericUpDown.ValueProperty, new Binding("Value") { Mode = BindingMode.TwoWay });
                     numeric.Bind(NumericUpDown.IsEnabledProperty, new Binding("IsEditable"));
 
@@ -74,7 +77,7 @@ namespace Controls.Selectors
                         Height = 24,
                         FontSize = 12,
                         Padding = new Avalonia.Thickness(4, 2),
-                        VerticalAlignment = VerticalAlignment.Center
+                        VerticalAlignment = VerticalAlignment.Center,
                     };
                     picker.Bind(DatePicker.SelectedDateProperty, new Binding("DateValue") { Mode = BindingMode.TwoWay });
                     picker.Bind(DatePicker.IsEnabledProperty, new Binding("IsEditable"));
@@ -88,7 +91,7 @@ namespace Controls.Selectors
                         Height = 24,
                         FontSize = 12,
                         Padding = new Avalonia.Thickness(4, 2),
-                        VerticalAlignment = VerticalAlignment.Center
+                        VerticalAlignment = VerticalAlignment.Center,
                     };
                     textBox.Bind(TextBox.TextProperty, new Binding("Value") { Mode = BindingMode.TwoWay });
                     textBox.Bind(TextBox.IsEnabledProperty, new Binding("IsEditable"));
@@ -102,6 +105,9 @@ namespace Controls.Selectors
                     HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
                     VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Padding = new Thickness(0),                  
+                    Margin = new Thickness(0),
                     Classes = { "DataFormEditorScroll" }
                 };
             }

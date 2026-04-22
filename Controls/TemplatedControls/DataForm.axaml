@@ -47,7 +47,8 @@
                                                     Grid.ColumnSpan="{Binding EditorColumnSpan}"
                                                     Content="{Binding}"
                                                     ContentTemplate="{StaticResource EditorTemplateSelector}"
-                                                    HorizontalAlignment="Stretch" />
+                                                    HorizontalAlignment="Stretch" 
+                                                    VerticalAlignment="Top"/>
 
                                     <TextBlock Grid.Column="2"
                                                Classes="DataFormErrorIcon"
@@ -114,7 +115,8 @@
                                         <ContentControl Grid.Column="1"
                                                         Content="{Binding}"
                                                         ContentTemplate="{StaticResource EditorTemplateSelector}"
-                                                        HorizontalAlignment="Stretch" />
+                                                        HorizontalAlignment="Stretch" 
+                                                        VerticalAlignment="Center"/>
 
                                         <TextBlock Grid.Column="2"
                                                    Classes="DataFormErrorIcon"
@@ -210,11 +212,12 @@
                                                 </DockPanel>
                                             </Button>
 
-                                            <ItemsControl ItemsSource="{Binding Rows}" IsVisible="{Binding IsExpanded}">
+                                            <ItemsControl ItemsSource="{Binding Rows}" IsVisible="{Binding IsExpanded}" VerticalAlignment="Center">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate DataType="models:FormRowModel">
                                                         <ContentControl Content="{Binding}"
-                                                                        ContentTemplate="{StaticResource RowTemplateSelector}" />
+                                                                        ContentTemplate="{StaticResource RowTemplateSelector}" 
+                                                                        VerticalAlignment="Center"/>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
