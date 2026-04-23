@@ -109,8 +109,8 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _holeColor, value);
         }
 
-        private IImage _centerImage;
-        public IImage CenterImage
+        private IImage? _centerImage;
+        public IImage? CenterImage
         {
             get => _centerImage;
             set => this.RaiseAndSetIfChanged(ref _centerImage, value);
@@ -140,7 +140,6 @@ namespace Demonstrations.Desktop.ViewModels
         public ReactiveCommand<Unit, Unit> PickCenterImageCommand { get; }
 
         // Взаимодействия для диалогов
-        public Interaction<Unit, IBrush?> ShowColorPicker { get; }
         public Interaction<Unit, string?> ShowOpenFileDialog { get; }
 
         private async Task PickCenterImageAsync()

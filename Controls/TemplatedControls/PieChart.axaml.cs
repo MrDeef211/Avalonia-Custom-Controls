@@ -56,8 +56,8 @@ public class PieChart : TemplatedControl
     public static readonly StyledProperty<IBrush> HoleColorProperty =
         AvaloniaProperty.Register<PieChart, IBrush>(nameof(HoleColor), Brushes.White);
 
-    public static readonly StyledProperty<IImage> CenterImageProperty =
-        AvaloniaProperty.Register<PieChart, IImage>(nameof(CenterImage), null);
+    public static readonly StyledProperty<IImage?> CenterImageProperty =
+        AvaloniaProperty.Register<PieChart, IImage?>(nameof(CenterImage), null);
 
     public static readonly StyledProperty<double> ImageZoomProperty =
         AvaloniaProperty.Register<PieChart, double>(nameof(ImageZoom), 100);
@@ -226,7 +226,7 @@ public class PieChart : TemplatedControl
     /// <summary>
     /// Изображение в центре отверсия
     /// </summary>
-    public IImage CenterImage
+    public IImage? CenterImage
     {
         get => GetValue(CenterImageProperty);
         set => SetValue(CenterImageProperty, value);

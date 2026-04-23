@@ -122,7 +122,7 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _fillMode, value);
         }
 
-        public IEnumerable<FillMode> AllFillModes => Enum.GetValues(typeof(FillMode)).Cast<FillMode>();
+        public static IEnumerable<FillMode> AllFillModes => Enum.GetValues(typeof(FillMode)).Cast<FillMode>();
 
         private IBrush _fillBrush = Brushes.DodgerBlue;
         public IBrush FillBrush
@@ -168,7 +168,7 @@ namespace Demonstrations.Desktop.ViewModels
 
         public ReactiveCommand<Unit, Unit> RandomizeCommand { get; }
 
-        private bool IsValidGridLength(string? input)
+        private static bool IsValidGridLength(string? input)
         {
             if (string.IsNullOrWhiteSpace(input)) return false;
             try

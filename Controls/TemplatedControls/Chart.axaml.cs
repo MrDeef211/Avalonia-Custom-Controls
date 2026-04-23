@@ -821,8 +821,8 @@ public class Chart : TemplatedControl
         for (int i = 0; i < points.Count; i++)
         {
             var sp = screenPoints[i];
-            double dist = Math.Sqrt(Math.Pow(sp.X - _mousePosition.Value.X, 2) +
-                                    Math.Pow(sp.Y - _mousePosition.Value.Y, 2));
+            double dist = Math.Sqrt(Math.Pow(sp.X - (_mousePosition?.X ?? 0), 2) +
+                                    Math.Pow(sp.Y - (_mousePosition?.Y ?? 0), 2));
 
             if (dist < 30 && dist < minDistance)
             {
@@ -842,7 +842,7 @@ public class Chart : TemplatedControl
             string tooltipText = $"X: {FormatNumber(data.Key)}\nY: {FormatNumber(data.Value)}";
             var ft = new FormattedText(
                 tooltipText,
-                System.Globalization.CultureInfo.InvariantCulture,
+                CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight,
                 Typeface.Default,
                 TooltipFontSize,
