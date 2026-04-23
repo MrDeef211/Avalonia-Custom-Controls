@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Project Path="Controls.Tests/Controls.Tests.csproj" Id="fed61206-01bc-4290-9e8e-435137714e4b" />
   <Project Path="Controls/Controls.csproj" />
   <Project Path="Demonstrations.Desktop/Demonstrations.Desktop.csproj" />

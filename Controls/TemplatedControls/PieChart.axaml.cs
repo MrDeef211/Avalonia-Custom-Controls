@@ -19,7 +19,7 @@ public class PieChart : TemplatedControl
     // индекс сектора под курсором
     private int? _hoverSectorIndex = null;
     // кэшированные данные секторов
-    private List<SectorData> _sectors = new();
+    private List<SectorData> _sectors = [];
 
     #region Styled Property
 
@@ -27,7 +27,7 @@ public class PieChart : TemplatedControl
         AvaloniaProperty.Register<PieChart, PieChartDataBase>(nameof(Content), new PieChartDataBase());
 
     public static readonly StyledProperty<IList<IBrush>> SectorColorsProperty =
-        AvaloniaProperty.Register<PieChart, IList<IBrush>>(nameof(SectorColors), new List<IBrush>());
+        AvaloniaProperty.Register<PieChart, IList<IBrush>>(nameof(SectorColors), []);
 
     public static readonly StyledProperty<bool> HighlightSectorProperty =
         AvaloniaProperty.Register<PieChart, bool>(nameof(HighlightSector), true);
@@ -182,7 +182,7 @@ public class PieChart : TemplatedControl
         {
             if (value < 0 || value > 1)
             {
-                throw new ArgumentOutOfRangeException("InnerRadius дожен входить в диапазон от 0 до 1");
+                throw new ArgumentOutOfRangeException(nameof(InnerRadius), " дожен входить в диапазон от 0 до 1");
             }
 
             SetValue(InnerRadiusProperty, value);
@@ -199,7 +199,7 @@ public class PieChart : TemplatedControl
         {
             if (value < 0 || value > 360)
             {
-                throw new ArgumentOutOfRangeException("StartAngle дожен входить в диапазон от 0 до 360");
+                throw new ArgumentOutOfRangeException(nameof(StartAngle), "дожен входить в диапазон от 0 до 360");
             }                
             SetValue(StartAngleProperty, value);
         }
@@ -242,7 +242,7 @@ public class PieChart : TemplatedControl
         {
             if (value < 0)
             {
-                throw new ArgumentOutOfRangeException("ImageZoom дожен быть больше 0");
+                throw new ArgumentOutOfRangeException(nameof(ImageZoom), " дожен быть больше 0");
             }
 
             SetValue(ImageZoomProperty, value);
@@ -294,6 +294,9 @@ public class PieChart : TemplatedControl
         set => SetValue(LabelFontStyleProperty, value);
     }
 
+    /// <summary>
+    /// Смещение размера при выделении в относительных единицах.
+    /// </summary>
     public double SizeShift
     {
         get => GetValue(SizeShiftProperty);
@@ -301,7 +304,7 @@ public class PieChart : TemplatedControl
         {
             if (value < 0)
             {
-                throw new ArgumentOutOfRangeException("SizeShift дожен быть больше 0");
+                throw new ArgumentOutOfRangeException(nameof(SizeShift), " дожен быть больше 0");
             }
 
             SetValue(SizeShiftProperty, value);
@@ -383,7 +386,7 @@ public class PieChart : TemplatedControl
         {
             var sec = _sectors[i];
             // Нормализуем, если меньше нуля
-            // Нужно из-за около костыльного сдвига угла на 90 градусов
+            // Нужно из-за сдвига угла на 90 градусов
             double start = sec.StartAngle < 0 ? (sec.StartAngle + 360) % 360.0 : sec.StartAngle % 360.0;
             double end = (start + sec.SweepAngle) % 360.0;
             if (sec.SweepAngle > 0)
@@ -459,7 +462,7 @@ public class PieChart : TemplatedControl
         if (sweepDeg <= 0) return;
 
         var (offset, effectiveOuterR, effectiveInnerR, effectiveStartDeg, effectiveSweepDeg)
-            = GetHighlightTransform(center.X, center.Y, outerR, innerR, startDeg, sweepDeg, isHighlighted);
+            = GetHighlightTransform(outerR, innerR, startDeg, sweepDeg, isHighlighted);
 
         double startRad = effectiveStartDeg * Math.PI / 180;
         double sweepRad = effectiveSweepDeg * Math.PI / 180;
@@ -483,13 +486,13 @@ public class PieChart : TemplatedControl
             }
             else
             {
-                Point outerStart = new Point(center.X + effectiveOuterR * Math.Cos(startRad) + offset.X,
+                Point outerStart = new(center.X + effectiveOuterR * Math.Cos(startRad) + offset.X,
                                              center.Y + effectiveOuterR * Math.Sin(startRad) + offset.Y);
-                Point outerEnd = new Point(center.X + effectiveOuterR * Math.Cos(endRad) + offset.X,
+                Point outerEnd = new(center.X + effectiveOuterR * Math.Cos(endRad) + offset.X,
                                            center.Y + effectiveOuterR * Math.Sin(endRad) + offset.Y);
-                Point innerStart = new Point(center.X + effectiveInnerR * Math.Cos(startRad) + offset.X,
+                Point innerStart = new(center.X + effectiveInnerR * Math.Cos(startRad) + offset.X,
                                              center.Y + effectiveInnerR * Math.Sin(startRad) + offset.Y);
-                Point innerEnd = new Point(center.X + effectiveInnerR * Math.Cos(endRad) + offset.X,
+                Point innerEnd = new(center.X + effectiveInnerR * Math.Cos(endRad) + offset.X,
                                            center.Y + effectiveInnerR * Math.Sin(endRad) + offset.Y);
 
                 ctx.BeginFigure(outerStart, true);
@@ -632,7 +635,7 @@ public class PieChart : TemplatedControl
     /// Рассчитывает модифицированные параметры для отрисовки выделенного сектора.
     /// </summary>
     private (Point offset, double outerRadius, double innerRadius, double startAngle, double sweepAngle)
-        GetHighlightTransform(double centerX, double centerY, double originalOuterR, double originalInnerR,
+        GetHighlightTransform(double originalOuterR, double originalInnerR,
                               double originalStartDeg, double originalSweepDeg, bool isHighlighted)
     {
         if (!isHighlighted || !HighlightSector)
@@ -643,7 +646,7 @@ public class PieChart : TemplatedControl
 
         double midRad = (originalStartDeg + originalSweepDeg / 2) * Math.PI / 180;
         double shift = originalOuterR * pushFactor;
-        Point offset = new Point(0, 0);
+        Point offset = new(0, 0);
 
         double newOuterR = originalOuterR;
         double newInnerR = originalInnerR;
@@ -681,17 +684,15 @@ public class PieChart : TemplatedControl
 
                 offset = new Point(Math.Cos(midRad) * shift, Math.Sin(midRad) * shift);
                 double ScalOffset = Math.Sqrt(offset.X * offset.X + offset.Y * offset.Y);
-                newOuterR = Math.Max(originalOuterR * (1 - pushFactor) - ScalOffset, (originalOuterR + originalInnerR) / 2);
 
-                if (InnerRadius < 0.1 || InnerRadius > 0.75)
-                    newInnerR = Math.Min(originalInnerR * (1 + pushFactor * 0.3), (originalOuterR + 2 * originalInnerR) / 3);
-                else
-                    newInnerR = Math.Min(originalInnerR + originalOuterR * pushFactor * 0.5, (originalOuterR + 2 * originalInnerR) / 3);
+                newOuterR = Math.Max(originalOuterR * (1 - pushFactor) - ScalOffset, (originalOuterR + originalInnerR) / 2);
+                newInnerR = Math.Min(originalInnerR * (1 + pushFactor), (originalOuterR + 2 * originalInnerR) / 3);
 
                 double angleDelta = originalSweepDeg * reduceAngleFactor / 2;
 
                 newStartDeg = originalStartDeg + angleDelta;
                 newSweepDeg = originalSweepDeg - 2 * angleDelta;
+
                 if (newSweepDeg <= 0) newSweepDeg = 0.1; 
                 break;
         }
@@ -712,7 +713,7 @@ public class PieChart : TemplatedControl
         if (total <= 0) return;
 
         double currentAngle = StartAngle;
-        var colors = SectorColors ?? new List<IBrush>();
+        var colors = SectorColors ?? [];
         var defaultColors = GetDefaultColors();
         int idx = 0;
         foreach (var pair in Content.Chart)
@@ -741,10 +742,10 @@ public class PieChart : TemplatedControl
     /// Цвета по умолчанию
     /// </summary>
     /// <returns></returns>
-    private IBrush[] GetDefaultColors()
+    private static IBrush[] GetDefaultColors()
     {
-        return new IBrush[]
-        {
+        return
+        [
                 Brushes.DodgerBlue,
                 Brushes.OrangeRed,
                 Brushes.Gold,
@@ -753,7 +754,7 @@ public class PieChart : TemplatedControl
                 Brushes.HotPink,
                 Brushes.Teal,
                 Brushes.Coral
-        };
+        ];
     }
 
 

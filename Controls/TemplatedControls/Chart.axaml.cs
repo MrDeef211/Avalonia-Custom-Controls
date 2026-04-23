@@ -771,7 +771,7 @@ public class Chart : TemplatedControl
 
         // Засечки и подписи по Y
         var yVals = LabelModeY == AxisLabelMode.Points
-            ? points.Select(p => p.Value).Distinct().ToList()
+            ? [.. points.Select(p => p.Value).Distinct()]
             : yLabels;
 
         foreach (var val in yVals)
@@ -800,7 +800,7 @@ public class Chart : TemplatedControl
 
             if (ShowPointsLabels)
             {
-                double TextAngle = 0;
+                double TextAngle;
                 TextAngle = CountToSpace(FilteredData.Count) < TiltThreshold * 2 ? (CountToSpace(FilteredData.Count) < TiltThreshold ? -60 : -45) : 0;
 
                 DrawText(context, FormatNumber(point.Value), new Point(nPoint.X, nPoint.Y - 15),
@@ -873,11 +873,13 @@ public class Chart : TemplatedControl
             FlowDirection.LeftToRight,
             typeface,
             fontSize ?? AxisLabelFontSize,
-            brush ?? AxisColor);
-
-        ft.TextAlignment = align;
+            brush ?? AxisColor)
+        {
+            TextAlignment = align
+        };
 
         var transform = Matrix.CreateTranslation(pos.X, pos.Y);
+
         if (angle != 0)
             transform = Matrix.CreateRotation(Math.PI * angle / 180) * transform;
 
@@ -895,7 +897,7 @@ public class Chart : TemplatedControl
     /// <summary>
     /// Возвращает список значений для линий сетки с автоматическим или заданным шагом.
     /// </summary>
-    private List<double> GetGridValues(double min, double max, GridLength size, double pixels, double autoPx)
+    private static List<double> GetGridValues(double min, double max, GridLength size, double pixels, double autoPx)
     {
         var res = new List<double>();
         double range = max - min;
@@ -933,12 +935,12 @@ public class Chart : TemplatedControl
     /// <summary>
     /// Возвращает список значений для подписей осей в зависимости от режима.
     /// </summary>
-    private List<double> GetLabelValues(double min, double max, AxisLabelMode mode, GridLength gSize,
+    private static List<double> GetLabelValues(double min, double max, AxisLabelMode mode, GridLength gSize,
         double pixels, List<KeyValuePair<double, double>> points, bool isY)
     {
-        if (mode == AxisLabelMode.None) return new List<double>();
+        if (mode == AxisLabelMode.None) return [];
         if (mode == AxisLabelMode.Points)
-            return isY ? points.Select(p => p.Value).Distinct().ToList() : points.Select(p => p.Key).ToList();
+            return isY ? [..points.Select(p => p.Value).Distinct()] : [..points.Select(p => p.Key)];
 
         if (mode == AxisLabelMode.Grid)
             return GetGridValues(min, max, gSize, pixels, isY ? 100 : 200);
@@ -974,8 +976,8 @@ public class Chart : TemplatedControl
 
         FilteredData = new(Content.Chart);
 
-        _sortedVisiblePoints = FilteredData.Chart.OrderBy(p => p.Key).ToList();
-        _sortedContentPoints = Content.Chart.OrderBy(p => p.Key).ToList();
+        _sortedVisiblePoints = [..FilteredData.Chart.OrderBy(p => p.Key)];
+        _sortedContentPoints = [..Content.Chart.OrderBy(p => p.Key)];
 
         _minX = _sortedContentPoints[0].Key;
         _maxX = _sortedContentPoints[^1].Key;
@@ -1084,7 +1086,7 @@ public class Chart : TemplatedControl
     /// <summary>
     /// Форматирует число для отображения на осях и в подсказках.
     /// </summary>
-    private string FormatNumber(double value)
+    private static string FormatNumber(double value)
     {
         double abs = Math.Abs(value);
         if (abs >= 1_000_000) return (value / 1_000_000).ToString("0.#") + "M";

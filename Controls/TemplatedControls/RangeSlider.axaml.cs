@@ -385,17 +385,15 @@ public class RangeSlider : TemplatedControl
             }
         });
 
-        if (_trackCanvas != null)
+        _trackCanvas?.GetObservable(BoundsProperty).Subscribe(bounds =>
         {
-            _trackCanvas.GetObservable(BoundsProperty).Subscribe(bounds =>
+            if (bounds.Width > 0)
             {
-                if (bounds.Width > 0)
-                {
-                    UpdateThumbPositions();
-                    InvalidateVisual();
-                }
-            });
-        }
+                UpdateThumbPositions();
+                InvalidateVisual();
+            }
+        });
+
 
         Dispatcher.UIThread.Post(() =>
         {
@@ -460,7 +458,6 @@ public class RangeSlider : TemplatedControl
 
     private void OnTextBoxKeyDown(object sender, KeyEventArgs e)
     {
-        var textBox = (TextBox)sender;
         if (e.Key == Key.Back || e.Key == Key.Delete || e.Key == Key.Enter || e.Key == Key.Tab ||
             e.Key == Key.Escape || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Home ||
             e.Key == Key.End || (e.KeyModifiers == KeyModifiers.Control && (e.Key == Key.V || e.Key == Key.X || e.Key == Key.C)))
@@ -617,17 +614,17 @@ public class RangeSlider : TemplatedControl
         if (range <= 0) return ticks;
 
         double step;
+        int count;
         if (TickStep.IsAuto)
         {
             int desiredCount = Math.Max(2, (int)(trackLength / 15));
-            int count = GetNearestDivisor(desiredCount);
+            count = GetNearestDivisor(desiredCount);
             step = range / (count - 1);
             step = RoundToNiceNumber(step);
-            count = (int)Math.Round(range / step) + 1;
         }
         else if (TickStep.IsStar)
         {
-            int count = (int)TickStep.Value;
+            count = (int)TickStep.Value;
             if (count < 2) return ticks;
             step = range / (count);
         }
@@ -669,7 +666,7 @@ public class RangeSlider : TemplatedControl
 
     #region Методы для расчётов
 
-    private int GetNearestDivisor(int desiredCount)
+    private static int GetNearestDivisor(int desiredCount)
     {
         var divisors = new[] { 2, 4, 5, 10, 20, 25, 50, 100 };
         int best = divisors[0];
@@ -681,7 +678,7 @@ public class RangeSlider : TemplatedControl
         return best;
     }
 
-    private double RoundToNiceNumber(double value)
+    private static double RoundToNiceNumber(double value)
     {
         double magnitude = Math.Pow(10, Math.Floor(Math.Log10(value)));
         double normalized = value / magnitude;

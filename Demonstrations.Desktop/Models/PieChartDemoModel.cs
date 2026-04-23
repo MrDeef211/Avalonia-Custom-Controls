@@ -17,8 +17,8 @@ namespace Demonstrations.Desktop.Models
             _generator = new PieChartGenerator();
             PieChart = _generator.GenerateDefaultData();
 
-            SectorColors = new List<IBrush>
-            {
+            SectorColors =
+            [
                 Brushes.DodgerBlue,
                 Brushes.OrangeRed,
                 Brushes.Gold,
@@ -27,7 +27,7 @@ namespace Demonstrations.Desktop.Models
                 Brushes.HotPink,
                 Brushes.Teal,
                 Brushes.Coral
-            };
+            ];
         }
 
         private PieChartDataBase _pieChart;

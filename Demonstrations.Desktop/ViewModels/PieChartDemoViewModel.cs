@@ -54,8 +54,9 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _highlightSector, value);
         }
 
-        public IEnumerable<HighlightType> AllHighlightType =>
-            Enum.GetValues(typeof(HighlightType)).Cast<HighlightType>();
+        public static IEnumerable<HighlightType> AllHighlightType =>
+            Enum.GetValues<HighlightType>().Cast<HighlightType>();
+        
         private HighlightType _highlightType = HighlightType.Push;
         public HighlightType HighlightType
         {
@@ -77,8 +78,9 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _showPercentages, value);
         }
 
-        public IEnumerable<LabelPlacement> AllLabelPlacements =>
-            Enum.GetValues(typeof(LabelPlacement)).Cast<LabelPlacement>();
+        public static IEnumerable<LabelPlacement> AllLabelPlacements =>
+            Enum.GetValues<LabelPlacement>().Cast<LabelPlacement>();
+
         private LabelPlacement _labelPlacement = LabelPlacement.Outside;
         public LabelPlacement LabelPlacement
         {
@@ -122,8 +124,9 @@ namespace Demonstrations.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _imageZoom, value);
         }
 
-        public IEnumerable<ImageScaling> AllImageScaling =>
-            Enum.GetValues(typeof(ImageScaling)).Cast<ImageScaling>();
+        public static IEnumerable<ImageScaling> AllImageScaling =>
+            Enum.GetValues<ImageScaling>().Cast<ImageScaling>();
+
         private ImageScaling _imageScaling;
         public ImageScaling ImageScaling
         {

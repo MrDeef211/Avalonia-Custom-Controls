@@ -24,7 +24,7 @@ public class ZoomControl : ContentControl
     private bool _isDragging;
     private DispatcherTimer _animationTimer;
 
-    private readonly HashSet<Key> _pressedKeys = new();
+    private readonly HashSet<Key> _pressedKeys = [];
 
     private readonly LinkedList<Matrix> _undoStack = new();
     private readonly Stack<Matrix> _redoStack = new();
@@ -82,7 +82,7 @@ public class ZoomControl : ContentControl
             if (value >= 0.1 && value <= 0.5)
                 SetValue(SmoothnessProperty, value);
             else
-                throw new ArgumentOutOfRangeException(nameof(Smoothness) + " должен быть в диапазоне от 0.1 до 0.5");
+                throw new ArgumentOutOfRangeException(nameof(Smoothness), " должен быть в диапазоне от 0.1 до 0.5");
         }
     }
 
