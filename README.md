@@ -19,6 +19,14 @@
 </Application>
 ```
 
+Также добавьте ссылку в view
+```xml
+<Window xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Controls"
+             ...>
+</Window>
+```
 Для библиотеки нужны AvaloniaUI и ReactiveUI
 
 ---
