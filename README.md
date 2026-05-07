@@ -492,6 +492,9 @@ MyChart.Content = data;
 | `GridSizeY`	| `GridLength`	| `Auto`	| Шаг сетки по `Y`. | 
 | `Axis`	| `bool`	| `true`	| Показывать оси координат (`X` и `Y`). | 
 | `AxisColor`	| `IBrush`	| `Green`	| Цвет осей и засечек. | 
+| `XDate`	| `bool`	| `False`	| Интерпретировать ли значения по оси X как даты. | 
+| `XDateFormatString`	| `string`	| `"g"`	| Формат даты и времени. | 
+
 
 ### Подписи точек
 
