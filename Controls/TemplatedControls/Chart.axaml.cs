@@ -118,7 +118,7 @@ public class Chart : TemplatedControl
         AvaloniaProperty.Register<Chart, KeyModifiers>(nameof(InteractiveModifier), KeyModifiers.None);
 
     public static readonly StyledProperty<double> AxisLabelFontSizeProperty =
-    AvaloniaProperty.Register<Chart, double>(nameof(AxisLabelFontSize), 10.0);
+        AvaloniaProperty.Register<Chart, double>(nameof(AxisLabelFontSize), 10.0);
 
     public static readonly StyledProperty<FontFamily> AxisLabelFontFamilyProperty =
         AvaloniaProperty.Register<Chart, FontFamily>(nameof(AxisLabelFontFamily), FontFamily.Default);
@@ -137,6 +137,12 @@ public class Chart : TemplatedControl
 
     public static readonly StyledProperty<double> TiltThresholdProperty =
         AvaloniaProperty.Register<Chart, double>(nameof(TiltThreshold), 24.0);
+
+    public static readonly StyledProperty<bool> XDateProperty =
+        AvaloniaProperty.Register<Chart, bool>(nameof(XDate), false);
+
+    public static readonly StyledProperty<string> XDateFormatStringProperty =
+        AvaloniaProperty.Register<Chart, string>(nameof(XDateFormatString), "g");
 
     #endregion 
 
@@ -167,7 +173,9 @@ public class Chart : TemplatedControl
             AxisLabelFontStyleProperty,
             PointLabelFontSizeProperty,
             TooltipFontSizeProperty,
-            TiltThresholdProperty);
+            TiltThresholdProperty,
+            XDateProperty,
+            XDateFormatStringProperty);
 
     }
 
@@ -440,6 +448,21 @@ public class Chart : TemplatedControl
     {
         get => GetValue(TiltThresholdProperty);
         set => SetValue(TiltThresholdProperty, value);
+    }
+
+    /// <summary>
+    /// Определяет, интерпретировать ли значения по оси X как даты (формат OLE Automation).
+    /// </summary>
+    public bool XDate
+    {
+        get => GetValue(XDateProperty);
+        set => SetValue(XDateProperty, value);
+    }
+
+    public string XDateFormatString
+    {
+        get => GetValue(XDateFormatStringProperty);
+        set => SetValue(XDateFormatStringProperty, value);
     }
 
     #endregion
@@ -765,7 +788,7 @@ public class Chart : TemplatedControl
             context.DrawLine(_axisPen, new Point(p.X, _axisY - 3), new Point(p.X, _axisY + 3));
 
             // Подпись
-            DrawText(context, FormatNumber(val), new Point(p.X, _axisY + 15), angleX,
+            DrawText(context, FormatX(val), new Point(p.X, _axisY + 15), angleX,
                 angleX != 0 ? TextAlignment.Right : TextAlignment.Center);
         }
 
@@ -839,7 +862,7 @@ public class Chart : TemplatedControl
 
             context.DrawEllipse(null, new Pen(ChartColor, ChartThickness), p, ChartThickness * 2.5, ChartThickness * 2.5);
 
-            string tooltipText = $"X: {FormatNumber(data.Key)}\nY: {FormatNumber(data.Value)}";
+            string tooltipText = $"X: {FormatX(data.Key)}\nY: {FormatNumber(data.Value)}";
             var ft = new FormattedText(
                 tooltipText,
                 CultureInfo.InvariantCulture,
@@ -1050,35 +1073,57 @@ public class Chart : TemplatedControl
     /// <param name="delta">Относительная величина, которая прибавится к величине диапазона</param>
     private void ZoomChart(Point point, double delta)
     {
-        
-        double step = Math.Abs(delta);
         double center = point.X;
+        double range = Maximum - Minimum;
 
-        double dxUp = (Maximum - center) * step;
-        double dxDw = (center - Minimum) * step;
-        dxUp = dxUp < 1 ? 1 : dxUp;
-        dxDw = dxDw < 1 ? 1 : dxDw;
+        double scale = (delta > 0) ? (1 - Math.Abs(delta)) : (1 + Math.Abs(delta));
+        double newRange = range * scale;
+        if (newRange <= 0) return;
 
-        var sortedKeys = FilteredData.Chart.Keys.OrderBy(k => k).ToList();
+        double newMin = center - (center - Minimum) * scale;
+        double newMax = center + (Maximum - center) * scale;
 
-        double aproxDelta = sortedKeys
-            .Zip(sortedKeys.Skip(1), (current, next) => next - current)
-            .Average();
+        newMin = Math.Max(newMin, _minX);
+        newMax = Math.Min(newMax, _maxX);
+
+        if (newMax - newMin < 1e-10) return;
 
         if (delta > 0)
         {
-            var newMax = Maximum - (Maximum - dxUp > center + aproxDelta ? dxUp : 0);
-            var newMin = Minimum + (Minimum + dxDw < center - aproxDelta ? dxDw : 0);
-            SetValue(MaximumProperty, newMax);
-            SetValue(MinimumProperty, newMin);
+            var pointsInRange = _sortedContentPoints
+                .Where(p => p.Key >= newMin && p.Key <= newMax)
+                .ToList();
+
+            if (pointsInRange.Count < 2)
+            {
+                int idx = _sortedContentPoints.BinarySearch(
+                    new KeyValuePair<double, double>(center, 0),
+                    Comparer<KeyValuePair<double, double>>.Create((a, b) => a.Key.CompareTo(b.Key)));
+
+                if (idx < 0) idx = ~idx;
+
+                int leftIdx = Math.Max(0, idx - 1);
+                int rightIdx = Math.Min(_sortedContentPoints.Count - 1, idx);
+
+                if (leftIdx == rightIdx)
+                {
+                    if (leftIdx > 0) leftIdx--;
+                    else if (rightIdx < _sortedContentPoints.Count - 1) rightIdx++;
+                }
+
+                if (leftIdx < rightIdx)
+                {
+                    newMin = Math.Min(newMin, _sortedContentPoints[leftIdx].Key);
+                    newMax = Math.Max(newMax, _sortedContentPoints[rightIdx].Key);
+
+                    newMin = Math.Max(newMin, _minX);
+                    newMax = Math.Min(newMax, _maxX);
+                }
+            }
         }
-        else if (delta < 0)
-        {
-            var newMax = (Maximum + dxUp < _maxX) ? Maximum + dxUp : _maxX;
-            var newMin = (Minimum - dxDw > _minX) ? Minimum - dxDw : _minX;
-            SetValue(MaximumProperty, newMax);
-            SetValue(MinimumProperty, newMin);
-        }
+
+        SetValue(MinimumProperty, newMin);
+        SetValue(MaximumProperty, newMax);
     }
 
     #endregion
@@ -1093,6 +1138,23 @@ public class Chart : TemplatedControl
         if (abs >= 1_000) return (value / 1_000).ToString("0.#") + "k";
         if (abs < 1 && abs > 0) return value.ToString("0.##");
         return value.ToString("0.#");
+    }
+
+    private string FormatX(double value)
+    {
+        if (XDate)
+        {
+            try
+            {
+                DateTime date = DateTime.FromOADate(value);
+                return date.ToString(XDateFormatString, CultureInfo.CurrentCulture);
+            }
+            catch
+            {
+                return "?";
+            }
+        }
+        return FormatNumber(value);
     }
 
     private Point ValueToPoint(double x, double y)
