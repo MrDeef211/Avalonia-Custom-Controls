@@ -105,33 +105,33 @@ namespace Controls.Models
     public class DataFormConfig
     {
 
-        protected internal readonly Dictionary<string, bool> _categoryCollapsible = new();
-        protected internal readonly Dictionary<string, bool> _categoryExpanded = new();
-        protected internal readonly Dictionary<string, DataFormFieldConfig> _fields = new();
-        protected internal readonly Dictionary<string, int> _categoryOrders = new();
+        private protected readonly Dictionary<string, bool> _categoryCollapsible = new();
+        private protected readonly Dictionary<string, bool> _categoryExpanded = new();
+        private protected readonly Dictionary<string, DataFormFieldConfig> _fields = new();
+        private protected readonly Dictionary<string, int> _categoryOrders = new();
 
         /// <summary>
         /// Определяет, могут ли категории сворачиваться пользователем.
         /// Ключ — имя категории, значение — <c>true</c>, если категория сворачиваема.
         /// </summary>
-        public IReadOnlyDictionary<string, bool> CategoryCollapsible => _categoryCollapsible;
+        public IReadOnlyDictionary<string, bool> CategoryCollapsible => new ReadOnlyDictionary<string, bool>(_categoryCollapsible);
 
         /// <summary>
         /// Начальное состояние развёрнутости категорий.
         /// Ключ — имя категории, значение — <c>true</c>, если категория развёрнута по умолчанию.
         /// </summary>
-        public IReadOnlyDictionary<string, bool> CategoryExpanded => _categoryExpanded;
+        public IReadOnlyDictionary<string, bool> CategoryExpanded => new ReadOnlyDictionary<string, bool>(_categoryExpanded);
 
         /// <summary>
         /// Конфигурации отдельных полей по имени свойства.
         /// </summary>
-        public IReadOnlyDictionary<string, DataFormFieldConfig> Fields => _fields;
+        public IReadOnlyDictionary<string, DataFormFieldConfig> Fields => new ReadOnlyDictionary<string, bool>(_fields);
 
         /// <summary>
         /// Порядок отображения категорий.
         /// Ключ — имя категории, значение — порядковый номер (меньше — раньше).
         /// </summary>
-        public IReadOnlyDictionary<string, int> CategoryOrders => _categoryOrders;
+        public IReadOnlyDictionary<string, int> CategoryOrders => new ReadOnlyDictionary<string, bool>(_categoryOrders);
 
         /// <summary>
         /// Добавляет конфигурации отдельных полей по имени свойства.
@@ -144,7 +144,7 @@ namespace Controls.Models
         public void AddFieldRule(string fieldName, DataFormFieldConfig config)
         {
             var normalized = fieldName?.Trim() ?? throw new ArgumentNullException(nameof(fieldName));
-            if (!Fields.ContainsKey(normalized))
+            if (!_fields.ContainsKey(normalized))
                 _fields.TryAdd(normalized, config);
             else
                 _fields[normalized] = MergeConfig(Fields[normalized], config);
@@ -171,7 +171,7 @@ namespace Controls.Models
         public void SetFieldRule(string fieldName, DataFormFieldConfig config)
         {
             var normalized = fieldName?.Trim() ?? throw new ArgumentNullException(nameof(fieldName));
-            if (!Fields.ContainsKey(normalized))
+            if (!_fields.ContainsKey(normalized))
                 _fields.TryAdd(normalized, config);
             else
                 _fields[normalized] = config;
@@ -188,7 +188,7 @@ namespace Controls.Models
         public void SetFieldValidation(string fieldName, DataFormFieldValidation validation)
         {
             var normalized = fieldName?.Trim() ?? throw new ArgumentNullException(nameof(fieldName));
-            if (!Fields.ContainsKey(normalized))
+            if (!_fields.ContainsKey(normalized))
                 _fields.TryAdd(normalized, new DataFormFieldConfig { Validation = validation });
             else
                 _fields[normalized].Validation = validation;
